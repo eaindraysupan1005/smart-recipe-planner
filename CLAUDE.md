@@ -15,8 +15,7 @@ Gate (W5, Sep 9 2026).
 ## Legal & compliance rules — always apply
 
 All agent behaviour and every requirement must comply with the team's legal
-rules in **[W2_Assignment_rule.md_APEX.md](W2_Assignment_rule.md_APEX.md)**
-(the "rule.md" from Week 2). It covers three Thai laws:
+rules in **[rule.md](rule.md)** (from Week 2). It covers three Thai laws:
 
 - **PDPA** — consent, purpose limit, data minimisation, delete raw IDs after
   verification, treat instructor names as personal data, encrypt the link
@@ -48,7 +47,7 @@ separate file only.
     backlog.md                           # prioritised backlog, MoSCoW
     05-log/{YYYYMMDD}-log.md             # work log
 CLAUDE.md
-W2_Assignment_rule.md_APEX.md            # legal/compliance rules (from W2)
+rule.md                                  # legal/compliance rules (from W2)
 ```
 
 ### Requirement spec files (`.docs/01-requirements/01-spec/`)
