@@ -10,7 +10,8 @@ description: >-
 # Audit Backlog
 
 Verify that `.docs/01-requirements/backlog.md` and the specs in
-`.docs/01-requirements/01-spec/` agree.
+`.docs/01-requirements/01-spec/` agree, for the Smart Recipe Planner & Pantry
+Manager.
 
 ## Steps
 
@@ -20,19 +21,23 @@ Verify that `.docs/01-requirements/backlog.md` and the specs in
    - every interview pain ID (`P1`, `P2`, …)
 2. Read `.docs/01-requirements/backlog.md`. Collect every row and its
    `Traces to:` references.
-3. Report three lists:
+3. Report four lists:
    - **Missing** — Must `F` items and every `LR` with no backlog row.
    - **Orphan** — backlog rows whose `Traces to:` points to an ID that does
      not exist in any spec, or is empty.
    - **Priority mismatch** — a backlog row placed under the wrong MoSCoW
      heading versus the spec.
-4. If two items look like the same thing but are worded differently, **do not
+   - **Untraced pain** — a pain (`P<n>`) no functional requirement solves.
+4. **Scope creep check** — every **Must** row must belong to the one core
+   workflow: pantry in → AI recipe → meal calendar → grocery list. Flag any
+   Must row that starts a second workflow.
+5. If two items look like the same thing but are worded differently, **do not
    merge them silently — ask**, and offer at least 3 options (merge / keep
    separate / rename one).
 
 ## Output
 
-A short pass/fail summary, then the three lists above with the exact IDs.
+A short pass/fail summary, then the lists above with the exact IDs.
 Do not edit any file unless the user asks you to fix a specific gap.
 
 ## Rule

@@ -1,49 +1,55 @@
-# Backlog — ElectiveLens
+# Backlog — Smart Recipe Planner & Pantry Manager
 
-Prioritised by MoSCoW. Every row traces to a requirement ID and a real interview
-pain (or a legal requirement). Source spec:
-[20260831-01-elective-review.md](01-spec/20260831-01-elective-review.md).
+Prioritised by MoSCoW. Every row traces to a requirement ID and a pain (or a
+legal requirement). Source spec:
+[20260902-01-pantry-meal-planning.md](01-spec/20260902-01-pantry-meal-planning.md).
+
+> P1–P3 currently come from the Charter §2 problem statement and are **pending
+> interview evidence** before the W5 User Validation Gate.
 
 ## Must
 
 | # | Item | Traces to |
 |---|------|-----------|
-| B1 | Anonymous review submission form: workload / grading / attendance / exam ratings + comment | F1, P1, P2 |
-| B2 | Course page — aggregate ratings for the four dimensions | F2, P1, P2 |
-| B3 | Course page — list of written reviews from verified past students | F3, P1, P2, P3 |
-| B4 | Single always-available elective catalogue (independent of MFU/REG uptime) | F4, P3 |
-| B5 | MFU SSO enrollment verification before reviewing | F5, P1, P2 |
-| B6 | Community Guidelines / Terms acceptance gate before first review | F6, P1 |
-| B7 | Delete raw student ID/email after verification; keep only verified flag | LR1 (PDPA) |
-| B8 | Encrypted anonymous-review <-> account link, admin-only decryption + access audit | LR2 (PDPA) |
-| B9 | Instructor names as personal data (teaching-role context only); SSO stores token only; notices-only messaging without opt-in | LR3 (PDPA) |
-| B10 | Posting log: account ID + IP + timestamp, separate from public review | LR4 (CCA §26) |
-| B11 | Edit/delete log + original content retained >=90 days after deletion | LR5 (CCA §26) |
-| B12 | Extended-retention hold flag (up to 1 year) + retain legally removed reviews internally | LR6 (CCA §26) |
-| B13 | Retrievable Terms/Guidelines acceptance record (user ID, timestamp, version) | LR7 (ETA §9/26) |
-| B14 | Append-only / unalterable moderation decision store | LR8 (ETA §26/28) |
-| B15 | Verified-enrollment badge proof + stored publish confirmation; no CA language without a real CA | LR9 (ETA §9/28) |
+| B1 | Pantry item entry: name + quantity + expiry date | F1, P1 |
+| B2 | Pantry list sorted expiry-first, with "expiring soon" marking | F2, P1 |
+| B3 | AI recipe generation from current pantry, expiry-prioritised | F3, P1, P2 |
+| B4 | Dietary filter profile applied to every generated recipe | F4, P2 |
+| B5 | Weekly calendar: assign a recipe to a day | F5, P2, P3 |
+| B6 | Auto grocery list = planned meals minus pantry stock | F6, P1, P3 |
+| B7 | Save a recipe (AI-generated or manual) for reuse | F7, P2, P3 |
+| B8 | Terms + AI & Food Safety Disclaimer gate before first generation | F8, P2 |
+| B9 | Explicit opt-in for sensitive dietary/allergy data; editable and deletable | LR1 (PDPA) |
+| B10 | AI transfer disclosure + consent; request payload carries ingredients and dietary flags only, no identifiers | LR2 (PDPA) |
+| B11 | Purpose limit on pantry data; full delete on account deletion; login stores token only; no third-party dietary data in a shared list | LR3 (PDPA) |
+| B12 | Creation log: account ID + IP + timestamp, separate from content | LR4 (CCA §26) |
+| B13 | Edit/delete log + original content retained ≥90 days after deletion | LR5 (CCA §26) |
+| B14 | Extended-retention hold flag (up to 1 year); retain removed recipes internally | LR6 (CCA §26) |
+| B15 | Retrievable acceptance & consent records, including withdrawal (user ID, timestamp, version) | LR7 (ETA §9/26) |
+| B16 | Reproducible AI-output record (text, model version, pantry snapshot, filters, timestamp) + stored action confirmations | LR8 (ETA §9/26) |
+| B17 | Append-only admin override/removal store; no "certified"/CA language in the UI | LR9 (ETA §26/28) |
 
 ## Should
 
 | # | Item | Traces to |
 |---|------|-----------|
-| B16 | Course search / filter / sort by rating | F7, P3 |
-| B17 | "Verified enrollment" badge on reviews | F8, P1, P2 |
-| B18 | Self-service edit / delete of own review | F9, P1 |
-| B19 | Flag a review as inappropriate or fake | F10, P1 |
-| B20 | Moderator queue: approve / take down flagged reviews | F11, P1 |
+| B18 | Deduct pantry quantities when a planned meal is marked cooked | F9, P1, P3 |
+| B19 | Search saved recipes by an ingredient on hand | F10, P1, P2 |
+| B20 | Manual recipe entry form | F11, P3 |
+| B21 | Edit / delete pantry items, recipes, and planned meals | F12, P1 |
+| B22 | AI-outage fallback to saved-recipe matching, with a clear notice | F13, P2 |
 
 ## Could
 
 | # | Item | Traces to |
 |---|------|-----------|
-| B21 | "Helpful" reaction on reviews, used for sorting | F12, P3 |
-| B22 | Side-by-side course comparison | F13, P1, P3 |
+| B23 | Barcode / receipt-photo pantry entry | F14, P1 |
+| B24 | Share the grocery list with a household member | F15, P3 |
+| B25 | Food-waste savings dashboard over time | F16, P1 |
 
 ## Won't (this phase)
 
 | # | Item | Traces to |
 |---|------|-----------|
-| B23 | Public reviewer profiles / reviewer identity / social graph | F14 |
-| B24 | Changes to REG registration mechanics or seat allocation | F15 |
+| B26 | Social features: public profiles, following, public recipe feed | F17 |
+| B27 | Nutrition / calorie / macro tracking; store price or delivery integration | F18 |
