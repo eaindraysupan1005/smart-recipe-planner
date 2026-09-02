@@ -59,14 +59,21 @@ separate file only.
   agents/
     requirement-writer.md      # raw pain notes -> requirement spec + backlog update
     backlog-auditor.md         # read-only sync check between specs and backlog
+    design-writer.md           # spec -> feature list, journey, prototype, 4 diagrams
   skills/
     capture-requirement/SKILL.md  # invoke: /capture-requirement
     audit-backlog/SKILL.md        # invoke: /audit-backlog
+    audit-design/SKILL.md         # invoke: /audit-design
 .docs/
   01-requirements/
     01-spec/{YYYYMMDD}-{no}-{topic}.md   # one requirement spec per topic
     backlog.md                           # prioritised backlog, MoSCoW
     05-log/{YYYYMMDD}-log.md             # work log
+  02-design/                             # W4 design draft
+    01-feature-list.md                   # FE1..FEn, acceptance criteria
+    02-user-journey.md                   # the one core workflow, step by step
+    03-prototype.md                      # low-fi wireframes (no code)
+    04-diagrams/                         # context, use case, architecture, activity
 CLAUDE.md
 rule.md                                  # legal/compliance rules (from W2)
 Smart Recipe Planner & Pantry Manager - Charter.md   # W1 company charter
