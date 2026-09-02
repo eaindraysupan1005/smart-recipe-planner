@@ -1,11 +1,11 @@
 # Backlog — Smart Recipe Planner & Pantry Manager
 
-Prioritised by MoSCoW. Every row traces to a requirement ID and a pain (or a
-legal requirement). Source spec:
+Prioritised by MoSCoW. Every row traces to a requirement ID and a real
+interview pain (or a legal requirement). Source spec:
 [20260902-01-pantry-meal-planning.md](01-spec/20260902-01-pantry-meal-planning.md).
 
-> P1–P3 currently come from the Charter §2 problem statement and are **pending
-> interview evidence** before the W5 User Validation Gate.
+Pains: **P1** forgotten pantry / expired food · **P2** cooking decision effort
+→ takeout · **P3** unplanned, inefficient grocery shopping.
 
 ## Must
 

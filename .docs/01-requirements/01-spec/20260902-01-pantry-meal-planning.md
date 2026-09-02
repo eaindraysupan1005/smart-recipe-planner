@@ -16,26 +16,16 @@
   small pantry and little planning time.
 - **Also affected:** Household members who shop from the list someone else made.
 
-### Pains
+### Interview pains
 
-> **Evidence status:** P1–P3 are taken from the Charter §2 Problem Statement.
-> They are **pending interview evidence** — each must be backed by real
-> interviewee quotes (≥15 users, ≈3 per member) before the W5 User Validation
-> Gate. Do not present them as validated until then.
-
-- **P1 — Invisible inventory:** People do not know what they already have or
-  when it expires. Ingredients are pushed to the back of the fridge or cupboard
-  and found only after they have spoiled, so food is thrown away and re-bought.
-  *(Charter §2 — pending interview evidence)*
-- **P2 — Decision fatigue & unusable recipes:** Recipe sites are organised
-  around dishes, not around available ingredients. Users must read a recipe
-  first and then check whether they can make it, and most recipes demand a
-  shopping trip for one or two missing items. *(Charter §2 — pending interview
-  evidence)*
-- **P3 — Disconnected planning & shopping:** Meal plans, saved recipes, and
-  grocery lists live in different places — notes apps, screenshots, bookmarks,
-  memory. Lists are rewritten from scratch and duplicate items already in the
-  pantry. *(Charter §2 — pending interview evidence)*
+- **P1 — Forgotten pantry, expired food:** Users forget what is in their pantry
+  and let food expire, wasting money.
+- **P2 — Cooking decision effort → takeout:** Deciding what to cook with random
+  leftover ingredients takes too much effort, so people default to takeout
+  instead.
+- **P3 — Unplanned shopping:** Grocery shopping is inefficient and people
+  over-buy or forget items because they don't plan against what they already
+  have.
 
 ## 2. Functional requirements
 
@@ -65,7 +55,9 @@
 - **NFR1 (the project metric):** In a before/after pilot with real users, median
   self-reported food thrown away per household per week drops by **≥ 30%**, and
   median weekly meal-planning time drops from baseline to **under 15 minutes**,
-  measured over **≥ 2 weeks** per user.
+  measured over **≥ 2 weeks** per user. Secondary: self-reported takeout
+  orders per week drop by **≥ 1** for users who reported defaulting to takeout
+  (P2).
 - **NFR2 (entry friction):** Adding one pantry item takes **no more than 3
   fields** (name, quantity, expiry) and **under 15 seconds** for a typical user;
   a first-time pantry of 20 items is loggable in **under 6 minutes**.

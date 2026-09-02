@@ -43,9 +43,8 @@ Never guess.**
 ## Spec format — five parts, in this order
 
 1. **Problem & users** — who is affected + the interview pains (`P1`, `P2`…),
-   quoted or closely paraphrased from the notes. No invented pains. If a pain
-   comes from the Charter rather than a real interview, label it
-   `(Charter §2 — pending interview evidence)`.
+   quoted or closely paraphrased from the notes. No invented pains — every
+   `P<n>` must come from a real user interview.
 2. **Functional** — `F1`, `F2`… each as a user story:
    `As a [user], I want [X], so that [Y].`
    Give each a MoSCoW priority: **Must / Should / Could / Won't**.

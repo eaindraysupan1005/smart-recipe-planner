@@ -18,8 +18,8 @@ Ask the user for, and do not proceed without:
 1. The **raw pain notes** (paste, or a file path). Who said it, and when.
 2. A **topic name** for the file slug (e.g. `pantry-tracking`,
    `ai-recipe-generation`, `meal-calendar`, `grocery-list`).
-3. Whether these are **real interview pains** or **Charter-derived** pains
-   pending evidence.
+3. Confirmation that every pain came from a **real user interview** — if one
+   did not, stop and ask before writing it into the spec.
 
 If anything is unclear, **ask and offer at least 3 options. Never guess.**
 Never invent an interviewee, a quote, or a pain.

@@ -93,8 +93,8 @@ Every backlog row traces back to a requirement ID and a real interview pain
 ## Working rules
 
 - If anything is unclear, **ask and offer at least 3 options. Never guess.**
-- Never fabricate interview pains or user quotes. Pains currently sourced from
-  the Charter are marked as such until real interview evidence replaces them.
+- Never fabricate interview pains or user quotes. Every `P<n>` in a spec comes
+  from a real user interview.
 - Keep the spec and the backlog in sync — run `/audit-backlog` after changes.
 - Commit and push after any change under `.claude/` or `.docs/`
   (`git add .` → `git commit -m "…"` → `git push`).
