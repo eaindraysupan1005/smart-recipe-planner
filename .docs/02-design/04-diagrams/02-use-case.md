@@ -5,7 +5,6 @@ Actors and what each can do. Every use case maps to `F` items in the spec.
 ```mermaid
 flowchart LR
     cook(["👤 Home Cook"])
-    admin(["👤 Admin"])
     ai(["🤖 AI Service"])
 
     subgraph SYSTEM["Smart Recipe Planner & Pantry Manager"]
@@ -22,7 +21,6 @@ flowchart LR
         UC10(["UC10 Search recipes by ingredient<br/>F10"])
         UC11(["UC11 Write recipe manually<br/>F11"])
         UC12(["UC12 Edit / delete own data<br/>F12"])
-        UC13(["UC13 Remove unsafe recipe<br/>LR9"])
     end
 
     cook --- UC1
@@ -37,7 +35,6 @@ flowchart LR
     cook --- UC10
     cook --- UC11
     cook --- UC12
-    admin --- UC13
 
     UC5 -.->|"«include»"| UC4
     UC5 -.->|"«include»"| UC3
@@ -46,7 +43,6 @@ flowchart LR
     UC5 ---|"calls"| ai
 
     style SYSTEM fill:#E4F2F0,stroke:#2A9D8F,stroke-width:2px
-    style UC13 fill:#FBEAE2,stroke:#D9542B
 ```
 
 ## Use case ↔ requirement map
@@ -65,7 +61,6 @@ flowchart LR
 | UC10 | Search recipes by ingredient | F10, P1, P2 | Should |
 | UC11 | Write recipe manually | F11, P3 | Should |
 | UC12 | Edit / delete own data | F12, LR5, P1 | Should |
-| UC13 | Remove unsafe recipe | LR9 | Must |
 
 ## The relationships that matter
 

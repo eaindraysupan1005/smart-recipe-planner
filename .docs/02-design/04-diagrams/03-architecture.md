@@ -15,7 +15,7 @@ flowchart TB
         planSvc["Meal Plan Service<br/>F5"]
         listSvc["Grocery List Service<br/>F6 — plan minus stock"]
         consentSvc["Consent Service<br/>LR1, LR2, LR7"]
-        auditSvc["Audit & Log Service<br/>LR4, LR5, LR6, LR9"]
+        auditSvc["Audit & Log Service<br/>LR4, LR5, LR6"]
         aiGw["AI Gateway<br/>LR2 strip identity · NFR8 quota<br/>NFR7 fallback"]
     end
 

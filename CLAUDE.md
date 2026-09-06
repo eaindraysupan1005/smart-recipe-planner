@@ -35,8 +35,7 @@ rules in **[rule.md](rule.md)** (from Week 2). It covers three Thai laws:
 - **Electronic Transactions Act §9 / 26 / 28** — retrievable acceptance records
   for Terms / AI & Food Safety Disclaimer and for consent (and withdrawal);
   reproducible AI-output records (text, model version, pantry snapshot, filters,
-  timestamp); admin overrides stored unalterably; no "certified" language
-  without a real certifying party.
+  timestamp); no "certified" language without a real certifying party.
 
 When writing a requirement spec, fold the Must-have rules above into the spec
 as numbered legal requirements (LR1, LR2, LR3…). Do not leave `rule.md` as a

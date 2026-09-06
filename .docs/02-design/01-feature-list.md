@@ -97,8 +97,7 @@ Implements **LR3, LR4, LR5, LR6, LR9** · no single screen — it sits behind ev
 | AC3 | A record can be flagged for extended retention up to 1 year without altering its content; the purge job skips it (LR6) |
 | AC4 | Account deletion removes pantry, plan, recipes, and dietary profile — logs excepted (LR3b) |
 | AC5 | Login stores a verification token only, never a provider credential (LR3c) |
-| AC6 | Admin removal/override of a recipe is append-only: decision, reasoning, timestamp, admin identity; updates are rejected (LR9) |
-| AC7 | No "certified" or "nutritionist-approved" copy appears anywhere in the UI (LR9) |
+| AC6 | No "certified" or "nutritionist-approved" copy appears anywhere in the UI (LR9) |
 
 ## FE8 — Insights & Fast Entry · **Could** *(not committed this phase)*
 

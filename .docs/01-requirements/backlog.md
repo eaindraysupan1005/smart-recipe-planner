@@ -27,7 +27,7 @@ Pains: **P1** forgotten pantry / expired food · **P2** cooking decision effort
 | B14 | Extended-retention hold flag (up to 1 year); retain removed recipes internally | LR6 (CCA §26) |
 | B15 | Retrievable acceptance & consent records, including withdrawal (user ID, timestamp, version) | LR7 (ETA §9/26) |
 | B16 | Reproducible AI-output record (text, model version, pantry snapshot, filters, timestamp) + stored action confirmations | LR8 (ETA §9/26) |
-| B17 | Append-only admin override/removal store; no "certified"/CA language in the UI | LR9 (ETA §26/28) |
+| B17 | No "certified"/"nutritionist-approved"/CA language in the UI | LR9 (ETA §28) |
 
 ## Should
 

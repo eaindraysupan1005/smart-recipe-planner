@@ -139,14 +139,10 @@
   action confirmations ("meal plan saved", "grocery list generated") as
   retrievable records, not transient UI notices. *Testable: given a recipe ID,
   return the exact text, model version, and inputs used.*
-- **LR9 (ETA §26/28 — unalterable overrides; no false certification):** Admin
-  removal or override of a recipe (e.g. an unsafe AI output) is stored with
-  decision, reasoning, timestamp, and approving admin in append-only form, with
-  no silent edits afterward; and the product must not use "certified",
-  "nutritionist-approved", or CA-backed language unless a licensed Certification
-  Authority or real certified professional is actually involved. *Testable:
-  attempt to update a decision row → rejected, history preserved; UI copy scan
-  finds no certification claims.*
+- **LR9 (ETA §28 — no false certification):** The product must not use
+  "certified", "nutritionist-approved", or CA-backed signature language unless a
+  licensed Certification Authority or a real certified professional is actually
+  involved. *Testable: a UI copy scan finds no certification claims.*
 
 ## 5. Scope
 
@@ -158,8 +154,7 @@
 - Auto grocery list = planned meals minus pantry stock (F6).
 - Recipe saving, AI and manual (F7, F11).
 - Consent & terms gate before first generation (F8, LR1, LR2, LR7).
-- Logging, ≥90-day retention, AI-output records, admin override store
-  (LR3–LR9).
+- Logging, ≥90-day retention, AI-output records (LR3–LR9).
 - Should-haves: deduct on cooked, ingredient search, edit/delete, AI-outage
   fallback (F9–F13).
 

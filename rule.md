@@ -102,10 +102,6 @@ timestamp, so the output shown to the user can be reproduced in a later dispute.
 generated"), it must store that confirmation as a retrievable record, not just
 a transient UI notice.
 
-\- If a moderator or admin removes or overrides a recipe (e.g. an unsafe
-AI output), the system must record the decision, reasoning, timestamp, and
-approving admin in unalterable form, and must not allow silent edits afterward.
-
 \- If the system displays any "certified", "nutritionist-approved", or
 CA-backed signature language, it must not use that language unless a licensed
 Certification Authority or a real certified professional is actually involved.
