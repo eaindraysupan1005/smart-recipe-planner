@@ -104,8 +104,8 @@
 
 ### Computer Crime Act §26
 - **LR4 (CCA §26 — creation log):** Every user-created item (manual recipe,
-  saved AI recipe, meal plan entry, shared list) is logged with account ID, IP
-  address, and timestamp, stored separately from the content itself. *Testable:
+  saved AI recipe, meal plan entry) is logged with account ID, IP address, and
+  timestamp, stored separately from the content itself. *Testable:
   each saved recipe has a matching log row with all three fields.*
 - **LR5 (CCA §26 — edit/delete log, 90-day retention):** Every edit or delete
   of a recipe, pantry item, or meal plan is logged with actor identity, IP, and
