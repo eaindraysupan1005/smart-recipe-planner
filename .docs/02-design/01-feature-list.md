@@ -12,7 +12,7 @@ written so a tester can pass/fail them.
 
 ## FE1 — Pantry Management · **Must**
 
-Covers **F1, F2, F12** (+ F9 in FE5, F14 in FE8) · relieves **P1**
+Covers **F1, F2, F12** (+ F9 in FE5) · relieves **P1**
 
 | # | Acceptance criteria |
 |---|---|
@@ -38,7 +38,7 @@ Covers **F4, F8** · implements **LR1, LR2, LR7** · relieves **P2**
 
 ## FE3 — AI Recipe Generation · **Must**
 
-Covers **F3, F13** · implements **LR2, LR8** · relieves **P1, P2**
+Covers **F3** · implements **LR2, LR8** · relieves **P1, P2**
 
 | # | Acceptance criteria |
 |---|---|
@@ -48,8 +48,7 @@ Covers **F3, F13** · implements **LR2, LR8** · relieves **P1, P2**
 | AC4 | A recipe returns in under 10 seconds at p90; progress shows within 1 second (NFR3) |
 | AC5 | The outbound request carries ingredients + dietary flags only — no email, name, or address (LR2) |
 | AC6 | Every generation stores its text, model version, pantry snapshot, filters, timestamp (LR8) |
-| AC7 | When the AI service fails or is rate-limited, saved-recipe matching appears within 5 seconds with a clear notice, never a raw error (F13, NFR7) |
-| AC8 | Generation is capped server-side at 30 per user per month on the free tier (NFR8) |
+| AC7 | Generation is capped server-side at 30 per user per month on the free tier (NFR8) |
 
 ## FE4 — Recipe Library · **Must**
 
@@ -77,14 +76,13 @@ Covers **F5** (Must) + **F9, F12** (Should) · relieves **P2, P3**
 
 ## FE6 — Auto Grocery List · **Must**
 
-Covers **F6** (Must) + **F15** (Could) · implements **LR3d** · relieves **P1, P3**
+Covers **F6** · relieves **P1, P3**
 
 | # | Acceptance criteria |
 |---|---|
 | AC1 | The list is generated from the planned week minus current pantry stock (F6) |
 | AC2 | The list contains **0** items already stocked in sufficient quantity, across ≥ 20 test plans (NFR6) |
 | AC3 | "Grocery list generated" is stored as a retrievable record (LR8) |
-| AC4 | A shared list must not expose another person's dietary or health data (LR3d, F15) |
 
 ## FE7 — Compliance & Audit Layer · **Must** *(cross-cutting)*
 
@@ -99,24 +97,12 @@ Implements **LR3, LR4, LR5, LR6, LR9** · no single screen — it sits behind ev
 | AC5 | Login stores a verification token only, never a provider credential (LR3c) |
 | AC6 | No "certified" or "nutritionist-approved" copy appears anywhere in the UI (LR9) |
 
-## FE8 — Insights & Fast Entry · **Could** *(not committed this phase)*
-
-Covers **F14, F16** · relieves **P1**
-
-| # | Acceptance criteria |
-|---|---|
-| AC1 | Barcode or receipt-photo entry adds a pantry item faster than typing (F14) |
-| AC2 | A dashboard shows food-waste reduction over time, feeding the NFR1 metric (F16) |
-
 ---
 
 ## Not built this phase
 
 | Excluded | Source |
 |---|---|
-| Social features — public profiles, following, public recipe feed | F17 (Won't) |
-| Nutrition / calorie / macro tracking | F18 (Won't) |
-| Grocery-store price or delivery integration | F18 (Won't) |
 | Any licensed Certification Authority integration | LR9 |
 
 ## Month-2 BUILD commitment

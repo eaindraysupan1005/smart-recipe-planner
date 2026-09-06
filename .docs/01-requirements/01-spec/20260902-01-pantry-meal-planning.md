@@ -43,12 +43,6 @@
 | F10 | As a home cook, I want to search my saved recipes by an ingredient I have, so that I can find a use for something before it expires. | Should | solves P1, P2 |
 | F11 | As a home cook, I want to write a recipe manually into a form, so that family recipes live with the AI ones. | Should | solves P3 |
 | F12 | As a home cook, I want to edit or delete any pantry item, recipe, or planned meal, so that I can correct mistakes. | Should | solves P1 |
-| F13 | As a home cook, I want to be warned when the AI service is unavailable and be shown my saved recipes that match my pantry instead, so that the app is still useful. | Should | solves P2 |
-| F14 | As a home cook, I want to add pantry items by scanning a barcode or a receipt photo, so that logging is faster than typing. | Could | solves P1 |
-| F15 | As a home cook, I want to share my grocery list with a household member, so that whoever shops has the right list. | Could | solves P3 |
-| F16 | As a home cook, I want to see how much food I stopped wasting over time, so that I can see the app working. | Could | solves P1 |
-| F17 | As a user, I do not need social features — public profiles, following other cooks, or a public recipe feed — in this phase. | Won't | out of scope |
-| F18 | As a user, I do not need nutrition/calorie tracking, macro targets, or grocery-store price or delivery integration in this phase. | Won't | out of scope |
 
 ## 3. Non-functional requirements
 
@@ -73,9 +67,9 @@
 - **NFR6 (grocery-list accuracy):** A generated grocery list contains **0**
   items already stocked in sufficient quantity in the pantry, verified across
   **≥ 20** test plans.
-- **NFR7 (availability & degradation):** The app is available **≥ 99.0%** per
-  calendar month; when the AI service fails or is rate-limited, the app falls
-  back to saved-recipe matching within **5 seconds** and never shows a raw error.
+- **NFR7 (availability):** The app is available **≥ 99.0%** per calendar
+  month; when the AI service fails or is rate-limited, the app shows a clear
+  message and never a raw error.
 - **NFR8 (AI cost ceiling):** Recipe generation stays within a budget of **≤ 30
   generations per user per month** on the free tier, enforced server-side.
 - **NFR9 (page load):** The pantry list (up to 200 items) and the weekly plan
@@ -104,8 +98,7 @@
   (b) On account deletion, pantry items, meal plan, saved recipes, and the
   dietary profile are deleted, including from backups within the stated window
   (CCA §26 logs excepted). (c) Social/email login stores only a verification
-  token, never the provider password. (d) A shared grocery list must not expose
-  another person's dietary or health data without that person's consent.
+  token, never the provider password.
   *Testable: delete account → no user rows remain except retained logs; token
   store holds no credential.*
 
@@ -155,14 +148,9 @@
 - Recipe saving, AI and manual (F7, F11).
 - Consent & terms gate before first generation (F8, LR1, LR2, LR7).
 - Logging, ≥90-day retention, AI-output records (LR3–LR9).
-- Should-haves: deduct on cooked, ingredient search, edit/delete, AI-outage
-  fallback (F9–F13).
+- Should-haves: deduct on cooked, ingredient search, edit/delete (F9–F12).
 
 ### Out of scope
-- Social features: public profiles, following, public recipe feed (F17).
-- Nutrition/calorie/macro tracking; store price or delivery integration (F18).
-- Could-haves not committed this phase: barcode/receipt scanning (F14),
-  household list sharing (F15), waste-savings dashboard (F16).
 - Any "certified"/CA-backed claim — explicitly excluded by LR9.
 
 ### The ONE core workflow this phase builds end-to-end

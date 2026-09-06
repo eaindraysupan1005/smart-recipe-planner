@@ -16,7 +16,7 @@ flowchart TB
         listSvc["Grocery List Service<br/>F6 — plan minus stock"]
         consentSvc["Consent Service<br/>LR1, LR2, LR7"]
         auditSvc["Audit & Log Service<br/>LR4, LR5, LR6"]
-        aiGw["AI Gateway<br/>LR2 strip identity · NFR8 quota<br/>NFR7 fallback"]
+        aiGw["AI Gateway<br/>LR2 strip identity · NFR8 quota"]
     end
 
     subgraph DATA["Data stores"]
@@ -34,7 +34,6 @@ flowchart TB
 
     recipeSvc --> aiGw
     aiGw -->|"ingredients + dietary flags only"| ext
-    aiGw -->|"on failure/quota:<br/>saved-recipe match (F13)"| recipeSvc
     aiGw --> genDb
 
     consentSvc -->|"gate: no consent → no call"| aiGw
@@ -54,7 +53,7 @@ flowchart TB
 
 | Decision | Reason |
 |---|---|
-| **AI Gateway is its own component** | One chokepoint where identity is stripped (LR2), quota is enforced (NFR8), fallback fires (NFR7), and the generation record is written (LR8). Compliance in one testable place instead of scattered through the app. |
+| **AI Gateway is its own component** | One chokepoint where identity is stripped (LR2), quota is enforced (NFR8), and the generation record is written (LR8). Compliance in one testable place instead of scattered through the app. |
 | **Four separate stores, not one** | Logs must survive content deletion (LR5) and consent must be append-only (LR7). Different lifecycles cannot share a table. |
 | **Consent Service gates the gateway** | LR2 is enforced by the call graph — an ungated path to the AI service does not exist. |
 | **Grocery list derives, never stores** | The list is computed from plan minus pantry at request time, so it cannot drift out of date (NFR6). |
@@ -70,10 +69,11 @@ flowchart TB
 > self-hosted model and still deliver the workflow.
 >
 > **We pay:** per-call cost and rate limits (NFR8 caps free-tier users at 30
-> generations/month), an availability dependency we do not control (NFR7 forces
-> a saved-recipe fallback), and a PDPA cross-border transfer that requires
-> disclosure, consent, and data minimisation (LR2). The Charter names AI cost
-> and availability as a top risk; NFR7 and NFR8 are the direct answer.
+> generations/month), an availability dependency we do not control (NFR7 sets
+> a 99% uptime target and requires a clear error message, never a raw one),
+> and a PDPA cross-border transfer that requires disclosure, consent, and data
+> minimisation (LR2). The Charter names AI cost and availability as a top
+> risk; NFR7 and NFR8 are the direct answer.
 >
 > **Revisit when:** generation cost per active user exceeds the free tier at
 > scale, or an allergen-safety failure (NFR5) traces to model behaviour we

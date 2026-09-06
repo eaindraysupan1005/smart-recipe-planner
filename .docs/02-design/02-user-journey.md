@@ -26,7 +26,7 @@
 
 | # | Trigger | System behaviour | Traces |
 |---|---------|------------------|--------|
-| A1 | AI service down or rate-limited at J6 | Within 5 seconds, shows saved recipes matching the pantry, with a plain-language notice — never a raw error | F13, NFR7 |
+| A1 | AI service down or rate-limited at J6 | Shows a plain-language notice, never a raw error | NFR7 |
 | A2 | Free-tier cap reached (30/month) | Blocks generation server-side, explains the cap, offers saved-recipe search | NFR8 |
 | A3 | Pantry is empty at J5 | Prompts to add items first rather than generating from nothing | F1 |
 | A4 | Nan withdraws AI consent later | Generation is disabled; the withdrawal is stored the same way the consent was | LR7 |
@@ -37,7 +37,7 @@
 
 | Risk | Where | Mitigation | Traces |
 |---|---|---|---|
-| **Entry friction kills adoption in week 1** — the Charter's biggest stated risk | J3 | 3 fields only, 15-second target; barcode/receipt entry is the Could-have escape hatch | NFR2, F14 |
+| **Entry friction kills adoption in week 1** — the Charter's biggest stated risk | J3 | 3 fields only, 15-second target | NFR2 |
 | Pantry goes stale, so recipes and lists become wrong | J10 | Deduct-on-cooked, so accuracy is a by-product of normal use | F9 |
 | Consent prompt at J5 feels like a scary wall | J5 | Show exactly what is sent (ingredients + dietary flags, no identity) instead of a legal blob | LR2 |
 | Trust breaks if one recipe ignores an allergy | J6 | NFR5 at 100%, plus the stored generation record so any failure is reproducible | NFR5, LR8 |

@@ -21,7 +21,7 @@ Pains: **P1** forgotten pantry / expired food · **P2** cooking decision effort
 | B8 | Terms + AI & Food Safety Disclaimer gate before first generation | F8, P2 |
 | B9 | Explicit opt-in for sensitive dietary/allergy data; editable and deletable | LR1 (PDPA) |
 | B10 | AI transfer disclosure + consent; request payload carries ingredients and dietary flags only, no identifiers | LR2 (PDPA) |
-| B11 | Purpose limit on pantry data; full delete on account deletion; login stores token only; no third-party dietary data in a shared list | LR3 (PDPA) |
+| B11 | Purpose limit on pantry data; full delete on account deletion; login stores token only | LR3 (PDPA) |
 | B12 | Creation log: account ID + IP + timestamp, separate from content | LR4 (CCA §26) |
 | B13 | Edit/delete log + original content retained ≥90 days after deletion | LR5 (CCA §26) |
 | B14 | Extended-retention hold flag (up to 1 year); retain removed recipes internally | LR6 (CCA §26) |
@@ -37,19 +37,3 @@ Pains: **P1** forgotten pantry / expired food · **P2** cooking decision effort
 | B19 | Search saved recipes by an ingredient on hand | F10, P1, P2 |
 | B20 | Manual recipe entry form | F11, P3 |
 | B21 | Edit / delete pantry items, recipes, and planned meals | F12, P1 |
-| B22 | AI-outage fallback to saved-recipe matching, with a clear notice | F13, P2 |
-
-## Could
-
-| # | Item | Traces to |
-|---|------|-----------|
-| B23 | Barcode / receipt-photo pantry entry | F14, P1 |
-| B24 | Share the grocery list with a household member | F15, P3 |
-| B25 | Food-waste savings dashboard over time | F16, P1 |
-
-## Won't (this phase)
-
-| # | Item | Traces to |
-|---|------|-----------|
-| B26 | Social features: public profiles, following, public recipe feed | F17 |
-| B27 | Nutrition / calorie / macro tracking; store price or delivery integration | F18 |

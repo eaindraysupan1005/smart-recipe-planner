@@ -6,7 +6,6 @@ outside it.
 ```mermaid
 flowchart TB
     cook(["👤 Home Cook<br/>(primary user)"])
-    member(["👤 Household Member<br/>(shared list — F15, Could)"])
 
     subgraph SYS["Smart Recipe Planner & Pantry Manager"]
         core["Pantry · AI Recipes · Meal Plan · Grocery List<br/>+ Consent & Audit layer"]
@@ -18,7 +17,6 @@ flowchart TB
 
     cook -->|"pantry items, dietary filters,<br/>meal choices (F1,F4,F5)"| SYS
     SYS -->|"recipes, weekly plan,<br/>grocery list (F3,F6)"| cook
-    member -->|"reads shared list (F15)"| SYS
 
     SYS -->|"ingredient names,<br/>quantities, dietary flags"| ai
     ai -->|"generated recipe text"| SYS

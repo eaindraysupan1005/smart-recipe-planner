@@ -99,21 +99,6 @@ information rather than a wall.
 Showing *which* pantry items it used — and their expiry warning — is what makes
 the AI trustworthy (P1). The dietary badge is the visible half of NFR5.
 
-## S4b — AI unavailable · F13, NFR7
-
-```
-┌─────────────────────────────────┐
-│  ⚠ Recipe generation is offline │
-│  Here's what you can cook from  │
-│  your saved recipes instead:    │
-│                                 │
-│  • Fried rice        4/5 items  │
-│  • Omelette          5/5 items  │
-└─────────────────────────────────┘
-```
-The app stays useful when the third-party service is down (Charter risk:
-AI cost & availability).
-
 ## S5 — Weekly plan · F5, F9
 
 ```
@@ -158,9 +143,8 @@ what they did **not** have to buy. That number is also the demo moment.
 | S2 Add item | F1, NFR2 |
 | S3 Consent | F8, LR1, LR2, LR7 |
 | S4 Recipe | F3, F7, NFR3, NFR4, NFR5, LR8 |
-| S4b Fallback | F13, NFR7, NFR8 |
 | S5 Weekly plan | F5, F9, F12, LR8 |
 | S6 Grocery list | F6, NFR6, LR8 |
 
-Not prototyped this phase: F10 ingredient search, F11 manual recipe entry (both
-Should), F14–F16 (Could), F17–F18 (Won't).
+Not prototyped this phase: F10 ingredient search, F11 manual recipe entry
+(both Should).

@@ -1,7 +1,7 @@
 # Diagram 4 of 4 — Activity
 
 The core workflow as a flow, with every decision point.
-This is where the consent step (LR1/LR2) and the AI-outage fallback (F13/NFR7)
+This is where the consent step (LR1/LR2) and the dietary-filter check (NFR5)
 become visible, rather than just claimed in prose.
 
 ```mermaid
@@ -22,11 +22,12 @@ flowchart TD
     storeConsent --> quota
 
     consent -->|Yes| quota{Under quota?<br/>≤30/month<br/>NFR8}
-    quota -->|No| fallback
+    quota -->|No| blocked["Blocked: monthly cap reached.<br/>Explain cap, offer saved-<br/>recipe search instead<br/>F10 · NFR8"]
     quota -->|Yes| aiUp{AI service<br/>reachable?}
 
-    aiUp -->|No| fallback["FALLBACK within 5s:<br/>saved recipes matching pantry<br/>+ plain notice, no raw error<br/>F13 · NFR7"]
-    fallback --> pickRecipe
+    aiUp -->|No| error["Show clear message:<br/>AI service unavailable.<br/>Offer saved-recipe search<br/>F10 · NFR7"]
+    blocked --> tapCook
+    error --> tapCook
 
     aiUp -->|Yes| callAi["AI Gateway strips identity,<br/>sends ingredients + dietary<br/>flags only · LR2"]
     callAi --> generated["Recipe returned <10s p90<br/>NFR3"]
@@ -54,7 +55,6 @@ flowchart TD
     style consent fill:#FFF4E0,stroke:#E1972B,stroke-width:2px
     style showConsent fill:#FFF4E0,stroke:#E1972B
     style dietCheck fill:#FBEAE2,stroke:#D9542B,stroke-width:2px
-    style fallback fill:#E4F2F0,stroke:#2A9D8F,stroke-width:2px
     style storeGen fill:#F3F4F7,stroke:#6A7686
     style storeConsent fill:#F3F4F7,stroke:#6A7686
     style logCreate fill:#F3F4F7,stroke:#6A7686
@@ -69,7 +69,6 @@ flowchart TD
 | `[/ parallelogram /]` | A legally required record is written (LR4, LR7, LR8) |
 | Amber | Consent gate — LR1, LR2, LR7 |
 | Red | Dietary/allergen check — NFR5, the one 100% requirement |
-| Green | Availability fallback — F13, NFR7 |
 
 ## The three branches that matter at the gate
 
@@ -78,5 +77,6 @@ flowchart TD
 2. **Dietary violation → never shown.** The check sits between generation and
    display, so a bad recipe cannot reach the user. This is NFR5 at 100% and the
    Charter's "AI output quality" risk.
-3. **AI down → still useful.** Both the quota branch and the unreachable branch
-   land on the same fallback, so the app degrades instead of failing (NFR7).
+3. **AI down or over quota → no raw error.** Both branches show a clear
+   message and point the user to manual saved-recipe search (F10) instead of
+   crashing or exposing a raw error (NFR7).
