@@ -1,6 +1,6 @@
 # Diagram 2 of 4 — Use Case
 
-Shows the Home Cook actor and every use case they can perform — scan a
+Shows the User actor and every use case they can perform — scan a
 receipt, correct the pantry, set dietary filters, accept consent, select
 items and generate a recipe, save a recipe, search by ingredient, mark a meal
 cooked and confirm leftovers, and build the grocery list — each mapped to its
@@ -9,7 +9,7 @@ meals are a flat list, not a calendar.
 
 ```mermaid
 graph LR
-    HomeCook((Home Cook))
+    User((User))
 
     UC1["UC1 Scan grocery receipt (F1)"]
     UC2["UC2 Correct a pantry item (F2)"]
@@ -24,18 +24,18 @@ graph LR
     UC11["UC11 Withdraw consent (LR7)"]
     UC12["UC12 Delete account (LR3)"]
 
-    HomeCook --> UC1
-    HomeCook --> UC2
-    HomeCook --> UC3
-    HomeCook --> UC4
-    HomeCook --> UC5
-    HomeCook --> UC6
-    HomeCook --> UC7
-    HomeCook --> UC8
-    HomeCook --> UC9
-    HomeCook --> UC10
-    HomeCook --> UC11
-    HomeCook --> UC12
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
+    User --> UC7
+    User --> UC8
+    User --> UC9
+    User --> UC10
+    User --> UC11
+    User --> UC12
 
     UC5 -. includes .-> UC4
     UC9 -. includes .-> UC10

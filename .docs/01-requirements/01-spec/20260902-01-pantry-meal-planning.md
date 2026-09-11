@@ -41,13 +41,13 @@ nothing outside this list is in scope.
 
 | ID | User story | MoSCoW | Traces |
 |----|-----------|--------|--------|
-| F1 | As a home cook, I want to scan a grocery receipt so that its items and quantities are added to my pantry automatically, with no typing, so that my pantry is never empty because entry felt like too much work. | Must | solves P1 |
-| F2 | As a home cook, I want to see what food I have and how much, correct anything the scan got wrong, and have quantities deducted (with a quick confirm of what's left) when I mark a meal cooked, so that my pantry always reflects reality without me re-entering it. | Must | solves P1 |
-| F3 | As a home cook, I want the AI to generate a recipe built from the pantry items I select, so that even a small handful of leftovers becomes a usable meal instead of takeout. | Must | solves P1, P2 |
-| F4 | As a home cook, I want my planned meals turned into a grocery list that excludes what is already in my pantry, so that I stop re-buying and overbuying. | Must | solves P3 |
-| F5 | As a home cook, I want to save both AI-generated and manually entered recipes, so that I can cook them again without regenerating or rewriting them. | Must | solves P2, P3 |
-| F6 | As a home cook with dietary needs, I want to save dietary filters (vegetarian, gluten-free, low-carb, and others) and have every generated recipe honour them, so that suggestions are actually cookable for me. | Must | solves P2 |
-| F7 | As a home cook, I want to search my saved recipes by an ingredient I have, so that I can find a use for something before it expires. | Must | solves P1, P2 |
+| F1 | As a user, I want to scan a grocery receipt so that its items and quantities are added to my pantry automatically, with no typing, so that my pantry is never empty because entry felt like too much work. | Must | solves P1 |
+| F2 | As a user, I want to see what food I have and how much, correct anything the scan got wrong, and have quantities deducted (with a quick confirm of what's left) when I mark a meal cooked, so that my pantry always reflects reality without me re-entering it. | Must | solves P1 |
+| F3 | As a user, I want the AI to generate a recipe built from the pantry items I select, so that even a small handful of leftovers becomes a usable meal instead of takeout. | Must | solves P1, P2 |
+| F4 | As a user, I want my planned meals turned into a grocery list that excludes what is already in my pantry, so that I stop re-buying and overbuying. | Must | solves P3 |
+| F5 | As a user, I want to save both AI-generated and manually entered recipes, so that I can cook them again without regenerating or rewriting them. | Must | solves P2, P3 |
+| F6 | As a user with dietary needs, I want to save dietary filters (vegetarian, gluten-free, low-carb, and others) and have every generated recipe honour them, so that suggestions are actually cookable for me. | Must | solves P2 |
+| F7 | As a user, I want to search my saved recipes by an ingredient I have, so that I can find a use for something before it expires. | Must | solves P1, P2 |
 
 The Terms/AI & Food Safety Disclaimer and consent gate that must sit in front
 of F3's first use is not a separate `F` item — it is carried as **LR1, LR2,
@@ -178,9 +178,9 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
 - Any "certified"/CA-backed claim — explicitly excluded by LR9.
 
 ### The ONE core workflow this phase builds end-to-end
-A home cook scans a grocery receipt → the pantry is built automatically → the
-cook selects pantry items to use → the system generates an AI recipe around
-them, honouring their dietary filters → the cook marks the meal cooked and
+A user scans a grocery receipt → the pantry is built automatically → the
+user selects pantry items to use → the system generates an AI recipe around
+them, honouring their dietary filters → the user marks the meal cooked and
 confirms what's left over, so the pantry stays accurate → the app produces a
 grocery list containing only the missing ingredients from what is still
 planned.

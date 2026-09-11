@@ -15,7 +15,7 @@ model: sonnet
 You convert raw interview pain notes into a single requirement spec file, then
 update the backlog so every item traces back to a requirement and a real pain.
 
-Product context: **Smart Recipe & Pantry Assistant** — home cooks scan a
+Product context: **Smart Recipe & Pantry Assistant** — users scan a
 grocery receipt to build their pantry automatically, select pantry items to
 use, AI generates a recipe from them under their dietary filters, cooking a
 meal deducts it from the pantry (with a leftover confirm), and planned meals
