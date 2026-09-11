@@ -10,8 +10,8 @@ description: >-
 # Audit Backlog
 
 Verify that `.docs/01-requirements/backlog.md` and the specs in
-`.docs/01-requirements/01-spec/` agree, for the Smart Recipe Planner & Pantry
-Manager.
+`.docs/01-requirements/01-spec/` agree, for the Smart Recipe & Pantry
+Assistant.
 
 ## Steps
 
@@ -29,8 +29,10 @@ Manager.
      heading versus the spec.
    - **Untraced pain** — a pain (`P<n>`) no functional requirement solves.
 4. **Scope creep check** — every **Must** row must belong to the one core
-   workflow: pantry in → AI recipe → meal calendar → grocery list. Flag any
-   Must row that starts a second workflow.
+   workflow: receipt scan → pantry in → AI recipe → cook & confirm leftovers →
+   grocery list, and functional rows must map onto exactly **F1–F7**. Flag any
+   Must row that starts a second workflow, adds an F8+, or reintroduces a
+   calendar/day-assigned meal planner.
 5. If two items look like the same thing but are worded differently, **do not
    merge them silently — ask**, and offer at least 3 options (merge / keep
    separate / rename one).

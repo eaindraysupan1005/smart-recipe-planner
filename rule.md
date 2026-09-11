@@ -6,8 +6,9 @@
 6631503120  Hsu Myat Thwe  
 6631503096  Thwin Khant Nyar Zaw
 
-**Product: Smart Recipe Planner & Pantry Manager** (pantry tracking, AI recipe
-generation from on-hand ingredients, weekly meal calendar, auto grocery list)
+**Product: Smart Recipe & Pantry Assistant** (receipt-scanned pantry tracking,
+AI recipe generation from selected on-hand ingredients, cooked-meal pantry
+deduction, auto grocery list)
 
 **PDPA (Personal Data Protection Act)**
 
@@ -33,11 +34,11 @@ needed (ingredient names + dietary flags) — never the account email, name, or
 household identifiers.
 
 \- If the system stores a pantry log, it must use it only for recipe
-generation, meal planning, and the grocery list — not for advertising,
+generation, planned meals, and the grocery list — not for advertising,
 resale, or profiling — unless the user opts in separately.
 
 \- If the user deletes their account, the system must delete the pantry items,
-meal plan, saved recipes, and dietary profile, and must not retain them in
+planned meals, saved recipes, and dietary profile, and must not retain them in
 backups beyond the stated retention window (access logs excepted — see CCA §26).
 
 \- If the system uses a social or email login, it must store only a
@@ -46,6 +47,11 @@ verification token, never the provider password or credential.
 \- If the system exports or shares a grocery list (e.g. to a household member),
 it must not include the other person's dietary or health data without that
 person's own consent.
+
+\- If the system reads a scanned grocery receipt, it must extract only item
+names, quantities, and prices needed to build the pantry — a receipt image
+must not be repurposed for anything beyond that (e.g. location, other
+purchases profiling) without separate consent.
 
 **Computer Crime Act §26**
 
@@ -57,12 +63,12 @@ logs so the origin of an online action can be traced if authorities request it.
 **Rules for the agent:**
 
 \- If the system lets a user create content (a manually written recipe, a saved
-AI recipe, a shared meal plan), it must log the account ID, IP address, and
+AI recipe, a planned meal), it must log the account ID, IP address, and
 timestamp separately from the content itself.
 
-\- If the system has an edit or delete action on a recipe, pantry item, or meal
-plan, it must log actor identity, IP, and timestamp, kept for ≥90 days even if
-the item is later deleted.
+\- If the system has an edit or delete action on a recipe, pantry item, or
+planned meal, it must log actor identity, IP, and timestamp, kept for ≥90 days
+even if the item is later deleted.
 
 \- If a competent authority requests extended retention on a specific record,
 the system must support flagging that record to keep it up to 1 year without
@@ -98,7 +104,7 @@ way.
 text, the model/version, the pantry snapshot and dietary filters used, and the
 timestamp, so the output shown to the user can be reproduced in a later dispute.
 
-\- If the system sends a confirmation (e.g. "meal plan saved", "grocery list
+\- If the system sends a confirmation (e.g. "meal added to plan", "grocery list
 generated"), it must store that confirmation as a retrievable record, not just
 a transient UI notice.
 

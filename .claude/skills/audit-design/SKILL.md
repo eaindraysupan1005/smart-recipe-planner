@@ -31,7 +31,8 @@ design draft meets the W5 gate criteria.
      dietary-filter check (NFR5).
    - The **architecture diagram** must state **one explicit trade-off**.
    - The **user journey** must cover the one core workflow end to end:
-     pantry in → AI recipe → meal calendar → grocery list.
+     receipt scan → pantry in → AI recipe → cook & confirm leftovers →
+     grocery list. It must not include a calendar/day-assignment step.
    - Every pain `P1`–`P3` must be relieved at some named journey step.
 5. If two items look like the same thing but are worded differently, **do not
    merge them silently — ask**, and offer at least 3 options.

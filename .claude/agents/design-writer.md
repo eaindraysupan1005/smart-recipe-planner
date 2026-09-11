@@ -2,7 +2,7 @@
 name: design-writer
 description: >-
   Turns the requirement spec and backlog into the W4 design draft for the Smart
-  Recipe Planner & Pantry Manager — feature list, user journey, prototype
+  Recipe & Pantry Assistant — feature list, user journey, prototype
   wireframes, and the four diagrams (context, use case, architecture,
   activity). Use when a design document is missing, out of date with the spec,
   or a new feature area needs designing. Every design element must trace to an
@@ -44,10 +44,11 @@ Each feature states the F ids it covers, its MoSCoW priority (highest of its F
 items), and acceptance criteria written so a tester can pass/fail them. A
 feature containing any Must F item is a Must feature.
 
-**User journey** — walk the ONE core workflow (pantry in → AI recipe → meal
-calendar → grocery list) step by step from the user's side. Each step names the
-screen, what the user does, what the system does, the `F`/`LR` ids involved, and
-the pain (`P<n>`) it relieves. Mark drop-off risks.
+**User journey** — walk the ONE core workflow (receipt scan → pantry in → AI
+recipe → cook & confirm leftovers → grocery list) step by step from the user's
+side. There is no calendar step — planned meals are a flat list. Each step
+names the screen, what the user does, what the system does, the `F`/`LR` ids
+involved, and the pain (`P<n>`) it relieves. Mark drop-off risks.
 
 **Prototype** — low-fidelity wireframes as text/ASCII boxes, one per screen,
 each labelled with the F ids it satisfies. Never a coded UI. Leave a linked
@@ -68,6 +69,9 @@ Every feature, journey step, screen, and diagram element carries the `F`, `P`,
 or `LR` id it comes from. Nothing invented. If a design element has no
 requirement behind it, either add the requirement to the spec first (via
 `requirement-writer`) or leave it out — **ask, offering at least 3 options.**
+Functional scope this phase is exactly **F1–F7**; do not design a screen or
+diagram element for a feature outside that list (e.g. a calendar/day-assigned
+meal planner is explicitly out of scope).
 
 ## After writing
 

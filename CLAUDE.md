@@ -4,16 +4,20 @@ Project context for Claude Code. Loaded automatically at the start of every sess
 
 ## Project
 
-**Smart Recipe Planner & Pantry Manager** — a platform that helps home cooks
-decide what to cook from the ingredients they already own. Users log pantry
-items with quantity and expiry date; the system generates AI recipes around what
-is about to expire (respecting dietary filters), assigns meals to a weekly
-calendar, and turns that plan into a grocery list containing only the missing
-items. Goal: less household food waste, less weekly planning time.
+**Smart Recipe & Pantry Assistant** — a platform that helps people cooking for
+themselves decide what to make from the ingredients they already have. Users
+scan a grocery receipt to build their pantry automatically, then select the
+items they want to use and the system generates a personalized AI recipe
+around them (respecting dietary preferences). Once a meal is marked as cooked,
+the app deducts the ingredients it used and asks the user to confirm what is
+left over, so the pantry stays accurate without manual entry. Planned meals
+are turned automatically into a grocery list containing only the items that
+are actually missing. Goal: less household food waste, less weekly planning
+time.
 
 Team: **Apex** (SE Case Studies, 1305493, 1/2569).
 Source of truth for vision, roles, and scope:
-[Smart Recipe Planner & Pantry Manager - Charter.md](Smart%20Recipe%20Planner%20&%20Pantry%20Manager%20-%20Charter.md).
+[Smart Recipe & Pantry Assistant- Charter.md](Smart%20Recipe%20%26%20Pantry%20Assistant-%20Charter.md).
 
 Course phase: **DISCOVER** (W1–W5). No production code yet — the work right now
 is requirements, backlog, design, and compliance, ending at the User Validation
@@ -27,11 +31,11 @@ rules in **[rule.md](rule.md)** (from Week 2). It covers three Thai laws:
 - **PDPA** — dietary filters that reveal health/religion are **sensitive data**
   needing explicit opt-in; disclose and consent before sending pantry data to a
   third-party AI service and send minimum fields only; pantry data used only for
-  recipes/plan/grocery list; full delete on account deletion; store only login
-  tokens, never credentials.
+  recipes/planned meals/grocery list; full delete on account deletion; store
+  only login tokens, never credentials.
 - **Computer Crime Act §26** — keep access/traffic logs (account ID, IP,
   timestamp) for ≥90 days for user-created content (manual recipes, saved AI
-  recipes, meal plans), retained even after the item is edited or deleted.
+  recipes, planned meals), retained even after the item is edited or deleted.
 - **Electronic Transactions Act §9 / 26 / 28** — retrievable acceptance records
   for Terms / AI & Food Safety Disclaimer and for consent (and withdrawal);
   reproducible AI-output records (text, model version, pantry snapshot, filters,
@@ -43,13 +47,21 @@ separate file only.
 
 ## Product guardrails (from the Charter)
 
-- **One core workflow** this semester: *pantry in → AI recipe → meal on the
-  calendar → grocery list out*. Anything outside that chain is Should/Could/Won't.
+- **One core workflow** this semester: *receipt scan → pantry in → AI recipe →
+  cook & confirm leftovers → grocery list out*. No weekly-calendar meal
+  planner — planned meals are a flat list, not day-assigned. Anything outside
+  that chain is Should/Could/Won't.
+- **Functional scope this phase is exactly F1–F7**, matching the Charter's
+  feature table: Receipt Scanner, Pantry Tracker, AI Recipe Generator, Auto
+  Grocery List, Recipe Saving, Dietary Filters, Search by Ingredient. All
+  seven are Core/Must — do not add F8+ without a new Charter feature behind it.
 - **Measurable metric** — before/after food waste and weekly planning time.
-- Known risks to respect in every requirement: AI output quality (must use real
-  pantry items and honour dietary filters), pantry data accuracy, manual-entry
-  friction, AI cost/rate limits (graceful degradation to saved recipes), and
-  self-reported measurement.
+- Known risks to respect in every requirement: AI output quality (must use
+  real, selected pantry items and honour dietary filters), receipt-scanning
+  accuracy (OCR on varied/abbreviated formats), pantry data accuracy over
+  time, confirmation fatigue (the cooked/leftover prompt must stay light), AI
+  cost/rate limits (graceful degradation to saved recipes), and self-reported
+  measurement.
 
 ## Repository structure
 
@@ -75,7 +87,7 @@ separate file only.
     04-diagrams/                         # context, use case, architecture, activity
 CLAUDE.md
 rule.md                                  # legal/compliance rules (from W2)
-Smart Recipe Planner & Pantry Manager - Charter.md   # W1 company charter
+Smart Recipe & Pantry Assistant- Charter.md   # W1 company charter
 ```
 
 ### Requirement spec files (`.docs/01-requirements/01-spec/`)

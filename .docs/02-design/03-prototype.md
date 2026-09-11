@@ -7,58 +7,59 @@
   `TODO: <link>`
 
 These wireframes fix *what is on each screen and why*. Colour, type, and spacing
-are the Designer's call.
+are the Designer's call. There is no weekly-calendar screen — planned meals
+are a flat list (see S6).
 
 ---
 
-## S1 — Pantry (home) · F1, F2
+## S1 — Pantry (home) · F2
 
 ```
 ┌─────────────────────────────────┐
-│  My Pantry              [ + ]   │
+│  My Pantry              [ 📷 ]  │
 ├─────────────────────────────────┤
-│  ⚠ EXPIRING SOON                │
-│  Spinach      1 bag    2 days   │
-│  Eggs         6        3 days   │
-├─────────────────────────────────┤
-│  Rice         2 kg     Nov 12   │
-│  Chicken      500 g    Sep 20   │
-│  Yoghurt      1 tub    Sep 14   │
+│  Spinach      1 bag             │
+│  Eggs         6                 │
+│  Rice         2 kg              │
+│  Chicken      500 g             │
+│  Yoghurt      1 tub             │
 │  ...                            │
 ├─────────────────────────────────┤
 │  [ 🍳  Cook something with this ]│
 └─────────────────────────────────┘
    Pantry  │ Plan │ Recipes │ List
 ```
-Expiry-first order is the default, not a filter the user must find (F2, P1).
-The primary action sits on the pantry screen — the pantry *is* the entry point.
+The pantry *is* the entry point; the camera icon starts a receipt scan (F1),
+and "Cook something with this" starts item selection (F3).
 
-## S2 — Add item · F1, NFR2
+## S2 — Scan & review receipt · F1
 
 ```
 ┌─────────────────────────────────┐
-│  ← Add to pantry                │
+│  ← Scan receipt                 │
 ├─────────────────────────────────┤
-│  Item     [ Spinach          ]  │
-│  Quantity [ 1 ] [ bag  ▾ ]      │
-│  Expires  [ Sep 4, 2026    📅]  │
+│  [   📷 camera preview     ]    │
 │                                 │
-│         [   Save & add next  ]  │
+│  Parsed items:                  │
+│   Spinach   1 bag        ✓      │
+│   Eggs      6             ✓     │
+│   Spmach    250g   ⚠ check name │
+│                                 │
+│         [   Save to pantry   ]  │
 └─────────────────────────────────┘
 ```
-Three fields, nothing else. "Save & add next" keeps focus in the form so 20
-items take under 6 minutes (NFR2). This screen is the adoption risk — every
-extra field costs users in week 1.
+No typing for a correct scan — Nan only touches the one flagged line (NFR2).
+This screen is the adoption risk named in the Charter: OCR must be tested
+against real, messy Thai and international receipts.
 
-## S3 — Consent (first generation only) · F8, LR2, LR7
+## S3 — Consent (first generation only) · LR1, LR2, LR7
 
 ```
 ┌─────────────────────────────────┐
 │  Before we generate a recipe    │
 ├─────────────────────────────────┤
 │  We send to our AI service:     │
-│    ✓ your ingredient names      │
-│    ✓ quantities & expiry dates  │
+│    ✓ your selected ingredients  │
 │    ✓ your dietary filters       │
 │                                 │
 │  We never send:                 │
@@ -77,7 +78,25 @@ Two **separate** checkboxes — Terms acceptance and AI-transfer consent are
 different consents (LR2, LR7). Plain list, not a legal blob, so it reads as
 information rather than a wall.
 
-## S4 — Generated recipe · F3, F7, LR8
+## S4 — Select items to cook · F3
+
+```
+┌─────────────────────────────────┐
+│  What do you want to use?       │
+├─────────────────────────────────┤
+│  [x] Spinach      1 bag         │
+│  [x] Eggs         6             │
+│  [x] Rice         2 kg          │
+│  [ ] Chicken      500 g         │
+│  [ ] Yoghurt      1 tub         │
+├─────────────────────────────────┤
+│         [  Generate recipe  ]   │
+└─────────────────────────────────┘
+```
+Selection is explicit — the recipe is built only from what Nan checks (F3,
+NFR4), not from the whole pantry silently.
+
+## S5 — Generated recipe · F3, F5, F6
 
 ```
 ┌─────────────────────────────────┐
@@ -85,38 +104,37 @@ information rather than a wall.
 │  ⏱ 20 min   ·  gluten-free ✓    │
 ├─────────────────────────────────┤
 │  USES FROM YOUR PANTRY          │
-│  • Spinach 1 bag   ⚠ 2 days     │
-│  • Eggs 3          ⚠ 3 days     │
+│  • Spinach 1 bag                │
+│  • Eggs 3                       │
 │  • Rice 1 cup                   │
 │  STAPLES  salt · oil · pepper   │
 ├─────────────────────────────────┤
 │  1. Heat oil ...                │
 │  2. ...                         │
 ├─────────────────────────────────┤
-│ [ Save ]  [ Add to a day ▾ ]    │
+│ [ Save ]  [ Add to my plan ]    │
 └─────────────────────────────────┘
 ```
-Showing *which* pantry items it used — and their expiry warning — is what makes
-the AI trustworthy (P1). The dietary badge is the visible half of NFR5.
+Showing *which* selected pantry items it used is what makes the AI
+trustworthy (P1). The dietary badge is the visible half of NFR5.
 
-## S5 — Weekly plan · F5, F9
+## S6 — My plan · F2, F4
 
 ```
 ┌─────────────────────────────────┐
-│  This week          Sep 2 – 8   │
+│  My planned meals                │
 ├─────────────────────────────────┤
-│  Wed  —                    [+]  │
-│  Thu  Spinach & Egg Skillet ✓   │
-│  Fri  Chicken Rice         [+]  │
-│  Sat  —                    [+]  │
+│  Spinach & Egg Skillet   [Cooked]│
+│  Chicken Rice             [Cooked]│
 ├─────────────────────────────────┤
 │   [  Build my shopping list  ]  │
 └─────────────────────────────────┘
 ```
-The ✓ marks "cooked" and triggers the pantry deduction (F9) — the mechanism
-that keeps the pantry accurate without re-entry.
+A flat list, not a calendar — meals are added here from S5 and stay until
+cooked or removed. Tapping "Cooked" deducts pantry quantities and opens the
+leftover-confirm step (F2, NFR11).
 
-## S6 — Grocery list · F6, NFR6
+## S7 — Grocery list · F4, NFR6
 
 ```
 ┌─────────────────────────────────┐
@@ -139,12 +157,13 @@ what they did **not** have to buy. That number is also the demo moment.
 
 | Screen | Requirements |
 |---|---|
-| S1 Pantry | F1, F2, F12, NFR9 |
-| S2 Add item | F1, NFR2 |
-| S3 Consent | F8, LR1, LR2, LR7 |
-| S4 Recipe | F3, F7, NFR3, NFR4, NFR5, LR8 |
-| S5 Weekly plan | F5, F9, F12, LR8 |
-| S6 Grocery list | F6, NFR6, LR8 |
+| S1 Pantry | F2, NFR9 |
+| S2 Scan & review receipt | F1, NFR2 |
+| S3 Consent | LR1, LR2, LR7 |
+| S4 Select items | F3 |
+| S5 Recipe | F3, F5, F6, NFR3, NFR4, NFR5, LR8 |
+| S6 My plan | F2, F4, NFR11 |
+| S7 Grocery list | F4, NFR6, LR8 |
 
-Not prototyped this phase: F10 ingredient search, F11 manual recipe entry
-(both Should).
+Search by ingredient (F7) and manual recipe entry (part of F5) are not
+prototyped this phase — both reuse the Recipe Library screen pattern.
