@@ -48,7 +48,7 @@ and "Cook something with this" starts item selection (F3).
 │         [   Save to pantry   ]  │
 └─────────────────────────────────┘
 ```
-No typing for a correct scan — Nan only touches the one flagged line (NFR2).
+No typing for a correct scan — Nan only touches the one flagged line (NFR3).
 This screen is the adoption risk named in the Charter: OCR must be tested
 against real, messy Thai and international receipts.
 
@@ -94,7 +94,7 @@ information rather than a wall.
 └─────────────────────────────────┘
 ```
 Selection is explicit — the recipe is built only from what Nan checks (F3,
-NFR4), not from the whole pantry silently.
+NFR5), not from the whole pantry silently.
 
 ## S5 — Generated recipe · F3, F5, F6
 
@@ -116,7 +116,7 @@ NFR4), not from the whole pantry silently.
 └─────────────────────────────────┘
 ```
 Showing *which* selected pantry items it used is what makes the AI
-trustworthy (P1). The dietary badge is the visible half of NFR5.
+trustworthy (P1). The dietary badge is the visible half of NFR6.
 
 ## S6 — My plan · F2, F4
 
@@ -134,7 +134,7 @@ A flat list, not a calendar — meals are added here from S5 and stay until
 cooked or removed. Tapping "Cooked" deducts pantry quantities and opens the
 leftover-confirm step (F2, NFR11).
 
-## S7 — Grocery list · F4, NFR6
+## S7 — Grocery list · F4, NFR7
 
 ```
 ┌─────────────────────────────────┐
@@ -158,12 +158,12 @@ what they did **not** have to buy. That number is also the demo moment.
 | Screen | Requirements |
 |---|---|
 | S1 Pantry | F2, NFR9 |
-| S2 Scan & review receipt | F1, NFR2 |
+| S2 Scan & review receipt | F1, NFR2, NFR3 |
 | S3 Consent | LR1, LR2, LR7 |
 | S4 Select items | F3 |
-| S5 Recipe | F3, F5, F6, NFR3, NFR4, NFR5, LR8 |
+| S5 Recipe | F3, F5, F6, NFR4, NFR5, NFR6, LR8 |
 | S6 My plan | F2, F4, NFR11 |
-| S7 Grocery list | F4, NFR6, LR8 |
+| S7 Grocery list | F4, NFR7, LR8 |
 
 Search by ingredient (F7) and manual recipe entry (part of F5) are not
 prototyped this phase — both reuse the Recipe Library screen pattern.

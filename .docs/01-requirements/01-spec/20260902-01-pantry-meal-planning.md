@@ -57,34 +57,29 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
 
 - **NFR1 (the project metric):** In a before/after pilot with real users,
   median self-reported food thrown away per household per week drops by
-  **≥ 30%**, and median weekly meal-planning time drops from baseline to
-  **under 15 minutes**, measured over **≥ 2 weeks** per user. Secondary:
-  self-reported takeout orders per week drop by **≥ 1** for users who reported
-  defaulting to takeout (P2).
-- **NFR2 (receipt-scan accuracy & friction):** A scanned receipt's items are
-  parsed and ready for pantry review in **under 5 seconds**; correcting one
-  misread line item takes **under 10 seconds**. Across a test set of **≥ 30**
-  real receipts (Thai and international formats, including abbreviated
-  store-specific names), **≥ 85%** of line items are parsed correctly before
-  any manual correction.
-- **NFR3 (generation latency):** An AI recipe is returned in **under 10
+  **≥ 20%**, and median weekly grocery spend drops by **≥ 10%**, measured
+  over **≥ 2 weeks** per user. (Per Project Proposal v1.1.)
+- **NFR2 (pantry intake speed):** A full receipt is scanned and added to the
+  pantry in **under 1 minute**.
+- **NFR3 (receipt scan accuracy):** Across a test set of **≥ 30** real
+  receipts (Thai and international formats, including abbreviated
+  store-specific names), **≥ 85%** of line items are read correctly; the user
+  confirms all items before saving.
+- **NFR4 (generation latency):** An AI recipe is returned in **under 10
   seconds** at the 90th percentile; the UI shows progress within **1 second**
   of the tap.
-- **NFR4 (AI fidelity — pantry):** In a 50-generation test set, **≥ 90%** of
+- **NFR5 (AI fidelity — pantry):** In a 50-generation test set, **≥ 90%** of
   generated recipes use **only** the pantry items the user selected plus a
   declared staples list (salt, oil, water, pepper).
-- **NFR5 (AI fidelity — dietary):** In the same test set, **100%** of
+- **NFR6 (AI fidelity — dietary):** In the same test set, **100%** of
   generated recipes contain **zero** ingredients excluded by the user's saved
   dietary filters. Any violation is a release blocker.
-- **NFR6 (grocery-list accuracy):** A generated grocery list contains **0**
+- **NFR7 (grocery-list accuracy):** A generated grocery list contains **0**
   items already stocked in sufficient quantity in the pantry, verified across
   **≥ 20** test grocery lists.
-- **NFR7 (availability):** The app is available **≥ 99.0%** per calendar
+- **NFR8 (availability):** The app is available **≥ 99.0%** per calendar
   month; when the AI service fails or is rate-limited, the app shows a clear
   message and never a raw error.
-- **NFR8 (AI cost ceiling):** Recipe generation stays within a budget of
-  **≤ 30 generations per user per month** on the free tier, enforced
-  server-side.
 - **NFR9 (page load):** The pantry list (up to 200 items) and the grocery
   list each render in **under 3 seconds** on a mid-range phone over a typical
   mobile connection.
@@ -158,7 +153,7 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
 ## 5. Scope
 
 ### In scope
-- Pantry built automatically from a scanned receipt (F1, NFR2).
+- Pantry built automatically from a scanned receipt (F1, NFR2, NFR3).
 - Pantry viewing, correction, and cooked-meal deduction with leftover confirm
   (F2, NFR11).
 - AI recipe generation from selected pantry items (F3).
@@ -172,6 +167,14 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
 ### Out of scope
 - Any day-by-day / weekly-calendar meal planner. Planned meals are a flat
   list the grocery list is built from — not assigned to specific days.
+- A per-user generation cap / free-tier quota on AI recipe generation — not
+  in scope this phase (dropped per Project Proposal v1.1).
+- Nutritional analysis and cost tracking.
+- Grocery retailer / delivery integrations and multi-household shared
+  pantries.
+- Native iOS and Android applications — the deliverable is a mobile-first
+  web app.
+- A self-hosted or fine-tuned recipe model.
 - Any "certified"/CA-backed claim — explicitly excluded by LR9.
 
 ### The ONE core workflow this phase builds end-to-end

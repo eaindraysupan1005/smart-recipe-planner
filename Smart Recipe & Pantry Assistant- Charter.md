@@ -26,7 +26,7 @@ The main goal of this project is to help users cook from what they already have,
 
 * **Streamline Grocery Shopping:** Convert planned meals into an accurate shopping list that excludes anything already in the pantry.
 
-* **Reduce Food Waste Measurably:** Achieve a measurable before/after reduction in discarded food and in weekly meal-planning time for real users.
+* **Reduce Food Waste Measurably:** Achieve a measurable before/after reduction in discarded food and in weekly grocery cost for real users.
 
 # **4\. Key Stakeholders**
 
@@ -37,13 +37,13 @@ The main goal of this project is to help users cook from what they already have,
 | AI Lead | EAINDRAY SU PAN | Owns the team's AI tooling, builds the agents.md, skills.md, the spec and backlog. Handles AI disclosure, and governance. |
 | Tech Lead | HSU MYAT THWE | Oversees the GitHub repository, code standards, and technical decisions. |
 | Designer | THWIN KHANT NYAR ZAW | Creates user-friendly, visually appealing, and intuitive digital experiences. |
-| Target Users | Young students and young individuals who lives alone and cook 4+times a week  | Track their pantry, plan weekly meals, and use the generated grocery lists to shop with less waste. |
+| Target Users | Young students and young individuals who lives alone and cook 4+ times a week  | Track their pantry, plan weekly meals, and use the generated grocery lists to shop with less waste. |
 
 # **5\. Scope and Key Features**
 
 The system focuses on one core workflow: pantry in, meal plan and grocery list out. The main features include:
 
-|  | Feature | Description | Priority |
+| No | Feature | Description | Priority |
 | :---- | :---- | :---- | :---- |
 | 1 | **Receipt Scanner** | Scan a grocery receipt to add items and quantities to the pantry automatically, with no typing.  | Core |
 | 2 | **Pantry Tracker** | Check what food you have and how much, update if there are any mismatches in the list. | Core |
@@ -57,23 +57,25 @@ The system focuses on one core workflow: pantry in, meal plan and grocery list o
 
 * **AI Output Quality:** Generated recipes must be realistic, safe to cook, and must actually use the selected pantry items and honour the dietary filters; hallucinated quantities or ignored restrictions would break user trust.
 
-* **Receipt Scanning Accuracy:** Receipts vary widely in format and print quality, and many use abbreviated or store-specific item names ("TOM CHRY 250G"). If scanning misreads items or quantities, the pantry starts wrong and everything downstream inherits the error. A correction step at scan time is required, and OCR accuracy on real Thai and international receipts must be tested early.
+* **Receipt Scanning Accuracy:** Receipts vary widely in format and print quality, and many use abbreviated or store-specific item names. If scanning misreads items or quantities, the pantry starts wrong and everything downstream inherits the error. A correction step at scan time is required, and OCR accuracy on real Thai and international receipts must be tested early.
 
 * **Pantry Data Accuracy Over Time:** The system depends on the pantry staying current. The cooked-and-confirm step handles ingredients used in recipes, but items that are never cooked — or eaten outside a planned meal — will drift out of sync with reality.
 
 * **Confirmation Fatigue:** The leftover confirmation only works if users actually mark meals as cooked. If they skip that step, the pantry silently degrades. The prompt must stay to a few taps, and the app should behave sensibly when a meal is never confirmed.
 
-* **AI Cost & Availability:** Recipe generation depends on a third-party AI service with usage costs and rate limits; the app must degrade gracefully to save recipes when the service is unavailable.
-
 * **Measurement Difficulty:** Food waste reduction is self-reported, so the before/after metric must be defined carefully to remain credible.
+
+* **Consent prompt friction**: A legal wall before the first generation could scare users off at the key moment.
+
+* **Compliance scope creep**: Logging, consent records and retention touch every feature and can be deferred until it is too late.
 
 # **7\. Timeline & Milestones**
 
 | Phase | Milestone /Deliverable | Weeks |
 | :---- | :---- | :---- |
 | Discover | Company Charter; requirement spec \+ backlog; 4 diagrams \+ prototype sketch; **User Validation Gate (pass/fail)** | **W1–W5** |
-| Build | Scope locked \+ Sprint 0; **Alpha Demo** – a user adds pantry items, generates an AI recipe from them, assigns it to a day, and receives a grocery list end-to-end | **W6–W8** |
-| Test | **Beta Review** – before/after metric (food waste and planning time) \+ at least 3 feedback-driven fixes (Impact Report) | **W9–W11** |
+| Build | Scope locked \+ Sprint 0; **Alpha Demo** – a user scans a receipt, generates an AI recipe from selected pantry items, adds it to their plan, and receives a grocery list end-to-end  | **W6–W8** |
+| Test | **Beta Review** – before/after metric (food waste and weekly grocery cost) \+ at least 3 feedback-driven fixes (Impact Report) | **W9–W11** |
 | Deliver | Real-user sign-off; **Final Showcase** (10-min pitch); portfolio pack (case study, demo video, evidence log, impact metrics, role statements) | **W12–W14** |
 
 # **8\. Authorization**

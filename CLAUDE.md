@@ -55,13 +55,17 @@ separate file only.
   feature table: Receipt Scanner, Pantry Tracker, AI Recipe Generator, Auto
   Grocery List, Recipe Saving, Dietary Filters, Search by Ingredient. All
   seven are Core/Must — do not add F8+ without a new Charter feature behind it.
-- **Measurable metric** — before/after food waste and weekly planning time.
+- **Measurable metric** — before/after food waste (≥20%) and weekly grocery
+  cost (≥10%).
 - Known risks to respect in every requirement: AI output quality (must use
   real, selected pantry items and honour dietary filters), receipt-scanning
   accuracy (OCR on varied/abbreviated formats), pantry data accuracy over
-  time, confirmation fatigue (the cooked/leftover prompt must stay light), AI
-  cost/rate limits (graceful degradation to saved recipes), and self-reported
-  measurement.
+  time, confirmation fatigue (the cooked/leftover prompt must stay light),
+  measurement difficulty (self-reported waste), consent prompt friction, and
+  compliance scope creep. *(No per-user generation cap this phase — dropped
+  from scope per Project Proposal v1.1; the Charter's Constraints & Risks list
+  no longer names AI availability as a risk either, though NFR8 still covers
+  it.)*
 
 ## Repository structure
 

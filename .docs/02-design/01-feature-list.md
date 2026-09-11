@@ -3,6 +3,7 @@
 - Date: 2026-09-02 (W4, DISCOVER)
 - Source spec: [20260902-01-pantry-meal-planning.md](../01-requirements/01-spec/20260902-01-pantry-meal-planning.md)
 - Backlog: [backlog.md](../01-requirements/backlog.md)
+- Feature grouping matches the Project Proposal v1.1 (FE1–FE8).
 
 Requirements say *what a user wants*; this list says *what gets built*. A
 feature is Must if it contains any Must `F` item. Acceptance criteria are
@@ -10,28 +11,25 @@ written so a tester can pass/fail them.
 
 ---
 
-## FE1 — Receipt-Scanned Pantry · **Must**
+## FE1 — Receipt Scanning & Pantry Intake · **Must**
 
 Covers **F1** · relieves **P1**
 
 | # | Acceptance criteria |
 |---|---|
 | AC1 | Scanning a grocery receipt adds its items and quantities to the pantry with no manual typing (F1) |
-| AC2 | Parsed items are ready for review in under 5 seconds (NFR2) |
-| AC3 | ≥ 85% of line items are parsed correctly across a ≥ 30-receipt test set spanning Thai and international formats (NFR2) |
-| AC4 | Correcting one misread line item takes under 10 seconds (NFR2) |
-| AC5 | The pantry list renders in under 3 seconds for 200 items (NFR9) |
+| AC2 | A full receipt is scanned and added to the pantry in under 1 minute (NFR2) |
+| AC3 | ≥ 85% of line items are read correctly across a ≥ 30-receipt test set spanning Thai and international formats; the user confirms all items before saving (NFR3) |
+| AC4 | The pantry list renders in under 3 seconds for 200 items (NFR9) |
 
-## FE2 — Pantry Tracker & Cooked Deduction · **Must**
+## FE2 — Pantry Management · **Must**
 
 Covers **F2** · relieves **P1**
 
 | # | Acceptance criteria |
 |---|---|
-| AC1 | A user can see current pantry items and quantities, and correct any mismatch |
-| AC2 | Marking a planned meal "cooked" deducts its ingredient quantities from the pantry |
-| AC3 | Confirming what's left over after a cooked meal takes ≤ 2 taps and under 10 seconds (NFR11) |
-| AC4 | The pantry list renders in under 3 seconds for 200 items (NFR9) |
+| AC1 | A user can see current pantry items and quantities, and edit or delete any item |
+| AC2 | The pantry list renders in under 3 seconds for 200 items (NFR9) |
 
 ## FE3 — Dietary Profile & Consent Gate · **Must**
 
@@ -52,14 +50,25 @@ Covers **F3** · implements **LR2, LR8** · relieves **P1, P2**
 
 | # | Acceptance criteria |
 |---|---|
-| AC1 | A generated recipe uses only the pantry items the user selected plus a declared staples list (salt, oil, water, pepper) in ≥ 90% of a 50-generation test set (NFR4) |
-| AC2 | **100%** of generations contain zero ingredients excluded by the saved dietary filters — any violation blocks release (NFR5) |
-| AC3 | A recipe returns in under 10 seconds at p90; progress shows within 1 second (NFR3) |
+| AC1 | A generated recipe uses only the pantry items the user selected plus a declared staples list (salt, oil, water, pepper) in ≥ 90% of a 50-generation test set (NFR5) |
+| AC2 | **100%** of generations contain zero ingredients excluded by the saved dietary filters — any violation blocks release (NFR6) |
+| AC3 | A recipe returns in under 10 seconds at p90 (NFR4) |
 | AC4 | The outbound request carries selected ingredients + dietary flags only — no email, name, or address (LR2) |
-| AC5 | Every generation stores its text, model version, pantry snapshot, filters, timestamp (LR8) |
-| AC6 | Generation is capped server-side at 30 per user per month on the free tier (NFR8) |
+| AC5 | Every generation stores its text, model version, pantry snapshot, filters, timestamp, and can be deleted (LR8) |
+| AC6 | The app stays available ≥ 99.0% of the month; when the AI service fails or is rate-limited, the app shows a clear message, never a raw error (NFR8) |
 
-## FE5 — Recipe Library & Search · **Must**
+## FE5 — Cooked & Leftover Confirmation · **Must**
+
+Covers **F2** · relieves **P1**
+
+| # | Acceptance criteria |
+|---|---|
+| AC1 | Marking a planned meal "cooked" deducts its ingredient quantities from the pantry |
+| AC2 | The removed items are shown in a confirmation box the user can adjust |
+| AC3 | Confirming what's left over takes ≤ 2 taps and under 10 seconds (NFR11) |
+| AC4 | If the user does not confirm, the pantry is left unchanged rather than guessed |
+
+## FE6 — Recipe Library · **Must**
 
 Covers **F5, F7** · implements **LR4, LR5** · relieves **P2, P3**
 
@@ -71,17 +80,17 @@ Covers **F5, F7** · implements **LR4, LR5** · relieves **P2, P3**
 | AC4 | Saving logs account id + IP + timestamp separately from the content (LR4) |
 | AC5 | Editing or deleting a recipe is logged and the original is kept ≥ 90 days (LR5) |
 
-## FE6 — Auto Grocery List · **Must**
+## FE7 — Auto Grocery List · **Must**
 
 Covers **F4** · relieves **P3**
 
 | # | Acceptance criteria |
 |---|---|
-| AC1 | The list is generated from currently planned meals minus current pantry stock (F4) |
-| AC2 | The list contains **0** items already stocked in sufficient quantity, across ≥ 20 test grocery lists (NFR6) |
-| AC3 | "Grocery list generated" is stored as a retrievable record (LR8) |
+| AC1 | When a user selects a recipe, the system compares its ingredients against the pantry and adds only the missing ones to the shopping list (F4) |
+| AC2 | The list contains **0** items already stocked in sufficient quantity, across ≥ 20 test grocery lists (NFR7) |
+| AC3 | Each list generation is stored as a retrievable record (LR8) |
 
-## FE7 — Compliance & Audit Layer · **Must** *(cross-cutting)*
+## FE8 — Compliance & Audit Layer · **Must** *(cross-cutting)*
 
 Implements **LR3, LR4, LR5, LR6, LR9** · no single screen — it sits behind every feature
 
@@ -105,5 +114,5 @@ Implements **LR3, LR4, LR5, LR6, LR9** · no single screen — it sits behind ev
 
 ## Month-2 BUILD commitment
 
-**FE1 → FE2 → FE3 → FE4 → FE5(AC1) → FE6**, with FE7 running behind them.
+**FE1 → FE2 → FE3 → FE4 → FE5 → FE6(AC1) → FE7**, with FE8 running behind them.
 That chain is the one core workflow. Everything else waits.

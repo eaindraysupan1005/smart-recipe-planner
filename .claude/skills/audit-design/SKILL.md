@@ -28,7 +28,7 @@ design draft meets the W5 gate criteria.
      items, or a journey step describing behaviour no requirement states.
 4. Gate-specific checks:
    - The **activity diagram** must show the consent step (LR1/LR2) and the
-     dietary-filter check (NFR5).
+     dietary-filter check (NFR6).
    - The **architecture diagram** must state **one explicit trade-off**.
    - The **user journey** must cover the one core workflow end to end:
      receipt scan → pantry in → AI recipe → cook & confirm leftovers →

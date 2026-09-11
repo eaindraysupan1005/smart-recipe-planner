@@ -61,7 +61,7 @@ one per file:
 - *Architecture* — components and data stores, with **one stated trade-off**
   (the course rubric requires it).
 - *Activity* — the core workflow as a flow with decision points; it must show
-  the consent step (LR1/LR2) and the dietary-filter check (NFR5).
+  the consent step (LR1/LR2) and the dietary-filter check (NFR6).
 
 ## Traceability rule
 
