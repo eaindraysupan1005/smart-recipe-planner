@@ -62,9 +62,9 @@ logs so the origin of an online action can be traced if authorities request it.
 
 **Rules for the agent:**
 
-\- If the system lets a user create content (a manually written recipe, a saved
-AI recipe, a planned meal), it must log the account ID, IP address, and
-timestamp separately from the content itself.
+\- If the system lets a user create content (a saved AI recipe, a planned
+meal), it must log the account ID, IP address, and timestamp separately from
+the content itself.
 
 \- If the system has an edit or delete action on a recipe, pantry item, or
 planned meal, it must log actor identity, IP, and timestamp, kept for ≥90 days

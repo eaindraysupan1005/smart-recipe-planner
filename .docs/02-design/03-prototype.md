@@ -165,5 +165,5 @@ what they did **not** have to buy. That number is also the demo moment.
 | S6 My plan | F2, F4, NFR11 |
 | S7 Grocery list | F4, NFR7, LR8 |
 
-Search by ingredient (F7) and manual recipe entry (part of F5) are not
-prototyped this phase — both reuse the Recipe Library screen pattern.
+Search by ingredient (F7) is not prototyped this phase — it reuses the
+Recipe Library screen pattern.

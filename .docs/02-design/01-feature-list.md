@@ -75,10 +75,9 @@ Covers **F5, F7** · implements **LR4, LR5** · relieves **P2, P3**
 | # | Acceptance criteria |
 |---|---|
 | AC1 | A user can save an AI-generated recipe and reopen it later without regenerating (F5) |
-| AC2 | A user can write a recipe manually into a form and save it alongside AI ones (F5) |
-| AC3 | A user can search saved recipes by an ingredient they have (F7) |
-| AC4 | Saving logs account id + IP + timestamp separately from the content (LR4) |
-| AC5 | Editing or deleting a recipe is logged and the original is kept ≥ 90 days (LR5) |
+| AC2 | A user can search saved recipes by an ingredient they have (F7) |
+| AC3 | Saving logs account id + IP + timestamp separately from the content (LR4) |
+| AC4 | Editing or deleting a recipe is logged and the original is kept ≥ 90 days (LR5) |
 
 ## FE7 — Auto Grocery List · **Must**
 

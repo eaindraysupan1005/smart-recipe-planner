@@ -16,7 +16,7 @@ graph LR
     UC3["UC3 Set dietary filters (F6, LR1)"]
     UC4["UC4 Accept Terms & consent (LR7, LR2)"]
     UC5["UC5 Select pantry items & generate recipe (F3)"]
-    UC6["UC6 Save a recipe — AI or manual (F5)"]
+    UC6["UC6 Save an AI-generated recipe (F5)"]
     UC7["UC7 Search saved recipes by ingredient (F7)"]
     UC8["UC8 Add a recipe to my plan (F4)"]
     UC9["UC9 Mark a meal cooked & confirm leftovers (F2)"]

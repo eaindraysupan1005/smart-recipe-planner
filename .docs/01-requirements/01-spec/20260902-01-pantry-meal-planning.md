@@ -45,7 +45,7 @@ nothing outside this list is in scope.
 | F2 | As a user, I want to see what food I have and how much, correct anything the scan got wrong, and have quantities deducted (with a quick confirm of what's left) when I mark a meal cooked, so that my pantry always reflects reality without me re-entering it. | Must | solves P1 |
 | F3 | As a user, I want the AI to generate a recipe built from the pantry items I select, so that even a small handful of leftovers becomes a usable meal instead of takeout. | Must | solves P1, P2 |
 | F4 | As a user, I want my planned meals turned into a grocery list that excludes what is already in my pantry, so that I stop re-buying and overbuying. | Must | solves P3 |
-| F5 | As a user, I want to save both AI-generated and manually entered recipes, so that I can cook them again without regenerating or rewriting them. | Must | solves P2, P3 |
+| F5 | As a user, I want to save an AI-generated recipe, so that I can cook it again without regenerating it. | Must | solves P2, P3 |
 | F6 | As a user with dietary needs, I want to save dietary filters (vegetarian, gluten-free, low-carb, and others) and have every generated recipe honour them, so that suggestions are actually cookable for me. | Must | solves P2 |
 | F7 | As a user, I want to search my saved recipes by an ingredient I have, so that I can find a use for something before it expires. | Must | solves P1, P2 |
 
@@ -116,8 +116,8 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
   except retained logs; token store holds no credential.*
 
 ### Computer Crime Act §26
-- **LR4 (CCA §26 — creation log):** Every user-created item (manual recipe,
-  saved AI recipe, planned meal) is logged with account ID, IP address, and
+- **LR4 (CCA §26 — creation log):** Every user-created item (saved AI recipe,
+  planned meal) is logged with account ID, IP address, and
   timestamp, stored separately from the content itself. *Testable:
   each saved recipe has a matching log row with all three fields.*
 - **LR5 (CCA §26 — edit/delete log, 90-day retention):** Every edit or delete
@@ -158,7 +158,7 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
   (F2, NFR11).
 - AI recipe generation from selected pantry items (F3).
 - Auto grocery list = planned meals minus pantry stock (F4).
-- Recipe saving, AI-generated and manual (F5).
+- Recipe saving, AI-generated (F5).
 - Saved dietary filters applied to every generated recipe (F6, LR1).
 - Search saved recipes by an ingredient on hand (F7).
 - Consent & terms gate before first generation (LR1, LR2, LR7).

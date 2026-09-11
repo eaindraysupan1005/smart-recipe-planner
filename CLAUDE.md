@@ -34,8 +34,8 @@ rules in **[rule.md](rule.md)** (from Week 2). It covers three Thai laws:
   recipes/planned meals/grocery list; full delete on account deletion; store
   only login tokens, never credentials.
 - **Computer Crime Act §26** — keep access/traffic logs (account ID, IP,
-  timestamp) for ≥90 days for user-created content (manual recipes, saved AI
-  recipes, planned meals), retained even after the item is edited or deleted.
+  timestamp) for ≥90 days for user-created content (saved AI recipes, planned
+  meals), retained even after the item is edited or deleted.
 - **Electronic Transactions Act §9 / 26 / 28** — retrievable acceptance records
   for Terms / AI & Food Safety Disclaimer and for consent (and withdrawal);
   reproducible AI-output records (text, model version, pantry snapshot, filters,

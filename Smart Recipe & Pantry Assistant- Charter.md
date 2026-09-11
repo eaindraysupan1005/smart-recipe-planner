@@ -49,7 +49,7 @@ The system focuses on one core workflow: pantry in, meal plan and grocery list o
 | 2 | **Pantry Tracker** | Check what food you have and how much, update if there are any mismatches in the list. | Core |
 | 3 | **AI Recipe Generator** | AI creates a new recipe from whatever is in your pantry, respecting dietary filters. | Core |
 | 4 | **Auto Grocery List** | Turn planned meals into a shopping list, minus what you already have. | Core |
-| 5 | **Recipe Saving** | Save both AI-generated and manually entered recipes for reuse. | Core |
+| 5 | **Recipe Saving** | Save AI-generated recipes for reuse.  | Core |
 | 6 | **Dietary Filters** | Filter recipes by vegetarian, gluten-free, low-carb, and similar needs. | Core |
 | 7 | **Search by Ingredient** | Find saved recipes using ingredients you already have. | Core |
 

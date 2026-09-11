@@ -15,7 +15,7 @@ recipes → takeout · **P3** disconnected planning & shopping.
 | B2 | Pantry view with correction, and cooked-meal deduction + leftover confirm | F2, P1 |
 | B3 | AI recipe generation from pantry items the user selects | F3, P1, P2 |
 | B4 | Auto grocery list = planned meals minus pantry stock | F4, P3 |
-| B5 | Save a recipe (AI-generated or manual) for reuse | F5, P2, P3 |
+| B5 | Save an AI-generated recipe for reuse | F5, P2, P3 |
 | B6 | Dietary filter profile applied to every generated recipe | F6, P2 |
 | B7 | Search saved recipes by an ingredient on hand | F7, P1, P2 |
 | B8 | Terms + AI & Food Safety Disclaimer gate before first generation | LR7 |
