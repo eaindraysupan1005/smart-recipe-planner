@@ -9,7 +9,7 @@ Project Proposal v1.1).
 
 ```mermaid
 flowchart TD
-    Start(["Home cook opens app"]) --> Scan["Scan grocery receipt (F1)"]
+    Start(["User opens app"]) --> Scan["Scan grocery receipt (F1)"]
     Scan --> Parse{"All items parsed\nconfidently?"}
     Parse -- "no" --> Correct["Correct flagged item(s) (F2)"]
     Correct --> Pantry
