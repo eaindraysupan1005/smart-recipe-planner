@@ -44,7 +44,7 @@ nothing outside this list is in scope.
 | F1 | As a user, I want to scan a grocery receipt so that its items and quantities are added to my pantry automatically, with no typing, so that my pantry is never empty because entry felt like too much work. | Must | solves P1 |
 | F2 | As a user, I want to see what food I have and how much, correct anything the scan got wrong, and have quantities deducted (with a quick confirm of what's left) when I mark a meal cooked, so that my pantry always reflects reality without me re-entering it. | Must | solves P1 |
 | F3 | As a user, I want the AI to generate a recipe built from the pantry items I select, so that even a small handful of leftovers becomes a usable meal instead of takeout. | Must | solves P1, P2 |
-| F4 | As a user, I want my planned meals turned into a grocery list that excludes what is already in my pantry, so that I stop re-buying and overbuying. | Must | solves P3 |
+| F4 | As a user, I want a grocery list built automatically from every recipe I've generated or picked that I haven't cooked yet — combined, and minus what's already in my pantry — so that I stop re-buying and overbuying without managing a separate list myself. | Must | solves P3 |
 | F5 | As a user, I want to save an AI-generated recipe, so that I can cook it again without regenerating it. | Must | solves P2, P3 |
 | F6 | As a user with dietary needs, I want to save dietary filters (vegetarian, gluten-free, low-carb, and others) and have every generated recipe honour them, so that suggestions are actually cookable for me. | Must | solves P2 |
 | F7 | As a user, I want to search my saved recipes by an ingredient I have, so that I can find a use for something before it expires. | Must | solves P1, P2 |
@@ -88,6 +88,10 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
 - **NFR11 (confirmation fatigue):** Marking a planned meal "cooked" and
   confirming what's left over takes **no more than 2 taps** and **under 10
   seconds**, so pantry accuracy does not depend on sustained user effort.
+- **NFR12 (zero-touch pooling):** A recipe joins the pending grocery-list pool
+  automatically — **0** additional taps and no separate "add to plan" action —
+  the moment it is generated or the moment it is selected from the recipe
+  library/favourites.
 
 ## 4. Legal requirements (from rule.md)
 
@@ -157,7 +161,8 @@ LR7** below, and appears as a gate in the Scope workflow (§5).
 - Pantry viewing, correction, and cooked-meal deduction with leftover confirm
   (F2, NFR11).
 - AI recipe generation from selected pantry items (F3).
-- Auto grocery list = planned meals minus pantry stock (F4).
+- Auto grocery list = every not-yet-cooked recipe (pooled automatically,
+  no manual "add" step) combined and minus pantry stock (F4, NFR12).
 - Recipe saving, AI-generated (F5).
 - Saved dietary filters applied to every generated recipe (F6, LR1).
 - Search saved recipes by an ingredient on hand (F7).
@@ -184,3 +189,10 @@ them, honouring their dietary filters → the user marks the meal cooked and
 confirms what's left over, so the pantry stays accurate → the app produces a
 grocery list containing only the missing ingredients from what is still
 planned.
+
+There is a second entry point into this same workflow, not a second workflow:
+a user who skips straight to F7 (search saved recipes) or the recipe
+library/favourites and picks an existing recipe joins the pending
+grocery-list pool the same way (F4, NFR12) and can build a grocery list from
+it without scanning or generating anything that session — useful when the
+pantry is empty or unchanged since last time.

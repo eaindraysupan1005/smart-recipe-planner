@@ -7,8 +7,10 @@
   `TODO: <link>`
 
 These wireframes fix *what is on each screen and why*. Colour, type, and spacing
-are the Designer's call. There is no weekly-calendar screen — planned meals
-are a flat list (see S6).
+are the Designer's call. There is no weekly-calendar screen, and no
+user-facing "My Plan" list screen either — a recipe joins the pending
+grocery-list pool automatically the moment it's generated or selected, with
+no separate "add" step (see S5, S5b, S7).
 
 ---
 
@@ -27,7 +29,7 @@ are a flat list (see S6).
 ├─────────────────────────────────┤
 │  [ 🍳  Cook something with this ]│
 └─────────────────────────────────┘
-   Pantry  │ Plan │ Recipes │ List
+   Pantry  │ Recipes │ List
 ```
 The pantry *is* the entry point; the camera icon starts a receipt scan (F1),
 and "Cook something with this" starts item selection (F3).
@@ -96,7 +98,7 @@ information rather than a wall.
 Selection is explicit — the recipe is built only from what Nan checks (F3,
 NFR5), not from the whole pantry silently.
 
-## S5 — Generated recipe · F3, F5, F6
+## S5 — Generated recipe · F3, F5, F6, F4
 
 ```
 ┌─────────────────────────────────┐
@@ -112,27 +114,54 @@ NFR5), not from the whole pantry silently.
 │  1. Heat oil ...                │
 │  2. ...                         │
 ├─────────────────────────────────┤
-│ [ Save ]  [ Add to my plan ]    │
+│ [ Mark as cooked ] [ Regenerate ]│
+│           [ Save ]               │
 └─────────────────────────────────┘
 ```
 Showing *which* selected pantry items it used is what makes the AI
-trustworthy (P1). The dietary badge is the visible half of NFR6.
+trustworthy (P1). The dietary badge is the visible half of NFR6. There is
+no "Add to plan" button — the recipe already joined the pending grocery-list
+pool the moment it was generated (F4, NFR12). "Regenerate" replaces this
+recipe with a new one from the same selection; "Mark as cooked" moves to S6.
 
-## S6 — My plan · F2, F4
+## S5b — Recipe Library · F5, F7, F4
 
 ```
 ┌─────────────────────────────────┐
-│  My planned meals                │
+│  My Recipes      🔍 by ingredient│
 ├─────────────────────────────────┤
-│  Spinach & Egg Skillet   [Cooked]│
-│  Chicken Rice             [Cooked]│
+│  Spinach & Egg Skillet          │
+│  Chicken Rice                   │
+│  Tomato Pasta                   │
+│  ...                            │
 ├─────────────────────────────────┤
-│   [  Build my shopping list  ]  │
+│           [  View  ]            │
+└─────────────────────────────────┘
+   Pantry  │ Recipes │ List
+```
+Reached from the **Recipes** tab — no pantry or receipt-scan step in between.
+Searching by ingredient (F7) filters this same list. Selecting a recipe here
+(re)joins the pending grocery-list pool automatically, the same way
+generating one does on S5 — no "Add to plan" button, and it works the same
+whether the pantry is full, partly stocked, or empty.
+
+## S6 — Cooked confirmation · F2, NFR11
+
+```
+┌─────────────────────────────────┐
+│  Nice! What's left over?        │
+├─────────────────────────────────┤
+│  Removed from pantry:           │
+│   Spinach   1 bag   ✓           │
+│   Eggs      3        ✓          │
+│   Rice      1 cup    ✓          │
+├─────────────────────────────────┤
+│         [  Confirm  ]           │
 └─────────────────────────────────┘
 ```
-A flat list, not a calendar — meals are added here from S5 and stay until
-cooked or removed. Tapping "Cooked" deducts pantry quantities and opens the
-leftover-confirm step (F2, NFR11).
+Reached only from "Mark as cooked" on S5 — there is no separate "My Plan"
+list to open first. Confirming takes ≤ 2 taps (NFR11); if Nan doesn't
+confirm, the pantry is left unchanged rather than guessed.
 
 ## S7 — Grocery list · F4, NFR7
 
@@ -161,9 +190,7 @@ what they did **not** have to buy. That number is also the demo moment.
 | S2 Scan & review receipt | F1, NFR2, NFR3 |
 | S3 Consent | LR1, LR2, LR7 |
 | S4 Select items | F3 |
-| S5 Recipe | F3, F5, F6, NFR4, NFR5, NFR6, LR8 |
-| S6 My plan | F2, F4, NFR11 |
+| S5 Recipe | F3, F5, F6, F4, NFR4, NFR5, NFR6, NFR12, LR8 |
+| S5b Recipe Library | F5, F7, F4, NFR12 |
+| S6 Cooked confirmation | F2, NFR11 |
 | S7 Grocery list | F4, NFR7, LR8 |
-
-Search by ingredient (F7) is not prototyped this phase — it reuses the
-Recipe Library screen pattern.

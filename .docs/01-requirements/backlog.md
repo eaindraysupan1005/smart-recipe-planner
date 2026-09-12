@@ -14,7 +14,7 @@ recipes → takeout · **P3** disconnected planning & shopping.
 | B1 | Receipt scan builds the pantry automatically (items + quantities, no typing) | F1, P1 |
 | B2 | Pantry view with correction, and cooked-meal deduction + leftover confirm | F2, P1 |
 | B3 | AI recipe generation from pantry items the user selects | F3, P1, P2 |
-| B4 | Auto grocery list = planned meals minus pantry stock | F4, P3 |
+| B4 | Auto grocery list = every not-yet-cooked recipe pooled automatically (no manual "add" step), combined and minus pantry stock | F4, NFR12, P3 |
 | B5 | Save an AI-generated recipe for reuse | F5, P2, P3 |
 | B6 | Dietary filter profile applied to every generated recipe | F6, P2 |
 | B7 | Search saved recipes by an ingredient on hand | F7, P1, P2 |

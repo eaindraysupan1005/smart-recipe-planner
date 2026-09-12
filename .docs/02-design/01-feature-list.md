@@ -85,9 +85,10 @@ Covers **F4** · relieves **P3**
 
 | # | Acceptance criteria |
 |---|---|
-| AC1 | When a user selects a recipe, the system compares its ingredients against the pantry and adds only the missing ones to the shopping list (F4) |
-| AC2 | The list contains **0** items already stocked in sufficient quantity, across ≥ 20 test grocery lists (NFR7) |
-| AC3 | Each list generation is stored as a retrievable record (LR8) |
+| AC1 | Generating a recipe (Journey 1) or selecting one from the library/favourites (Journey 2) joins the pending grocery-list pool automatically — no separate "add" tap (F4, NFR12) |
+| AC2 | Building the list combines ingredients across every not-yet-cooked recipe in the pool and compares the combined total against the pantry, adding only what's missing (F4) |
+| AC3 | The list contains **0** items already stocked in sufficient quantity, across ≥ 20 test grocery lists (NFR7) |
+| AC4 | Each list generation is stored as a retrievable record (LR8) |
 
 ## FE8 — Compliance & Audit Layer · **Must** *(cross-cutting)*
 

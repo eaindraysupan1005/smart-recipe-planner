@@ -7,40 +7,52 @@ grocery list and the pantry deduction on a cooked meal. There is no
 calendar/day-assignment step, and no generation cap (dropped from scope per
 Project Proposal v1.1).
 
+Laid out as two swimlanes — **User** (actions and decisions made by the
+person using the app) and **System** (app/backend processing, checks, and
+records) — to make the handoffs between them explicit.
+
 ```mermaid
-flowchart TD
-    Start(["User opens app"]) --> Scan["Scan grocery receipt (F1)"]
-    Scan --> Parse{"All items parsed\nconfidently?"}
-    Parse -- "no" --> Correct["Correct flagged item(s) (F2)"]
-    Correct --> Pantry
-    Parse -- "yes" --> Pantry["Pantry updated (F2)"]
+flowchart TB
+    subgraph System["Lane: System"]
+        direction TB
+        ParseReceipt["AI scans receipt,\nbuilds pantry list (F1, NFR2)"]
+        AskConsent["Ask AI consent —\nwhat's sent, why (LR2)"]
+        Generate["AI generates recipe from\nselected items (F3, F6, LR8)"]
+        Pool["Recipe joins pending\ngrocery-list pool (F4, NFR12)"]
+        Deduct["AI subtracts used\nquantities from pantry (F2)"]
+        BuildList["Build grocery list from\npooled recipes minus pantry (F4, NFR7)"]
+    end
 
-    Pantry --> Select["Select pantry items to use (F3)"]
-    Select --> ConsentCheck{"Terms + AI consent\nalready on file?"}
-    ConsentCheck -- "no" --> ConsentGate["Show consent gate (LR1, LR2, LR7)"]
-    ConsentGate --> ConsentGiven{"Consent given?"}
-    ConsentGiven -- "no" --> End1(["Stop — no generation"])
-    ConsentGiven -- "yes" --> AIAvail
-    ConsentCheck -- "yes" --> AIAvail{"AI service\navailable? (NFR8)"}
+    subgraph User["Lane: User"]
+        direction TB
+        Start(["Log in / sign up"])
+        Scan["Scan grocery receipt (F1)"]
+        Confirm["Confirm pantry list (F2)"]
+        Select["Select pantry items to use (F3)"]
+        CookTap["Tap 'Cook something\nwith this' (F3)"]
+        ConsentDecision{"Give AI consent?\n(LR2)"}
+        RecipeDecision{"Mark as cooked or\nregenerate?"}
+        ConfirmDecision{"Confirm leftovers\nnow, or not yet?"}
+        ConfirmSub["Confirm pantry\nsubtraction (NFR11)"]
+        Exit(["Exit"])
+    end
 
-    AIAvail -- "no" --> Fallback["Show plain-language notice,\noffer saved recipes"]
-    Fallback --> End2(["Stop"])
-    AIAvail -- "yes" --> Generate["Generate recipe from\nselected items (F3)"]
-
-    Generate --> DietCheck{"Zero excluded\ningredients? (NFR6)"}
-    DietCheck -- "no — release blocker" --> Reject["Recipe rejected,\nregenerate or fall back"]
-    Reject --> Generate
-    DietCheck -- "yes" --> ShowRecipe["Show recipe,\nstore generation record (LR8)"]
-
-    ShowRecipe --> SaveDecision{"Save and/or\nadd to plan?"}
-    SaveDecision -- "save" --> SaveRecipe["Save to library (F5, LR4)"]
-    SaveDecision -- "add to plan" --> AddPlan["Add to flat plan list (F4)"]
-    SaveRecipe --> AddPlan
-
-    AddPlan --> Cooked{"Meal marked\ncooked?"}
-    Cooked -- "not yet" --> BuildList
-    Cooked -- "yes" --> Deduct["Deduct pantry quantities,\nconfirm leftovers (F2, NFR11)"]
-    Deduct --> BuildList["Build grocery list =\nplanned meals minus pantry (F4, NFR7)"]
-
-    BuildList --> Done(["Grocery list shown"])
+    Start --> Scan
+    Scan --> ParseReceipt
+    ParseReceipt --> Confirm
+    Confirm --> Select
+    Select --> CookTap
+    CookTap --> AskConsent
+    AskConsent --> ConsentDecision
+    ConsentDecision -- "no" --> Confirm
+    ConsentDecision -- "yes" --> Generate
+    Generate --> Pool
+    Pool --> RecipeDecision
+    RecipeDecision -- "regenerate" --> Generate
+    RecipeDecision -- "mark cooked" --> Deduct
+    Deduct --> ConfirmDecision
+    ConfirmDecision -- "not yet" --> Confirm
+    ConfirmDecision -- "confirm" --> ConfirmSub
+    ConfirmSub --> BuildList
+    BuildList --> Exit
 ```
