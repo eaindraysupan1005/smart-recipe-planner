@@ -1,7 +1,7 @@
 # User Journey — the one core workflow, two entry points
 
 - Date: 2026-09-02 (W4, DISCOVER)
-- Persona: **Nan**, cooks for herself 4+ times a week, throws out small
+- Persona: **Susan**, cooks for herself 4+ times a week, throws out small
   leftovers most weeks and orders takeout when she can't decide what to cook
   (P1, P2, P3).
 - The app has **two ways in** to the same underlying system, not two separate
@@ -15,7 +15,7 @@
 
 ## One-time setup (before either journey, first use only)
 
-| # | Screen | Nan does | System does | Traces |
+| # | Screen | Susan does | System does | Traces |
 |---|--------|----------|-------------|--------|
 | S1 | Sign-up / Terms | Creates an account, accepts Terms + AI & Food Safety Disclaimer | Stores acceptance: user id, timestamp, version | LR7 |
 | S2 | Dietary profile | Opts in to "gluten-free" and an allergy (peanuts) | Stores as **sensitive data** under a separate explicit opt-in; not set by default | F6, LR1 |
@@ -24,7 +24,7 @@
 
 ## Journey 1 — Cook now
 
-| # | Screen | Nan does | System does | Traces | Pain relieved |
+| # | Screen | Susan does | System does | Traces | Pain relieved |
 |---|--------|----------|-------------|--------|---------------|
 | J1 | Pantry (home) | Opens the app | Shows current pantry items and quantities | F2 | **P1** |
 | J2 | Scan receipt | Photographs her grocery receipt | — | F1 | **P1** |
@@ -38,7 +38,7 @@
 
 ## Journey 2 — Grocery list from an existing recipe
 
-| # | Screen | Nan does | System does | Traces | Pain relieved |
+| # | Screen | Susan does | System does | Traces | Pain relieved |
 |---|--------|----------|-------------|--------|---------------|
 | K1 | Recipe list / Favourites | Opens the app, goes straight to her saved recipes (all AI-generated) or her favourites — no scan, no pantry step | Shows the saved recipes, searchable by ingredient | F5, F7 | **P2, P3** |
 | K2 | Select a recipe | Picks "Chicken Rice" | The recipe (re)joins the pending grocery-list pool automatically — no "add" tap; pantry stock is **not** checked yet | F4, NFR12 | P3 |
