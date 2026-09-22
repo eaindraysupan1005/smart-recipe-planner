@@ -28,3 +28,22 @@ recipes → takeout · **P3** disconnected planning & shopping.
 | B15 | Retrievable acceptance & consent records, including withdrawal (user ID, timestamp, version) | LR7 (ETA §9/26) |
 | B16 | Reproducible AI-output record (text, model version, pantry snapshot, filters, timestamp) + stored action confirmations | LR8 (ETA §9/26) |
 | B17 | No "certified"/"nutritionist-approved"/CA language in the UI | LR9 (ETA §28) |
+
+No Should tier: the spec's seven functional requirements (F1–F7) are all
+Core/Must this phase — nothing sits between Must and Won't.
+
+## Won't (this phase)
+
+Explicitly out of scope per the spec's §5 "Out of scope". Revisit after the
+W5 User Validation Gate.
+
+| # | Item | Reason |
+|---|------|--------|
+| B18 | Day-by-day / weekly-calendar meal planner | Spec §5: planned meals are a flat list, not assigned to specific days |
+| B19 | Per-user AI generation cap / free-tier quota | Spec §5: dropped per Project Proposal v1.1 |
+| B20 | Nutritional analysis and cost tracking | Spec §5: explicitly out of scope |
+| B21 | Grocery retailer / delivery integrations | Spec §5: explicitly out of scope |
+| B22 | Multi-household shared pantries | Spec §5: explicitly out of scope |
+| B23 | Native iOS and Android apps | Spec §5: deliverable is a mobile-first web app |
+| B24 | Self-hosted or fine-tuned recipe model | Spec §5: explicitly out of scope |
+| B25 | "Certified"/CA-backed claims in the UI | LR9 (ETA §28); spec §5 |
