@@ -1,0 +1,19 @@
+{
+  "name": "what2cook",
+  "private": true,
+  "version": "1.0.0",
+  "description": "What2Cook — Smart Recipe & Pantry Assistant (Team Apex)",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c yellow,cyan \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend",
+    "dev:phone": "concurrently -n api,web -c yellow,cyan \"npm run dev -w backend\" \"PHONE=1 npm run dev -w frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
