@@ -30,6 +30,7 @@ function load(): DB {
 export const db: DB = load();
 
 let pending: NodeJS.Timeout | null = null;
+let lastWrite = 0;
 
 /** Debounced write-through to a JSON file so data survives restarts. */
 export function persist(): void {
@@ -38,7 +39,29 @@ export function persist(): void {
     pending = null;
     fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+    lastWrite = Date.now();
   }, 50);
+}
+
+/**
+ * Picks up changes written by another process — e.g. `npm run seed` while the
+ * server is running — instead of overwriting them from memory.
+ */
+export function watchDataFile(): void {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.watch(DATA_DIR, (_event, file) => {
+      if (file !== 'db.json' || Date.now() - lastWrite < 500) return;
+      try {
+        Object.assign(db, load());
+        console.log('Reloaded db.json (changed on disk)');
+      } catch {
+        /* half-written file: the next event will catch the complete one */
+      }
+    });
+  } catch {
+    /* watching is a convenience; the server works fine without it */
+  }
 }
 
 export const newId = (): string => crypto.randomUUID();

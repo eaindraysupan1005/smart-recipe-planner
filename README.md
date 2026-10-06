@@ -3,7 +3,60 @@
 Team Apex. React + TypeScript frontend, Node + Express + TypeScript backend.
 Built from the Claude Design prototype `What2Cook.dc.html`.
 
-## Run it
+## Alpha Demo Day (one-command run)
+
+```bash
+npm install
+npm run demo
+```
+
+That builds both apps, loads the demo data and starts **one** server:
+**http://localhost:4000** — app and API together, no Vite, no proxy.
+
+Sign in with **demo@what2cook.app** and **any password** (auth is a dummy).
+
+Reset the demo data at any time, even while the server is running — it reloads
+the file automatically:
+
+```bash
+npm run seed          # reset the demo account only
+npm run seed:fresh    # wipe everything and reseed
+```
+
+The demo account starts with 12 pantry items, 1 saved recipe (missing one
+ingredient, so the shopping list has something to show), 1 AI suggestion
+waiting, a 3-item shopping list, and its consent records already on file.
+
+### The 4-minute demo path
+
+1. **Pantry** — 12 items, newest scan first.
+2. **Scan** → "Use a sample receipt" (or a real receipt with the camera) →
+   review the read items → **Add to pantry**.
+3. **Pantry** — tick 2–3 items → **Cook with N selected**.
+4. **Recipe** — uses only the ticked items, dietary filters applied →
+   **Mark as cooked** → confirm what is left over.
+5. **Pantry** — amounts are deducted; anything used up is gone.
+6. **Saved** → a recipe → **Add missing items to list** → **List**.
+
+### Checks the markers will run
+
+- **Refresh test:** add an item, reload the page — it is still there (data is
+  written to `backend/data/db.json`, and the session token survives a reload).
+- **Hands-off test:** every step above is reachable by tapping; nothing needs
+  the console or a URL typed by hand.
+
+### If something goes wrong on the day
+
+| Problem | Fix |
+|---|---|
+| Port 4000 busy | `API_PORT=4100 npm run start -w backend`, then open that port |
+| Data looks wrong mid-demo | `npm run seed` in a second terminal — no restart needed |
+| Camera blocked on the laptop | Use "No receipt handy? Use a sample receipt" |
+| Starting from scratch | `npm install && npm run demo` |
+
+Dev mode (two servers, hot reload) is still `npm run dev` — see below.
+
+## Run it (development)
 
 ```bash
 npm install

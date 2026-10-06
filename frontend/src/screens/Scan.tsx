@@ -350,12 +350,7 @@ export function ScanReview() {
           scannedAt={scannedAt}
           onClose={() => setEditIdx(null)}
           onSave={(l) => {
-<<<<<<< HEAD
-            if (l) l = { ...l, confident: true };
-            update(editIdx, l);
-=======
             update(editIdx, l ? { ...l, confident: true } : null);
->>>>>>> c78a9cd (update code info)
             setEditIdx(null);
           }}
         />

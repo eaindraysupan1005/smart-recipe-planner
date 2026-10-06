@@ -1,8 +1,6 @@
 node_modules/
-<<<<<<< HEAD
+dist/
 backend/data/
-=======
->>>>>>> c78a9cd (update code info)
 .DS_Store
 *.log
 .env
