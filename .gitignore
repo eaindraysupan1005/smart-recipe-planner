@@ -1,5 +1,8 @@
 node_modules/
+<<<<<<< HEAD
 backend/data/
+=======
+>>>>>>> c78a9cd (update code info)
 .DS_Store
 *.log
 .env
