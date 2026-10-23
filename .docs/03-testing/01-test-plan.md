@@ -103,25 +103,51 @@ above)**, **time on task**, **errors**, and **before vs. after time** where a
 baseline exists (T1, T4). Entered into one spreadsheet row per user (U01…),
 same day as the session.
 
-### Optional — choose none, one, or several (team decision)
-- **SUS** (System Usability Scale, 10 items) immediately after the tasks —
-  gives a single 0–100 usability score per user, compared against the
-  benchmark of 68.
-- **TAM** (3 constructs: PU, PEOU, BI) — fits a workplace-style tool used by
-  choice for a task.
-- **UTAUT2** (pick relevant constructs, always include BI) — fits a
-  consumer app adopted voluntarily.
-- Pick **at most one** of TAM/UTAUT2, never both; report mean ± SD per
-  construct, no causal claims.
+### System Usability Scale (SUS)
+The team is using **SUS** as the usability
+instrument. SUS is not selected to "prove" the task-performance evidence
+above — it answers a different question (*how easy did it feel?* vs. *did it
+actually work?*) and gives us a standard, comparable number for the final
+write-up.
 
-**If the team uses none of SUS/TAM/UTAUT2**, this Test Plan substitutes the
-required method/procedure/results/evidence write-up (per the course's
-"no standard instrument" format) — the team must decide this before 4 Nov so
-the questionnaire packet (if any) is printed/loaded in advance.
+**When it's given:** immediately after the 5 tasks (T1–T5), before the
+3-question interview — per the session structure in §3.2.
 
-> **Team decision needed:** which of the three optional instruments (if any)
-> to run. This Test Plan assumes **none selected yet** — fill in before 28
-> Oct so sessions on 4 Nov include the right paperwork.
+**The 10 items** (Likert 1–5, strongly disagree → strongly agree; "system"
+replaced with the product name):
+1. I think that I would like to use this system frequently.
+2. I found the system unnecessarily complex.
+3. I thought the system was easy to use.
+4. I think that I would need the support of a technical person to be able to
+   use this system.
+5. I found the various functions in this system were well integrated.
+6. I thought there was too much inconsistency in this system.
+7. I would imagine that most people would learn to use this system very
+   quickly.
+8. I found the system very cumbersome to use.
+9. I felt very confident using the system.
+10. I needed to learn a lot of things before I could get going with this
+    system.
+
+Items are read/given exactly as above — no dropping, no rewording beyond the
+product name.
+
+**Scoring (per user):**
+- Odd items (1, 3, 5, 7, 9): score − 1
+- Even items (2, 4, 6, 8, 10): 5 − score
+- Sum all 10, × 2.5 → a 0–100 score for that user
+
+**Reporting (across users):**
+- Report the **mean and SD** across all ≥10 sessions — not a per-item
+  breakdown, not a percentage.
+- Compare the mean against the **benchmark of 68** (Sauro & Lewis):
+  ≥80.8 = A (excellent), 68 = average (C), <51.7 = F (needs fixing).
+- Plot per-user scores as a bar chart with a line at the 68 benchmark and a
+  line at the team's mean, for the final presentation (P4 Impact Metrics).
+
+**Analysis note:** a low SUS score next to a specific task's failures (e.g.,
+T3's leftover-confirm step) is the evidence that links a usability problem to
+a fix, per the course's "insight → fix" format — not the SUS number alone.
 
 ---
 
