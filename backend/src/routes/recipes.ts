@@ -2,7 +2,9 @@ import { Router } from 'express';
 import { db, newId, now, persist } from '../db.js';
 import { HttpError } from '../middleware.js';
 import { consentState } from '../consent.js';
-import { activeFilters, AiUnavailableError, generateRecipe, MODEL_VERSION } from '../ai.js';
+import { activeFilters, AiUnavailableError } from '../ai.js';
+import { cook, type ChefResult } from '../chef.js';
+import { MOODS } from '../moods.js';
 import { getDiet } from './profile.js';
 import { userPantry } from './pantry.js';
 import type { Ingredient, PantryItem, Recipe } from '../types.js';
@@ -49,10 +51,11 @@ recipesRouter.get('/', (req, res) => {
 async function runGeneration(
   userId: string,
   itemIds: string[],
+  moodId: string | null,
   variant: number,
   simulateFailure: boolean,
   regeneratedFrom?: string,
-): Promise<Recipe> {
+): Promise<Recipe[]> {
   const { aiConsent, dietConsent } = consentState(userId);
   if (!aiConsent) {
     throw new HttpError(403, 'consent_required', 'We need your consent before sending ingredients to the AI service.');
@@ -60,73 +63,102 @@ async function runGeneration(
   const pantry = userPantry(userId);
   const picked = pantry.filter((p) => itemIds.includes(p.id));
   if (!picked.length) throw new HttpError(400, 'nothing_picked', 'Pick at least one pantry item to cook with.');
+  if (simulateFailure) {
+    throw new HttpError(503, 'ai_unavailable', "We couldn't reach the recipe service. Nothing was lost.");
+  }
 
   // Minimum fields only: name, qty, unit + dietary flags. No identity.
   const snapshot: Ingredient[] = picked.map((p) => ({ name: p.name, qty: p.qty, unit: p.unit }));
   const diet = dietConsent ? getDiet(userId) : undefined;
 
-  let out;
+  let outcome;
   try {
-    out = await generateRecipe(snapshot, diet, variant, { simulateFailure });
+    outcome = await cook({ picked: snapshot, diet, moodId, variant });
   } catch (e) {
     if (e instanceof AiUnavailableError) {
       throw new HttpError(503, 'ai_unavailable', "We couldn't reach the recipe service. Nothing was lost.");
     }
     throw e;
   }
-  if (!out.ingredients.length) {
-    const why = out.excluded.map((x) => `${x.name} (${x.reason})`).join(', ');
-    throw new HttpError(422, 'all_excluded', `Your dietary filters rule out everything you picked: ${why}. Pick something else.`);
+  if (!outcome.results.length) {
+    throw new HttpError(422, 'nothing_fits', 'Nothing we can cook safely from those items with your filters. Try picking something else.');
   }
 
-  const recipe: Recipe = {
-    id: newId(),
-    userId,
-    name: out.name,
-    minutes: out.minutes,
-    tags: out.tags,
-    ingredients: out.ingredients,
-    staples: out.staples,
-    steps: out.steps,
-    excluded: out.excluded,
-    status: 'generated',
-    pickedItemIds: picked.map((p) => p.id),
-    generation: {
-      model: MODEL_VERSION,
-      pantrySnapshot: snapshot,
-      filters: diet ? activeFilters(diet) : [],
-      createdAt: now(),
-      durationMs: out.durationMs,
-      variant,
-      regeneratedFrom,
-    },
-  };
-  db.recipes.push(recipe);
-  // ETA — reproducible AI output record, stored apart from the suggestion itself.
-  db.aiRecords.push({
-    id: newId(),
-    userId,
-    recipeId: recipe.id,
-    text: [recipe.name, ...recipe.ingredients.map((i) => `${i.name} ${i.qty} ${i.unit}`), ...recipe.steps].join('\n'),
-    generation: recipe.generation,
+  const filters = diet ? activeFilters(diet) : [];
+  const made: Recipe[] = outcome.results.map((r: ChefResult) => {
+    const recipe: Recipe = {
+      id: newId(),
+      userId,
+      name: r.name,
+      minutes: r.minutes,
+      servings: r.servings,
+      tags: filters.map((f) => `${f} ✓`),
+      ingredients: r.ingredients,
+      staples: r.staples,
+      steps: r.steps,
+      excluded: r.excluded,
+      why: r.why,
+      missing: r.missing,
+      status: 'generated',
+      pickedItemIds: picked.map((p) => p.id),
+      generation: {
+        model: outcome.model,
+        pantrySnapshot: snapshot,
+        filters,
+        createdAt: now(),
+        durationMs: outcome.durationMs,
+        variant,
+        regeneratedFrom,
+        mood: moodId ?? undefined,
+        method: r.method,
+        sourceRecipeId: r.sourceRecipeId,
+        sourceRecipeName: r.sourceRecipeName,
+        datasetSource: outcome.datasetSource,
+        usedAi: outcome.usedAi,
+      },
+    };
+    db.recipes.push(recipe);
+    // ETA — reproducible AI output record, stored apart from the suggestion.
+    db.aiRecords.push({
+      id: newId(),
+      userId,
+      recipeId: recipe.id,
+      text: [recipe.name, r.why, ...recipe.ingredients.map((i) => `${i.name} ${i.qty} ${i.unit}`), ...recipe.steps].filter(Boolean).join('\n'),
+      generation: recipe.generation,
+    });
+    return recipe;
   });
   persist();
-  return recipe;
+  return made;
 }
 
+/** The occasions the mood picker offers. */
+recipesRouter.get('/moods', (_req, res) => {
+  res.json({ moods: MOODS.map(({ id, label, blurb, emoji }) => ({ id, label, blurb, emoji })) });
+});
+
 recipesRouter.post('/generate', async (req, res) => {
-  const { itemIds } = req.body ?? {};
+  const { itemIds, mood } = req.body ?? {};
   if (!Array.isArray(itemIds)) throw new HttpError(400, 'nothing_picked', 'Pick at least one pantry item to cook with.');
+  const moodId = typeof mood === 'string' && MOODS.some((m) => m.id === mood) ? mood : null;
   const variant = Math.floor(Math.random() * 3);
-  const recipe = await runGeneration(req.user!.id, itemIds, variant, req.header('x-simulate-ai-failure') === '1');
-  res.status(201).json({ recipe: withCheck(recipe, userPantry(req.user!.id)) });
+  const made = await runGeneration(req.user!.id, itemIds, moodId, variant, req.header('x-simulate-ai-failure') === '1');
+  const pantry = userPantry(req.user!.id);
+  res.status(201).json({ recipes: made.map((r) => withCheck(r, pantry)), recipe: withCheck(made[0], pantry) });
 });
 
 recipesRouter.post('/:id/regenerate', async (req, res) => {
   const userId = req.user!.id;
   const from = findRecipe(userId, req.params.id);
-  const recipe = await runGeneration(userId, from.pickedItemIds, from.generation.variant + 1, req.header('x-simulate-ai-failure') === '1', from.id);
-  res.status(201).json({ recipe: withCheck(recipe, userPantry(userId)) });
+  const made = await runGeneration(
+    userId,
+    from.pickedItemIds,
+    from.generation.mood ?? null,
+    from.generation.variant + 1,
+    req.header('x-simulate-ai-failure') === '1',
+    from.id,
+  );
+  res.status(201).json({ recipe: withCheck(made[0], userPantry(userId)) });
 });
 
 recipesRouter.get('/:id', (req, res) => {

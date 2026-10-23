@@ -36,7 +36,23 @@ export interface Recipe {
   excluded: { name: string; reason: string }[];
   status: 'generated' | 'saved';
   pickedItemIds: string[];
-  generation: { model: string; filters: string[]; createdAt: string; durationMs: number; variant: number; regeneratedFrom?: string };
+  why?: string;
+  servings?: number;
+  missing?: string[];
+  generation: {
+    model: string;
+    filters: string[];
+    createdAt: string;
+    durationMs: number;
+    variant: number;
+    regeneratedFrom?: string;
+    mood?: string;
+    method?: 'picked' | 'adapted' | 'invented' | 'local';
+    sourceRecipeId?: string;
+    sourceRecipeName?: string;
+    datasetSource?: string;
+    usedAi?: boolean;
+  };
   savedAt?: string;
   lastCookedAt?: string;
   check: { have: (Ingredient & { stock: string })[]; need: Ingredient[] };
@@ -47,6 +63,13 @@ export interface ScannedLine extends Ingredient {
   /** false when the line didn't match a known food — worth a second look. */
   confident: boolean;
   alreadyHave: boolean;
+}
+
+export interface Mood {
+  id: string;
+  label: string;
+  blurb: string;
+  emoji: string;
 }
 
 export interface Diet {
@@ -177,8 +200,9 @@ export const api = {
 
   recipes: (status: 'generated' | 'saved') => request<{ recipes: Recipe[] }>('GET', `/recipes?status=${status}`),
   recipe: (id: string) => request<{ recipe: Recipe }>('GET', `/recipes/${id}`),
-  generate: (itemIds: string[], simulateFailure = false) =>
-    request<{ recipe: Recipe }>('POST', '/recipes/generate', { itemIds }, simulateFailure ? { 'x-simulate-ai-failure': '1' } : {}),
+  moods: () => request<{ moods: Mood[] }>('GET', '/recipes/moods'),
+  generate: (itemIds: string[], mood: string | null, simulateFailure = false) =>
+    request<{ recipes: Recipe[]; recipe: Recipe }>('POST', '/recipes/generate', { itemIds, mood }, simulateFailure ? { 'x-simulate-ai-failure': '1' } : {}),
   regenerate: (id: string) => request<{ recipe: Recipe }>('POST', `/recipes/${id}/regenerate`),
   saveRecipe: (id: string) => request<{ recipe: Recipe }>('POST', `/recipes/${id}/save`),
   deleteRecipe: (id: string) => request<void>('DELETE', `/recipes/${id}`),

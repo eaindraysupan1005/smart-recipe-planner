@@ -37,7 +37,7 @@ export function Pantry() {
   const cook = () => {
     if (!selected.length) return;
     if (!user?.aiConsent) setAskConsent(true);
-    else nav('/recipes/generate');
+    else nav('/recipes/mood');
   };
 
   if (!items.length) {
@@ -137,7 +137,7 @@ export function Pantry() {
           onClose={() => setAskConsent(false)}
           onGranted={() => {
             setAskConsent(false);
-            nav('/recipes/generate');
+            nav('/recipes/mood');
           }}
         />
       )}

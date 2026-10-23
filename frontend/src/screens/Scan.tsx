@@ -211,15 +211,22 @@ export function ScanReading() {
           )}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.25 }}>
-              {done ? (found ? `${found} items found` : 'No items found') : 'Extracting items'}
+              {done ? (found ? `${found} items found` : 'No items found') : 'Reading your receipt'}
             </div>
             <div style={{ fontSize: 13.5, lineHeight: 1.5, color: 'var(--ink-60)', marginTop: 6 }}>
               {done && !found
                 ? "We couldn't make out any food lines. Flatten the receipt, use brighter light, and fill the frame."
                 : 'The first scan downloads the reader (a few seconds). You confirm everything before it lands in your pantry.'}
             </div>
-            <div className="progress" style={{ marginTop: 16 }}>
-              <div style={{ width: `${pct}%` }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 16 }}>
+              <ProgressRing pct={pct} />
+              {!done && (
+                <div className="shimmer-list" style={{ flex: 1, alignItems: 'stretch' }}>
+                  <div className="shimmer" style={{ height: 11, width: '85%' }} />
+                  <div className="shimmer" style={{ height: 11, width: '65%' }} />
+                  <div className="shimmer" style={{ height: 11, width: '75%' }} />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -254,6 +261,23 @@ export function ScanReading() {
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+
+/** Circular progress for the scan — reads better than a thin bar on a phone. */
+function ProgressRing({ pct }: { pct: number }) {
+  const r = 34;
+  const circumference = 2 * Math.PI * r;
+  const offset = circumference * (1 - Math.max(0, Math.min(100, pct)) / 100);
+  return (
+    <div className="ring" style={{ flex: '0 0 92px' }}>
+      <svg width="92" height="92" viewBox="0 0 92 92">
+        <circle className="track" cx="46" cy="46" r={r} fill="none" strokeWidth="7" />
+        <circle className="bar" cx="46" cy="46" r={r} fill="none" strokeWidth="7" strokeDasharray={circumference} strokeDashoffset={offset} />
+      </svg>
+      <div className="pct">{Math.round(pct)}%</div>
     </div>
   );
 }

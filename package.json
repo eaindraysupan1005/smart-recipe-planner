@@ -14,7 +14,8 @@
     "dev:phone": "concurrently -n api,web -c yellow,cyan \"npm run dev -w backend\" \"PHONE=1 npm run dev -w frontend\"",
     "seed": "npm run seed -w backend",
     "seed:fresh": "npm run seed -w backend -- --fresh",
-    "demo": "npm run build && npm run seed && npm run start -w backend"
+    "demo": "npm run build && npm run seed && npm run start -w backend",
+    "import:recipes": "npm run import:recipes -w backend --"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

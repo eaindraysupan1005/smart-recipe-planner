@@ -4,12 +4,21 @@ import { api, ApiError, fmtQty, type Deduction, type Recipe } from '../api';
 import { useApp } from '../state';
 import { Back, CheckIcon, Loading, RefreshIcon, Sheet, TabScreen } from '../components/ui';
 
-/** Sends the picked items to the AI service and routes to the result. */
+const COOKING_LINES = [
+  'Reading your pantry…',
+  'Looking through the recipe book…',
+  'Checking your dietary filters…',
+  'Choosing a dish for the occasion…',
+  'Writing up the method…',
+];
+
+/** Sends the picked items + occasion to the chef and routes to the result. */
 export function Generate() {
   const nav = useNavigate();
   const [params] = useSearchParams();
-  const { selected, showToast } = useApp();
+  const { selected, mood, showToast } = useApp();
   const [error, setError] = useState('');
+  const [line, setLine] = useState(0);
   const started = useRef(false);
 
   useEffect(() => {
@@ -20,8 +29,12 @@ export function Generate() {
       return;
     }
     api
-      .generate(selected, params.get('fail') === '1')
-      .then(({ recipe }) => nav(`/recipes/${recipe.id}`, { replace: true }))
+      .generate(selected, mood, params.get('fail') === '1')
+      .then(({ recipes, recipe }) => {
+        // Several suggestions go to the list; a single one opens directly.
+        if (recipes && recipes.length > 1) nav('/recipes', { replace: true });
+        else nav(`/recipes/${(recipes?.[0] ?? recipe).id}`, { replace: true });
+      })
       .catch((e) => {
         if (e instanceof ApiError && (e.code === 'ai_unavailable' || e.code === 'network')) nav('/recipes/unavailable', { replace: true });
         else if (e instanceof ApiError && e.code === 'consent_required') {
@@ -29,29 +42,57 @@ export function Generate() {
           nav('/pantry', { replace: true });
         } else setError(e instanceof ApiError ? e.message : 'Something went wrong.');
       });
-  }, [nav, params, selected, showToast]);
+  }, [nav, params, selected, mood, showToast]);
+
+  // Rotate the status lines while the chef works.
+  useEffect(() => {
+    if (error) return;
+    const t = window.setInterval(() => setLine((l) => (l + 1) % COOKING_LINES.length), 1400);
+    return () => window.clearInterval(t);
+  }, [error]);
+
+  if (error) {
+    return (
+      <TabScreen>
+        <div className="center">
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--red-soft)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 19 }}>!</div>
+          <div style={{ fontSize: 18, fontWeight: 700 }}>We couldn't make a recipe from that</div>
+          <div className="lead" style={{ marginTop: 0 }}>{error}</div>
+          <button className="btn sm" onClick={() => nav('/pantry')}>Back to pantry</button>
+        </div>
+      </TabScreen>
+    );
+  }
 
   return (
     <TabScreen>
-      <div className="center">
-        {error ? (
-          <>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--red-soft)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 19 }}>!</div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>We couldn't make a recipe from that</div>
-            <div className="lead" style={{ marginTop: 0 }}>{error}</div>
-            <button className="btn sm" onClick={() => nav('/pantry')}>Back to pantry</button>
-          </>
-        ) : (
-          <>
-            <div className="spinner" />
-            <div style={{ fontSize: 18, fontWeight: 700 }}>Cooking up a recipe…</div>
-            <div className="sub">Using only the {selected.length} items you picked, plus basic staples.</div>
-          </>
-        )}
+      <div className="center" style={{ gap: 20 }}>
+        <div className="pot" aria-hidden>
+          <span className="steam s1" />
+          <span className="steam s2" />
+          <span className="steam s3" />
+          <span className="pot-body" />
+        </div>
+        <div style={{ fontSize: 19, fontWeight: 700 }}>The chef is thinking…</div>
+        <div className="sub" style={{ minHeight: 20, transition: 'opacity .3s' }} key={line}>
+          <span className="fade-in">{COOKING_LINES[line]}</span>
+        </div>
+        <div className="shimmer-list" style={{ width: '100%', maxWidth: 300 }}>
+          <div className="shimmer" style={{ height: 14, width: '70%' }} />
+          <div className="shimmer" style={{ height: 14, width: '90%' }} />
+          <div className="shimmer" style={{ height: 14, width: '55%' }} />
+        </div>
       </div>
     </TabScreen>
   );
 }
+
+const METHOD_NOTE: Record<string, string> = {
+  picked: 'Chosen by the chef from our recipe database.',
+  adapted: 'Adapted by the chef from a recipe in our database to fit your pantry.',
+  invented: 'Written by the chef for your ingredients — it has no source recipe.',
+  local: 'Matched from our recipe database without the AI chef.',
+};
 
 /** J6 — recipe result, with Regenerate and Mark as cooked (C1). */
 export function RecipeDetail() {
@@ -126,6 +167,19 @@ export function RecipeDetail() {
           ))}
         </div>
 
+        {recipe.why && (
+          <div className="why">
+            <span className="chef" aria-hidden>👨‍🍳</span>
+            <span>{recipe.why}</span>
+          </div>
+        )}
+
+        {!!recipe.missing?.length && (
+          <div className="note" style={{ marginTop: 12, background: 'var(--red-soft)', color: 'var(--ink)' }}>
+            You'll need to buy: <strong>{recipe.missing.join(', ')}</strong>.
+          </div>
+        )}
+
         {recipe.excluded.length > 0 && (
           <div className="note" style={{ marginTop: 16 }}>
             Left out to respect your filters: {recipe.excluded.map((x) => `${x.name} (${x.reason})`).join(', ')}.
@@ -156,7 +210,7 @@ export function RecipeDetail() {
         </div>
 
         <div className="note sand" style={{ marginTop: 22, fontSize: 12 }}>
-          This recipe is stored with its model version ({recipe.generation.model}), the pantry snapshot and the filters used, so it can be reproduced exactly. Check food safety yourself before cooking.
+          {METHOD_NOTE[recipe.generation.method ?? 'local']} Stored with its model ({recipe.generation.model}), the pantry snapshot and the filters used, so it can be reproduced exactly. Check food safety yourself before cooking.
         </div>
         <button className="muted-link" style={{ fontSize: 13, color: 'var(--ink-45)', textDecoration: 'underline' }} onClick={() => nav('/recipes/unavailable')}>
           Recipe didn't come back?
