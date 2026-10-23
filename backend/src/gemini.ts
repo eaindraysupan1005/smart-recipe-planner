@@ -21,7 +21,7 @@ function loadEnv(): void {
 }
 loadEnv();
 
-const MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash';
+const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash';
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 export const geminiModel = (): string => MODEL;
@@ -47,10 +47,34 @@ interface AskOptions {
   image?: string;
   temperature?: number;
   timeoutMs?: number;
+  /** Extra attempts when the model is overloaded (429/503). */
+  retries?: number;
 }
 
-/** Sends one prompt and returns the model's raw text reply. */
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Sends one prompt and returns the model's raw text reply.
+ * Overload (429/503) is common on the free tier, so retry briefly before
+ * giving up — the caller falls back to local matching after that.
+ */
 export async function ask(prompt: string, opts: AskOptions = {}): Promise<string> {
+  const attempts = (opts.retries ?? 2) + 1;
+  let last: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await askOnce(prompt, opts);
+    } catch (e) {
+      last = e;
+      const status = e instanceof GeminiError ? e.status : 0;
+      if (status !== 429 && status !== 503 && status !== 500) break;
+      if (i < attempts - 1) await sleep(700 * (i + 1));
+    }
+  }
+  throw last;
+}
+
+async function askOnce(prompt: string, opts: AskOptions = {}): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new GeminiError('GEMINI_API_KEY is not set');
 

@@ -84,6 +84,12 @@ async function runGeneration(
     throw new HttpError(422, 'nothing_fits', 'Nothing we can cook safely from those items with your filters. Try picking something else.');
   }
 
+  // Suggestions are transient: a new run replaces the unsaved ones. The AI
+  // records they produced are kept (ETA), only the suggestion rows go.
+  if (!regeneratedFrom) {
+    db.recipes = db.recipes.filter((r) => !(r.userId === userId && r.status === 'generated'));
+  }
+
   const filters = diet ? activeFilters(diet) : [];
   const made: Recipe[] = outcome.results.map((r: ChefResult) => {
     const recipe: Recipe = {
