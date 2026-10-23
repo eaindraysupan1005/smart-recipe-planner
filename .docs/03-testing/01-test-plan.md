@@ -32,17 +32,6 @@ All seven Must functional requirements (F1–F7 / FE1–FE7) and the
 cross-cutting compliance layer (FE8 / LR1–LR9) are in scope, because every
 Must item in the spec needs evidence it works, not just that it exists.
 
-### Out of scope for this round
-- Everything in the backlog's **Won't** tier (B18–B25): weekly-calendar
-  planning, generation caps, nutrition/cost tracking, retailer integrations,
-  shared pantries, native apps, a self-hosted model, certification claims.
-- Load/stress testing beyond the stated NFR9 (200-item render) and NFR8
-  (99.0% availability) thresholds — no dedicated performance rig this round.
-- Security/penetration testing — covered separately by the 31 Oct guest
-  lecture track, not by this Test Plan.
-- Full localisation beyond the Thai/international receipt formats already
-  covered by NFR3.
-
 ---
 
 ## 2. Test levels (Testing Pyramid + UAT)
@@ -199,8 +188,3 @@ _(fill in per team member before submission)_
 - Raw evidence (consent forms, spreadsheet, photos/video if permitted) kept
   available for the instructor to verify — nothing fabricated.
 
----
-
-## Submission
-
-Submit via: `[add submission channel]`, one per team, before Wed 28 Oct 2026.
