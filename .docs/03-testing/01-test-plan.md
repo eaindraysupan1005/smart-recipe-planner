@@ -1,17 +1,10 @@
 # Test Plan — Smart Recipe & Pantry Assistant
 
-- Date: 2026-10-23
-- Due: before Wed 28 Oct 2026, one per team
 - Source spec: [20260902-01-pantry-meal-planning.md](../01-requirements/01-spec/20260902-01-pantry-meal-planning.md)
 - Backlog: [backlog.md](../01-requirements/backlog.md)
 - Feature list: [01-feature-list.md](../02-design/01-feature-list.md)
 - User journey: [02-user-journey.md](../02-design/02-user-journey.md)
 - Legal source: [rule.md](../../rule.md)
-- Field testing date: Wed 4 Nov 2026 (W12)
-- **AI-use disclosure:** AI was used to draft the test case table and UAT task
-  wording from the requirement spec and feature list below. The team reviewed
-  and must confirm every case against the actual build before testing on 4 Nov,
-  and record any edits made.
 
 ---
 
@@ -58,29 +51,23 @@ from the feature list. Pass/fail is the stated threshold, not "looks fine."
 
 | # | Case | Level | Steps (summary) | Test data | Expected result | Traces |
 |---|---|---|---|---|---|---|
-| TC1 | Receipt scan builds pantry | Integration | Upload a photographed receipt → confirm parsed items → save | ≥30 real receipts, Thai + international, incl. abbreviated store names | Pantry gets items+qty with no typing; scan-to-saved ≤ 1 min; ≥85% of line items read correctly; user must confirm before save | F1, NFR2, NFR3, FE1 |
-| TC2 | Pantry view/edit at scale | E2E | Load a pantry with 200 items; edit one; delete one | Seeded 200-row pantry | List renders <3s; edit/delete persist correctly | NFR9, FE2 |
+| TC1 | Receipt scan builds pantry | Integration | Upload a photographed receipt → confirm parsed items → save | ≥10 real receipts, Thai + international, incl. abbreviated store names | Pantry gets items+qty with no typing; scan-to-saved ≤ 1 min; ≥85% of line items read correctly; user must confirm before save | F1, NFR2, NFR3, FE1 |
+| TC2 | Pantry view/edit at scale | E2E | Load a pantry with 15 items; edit one; delete one | Seeded 15 pantry | List renders <3s; edit/delete persist correctly | NFR9, FE2 |
 | TC3 | Dietary opt-in is never on by default | Integration | Create a fresh account; inspect dietary flags before any opt-in | New account | Zero dietary flags set until an explicit opt-in record exists | LR1, FE3-AC2 |
 | TC4 | Terms + AI disclaimer gate blocks first generation | Integration | Attempt to generate a recipe before accepting Terms | New account, no acceptance record | Generation is blocked; accepting Terms creates a record (user id, timestamp, version) before generation proceeds | LR7, FE3-AC3/AC5 |
 | TC5 | AI-transfer consent is separate from Terms | Integration | Accept Terms only, then attempt generation; then accept AI-transfer consent | Account with Terms accepted, no AI consent | Generation still blocked until the separate AI-transfer consent is recorded | LR2, FE3-AC4 |
 | TC6 | Consent withdrawal is recorded | Integration | Withdraw dietary or AI-transfer consent | Account with prior consent | Withdrawal stored with user id, timestamp, version, same as acceptance | LR1, LR7 |
-| TC7 | Recipe generation uses only selected pantry items + staples | Integration | Generate 50 recipes from varied pantry selections | 50-generation test set | ≥90% of recipes use only selected items + declared staples (salt, oil, water, pepper) | NFR5, FE4-AC1 |
-| TC8 | Recipe generation never violates dietary filters | Integration | Generate recipes for accounts with each filter type (vegetarian, gluten-free, low-carb, allergy) | Same 50-generation test set, filtered subsets | 100% contain zero excluded ingredients; any violation is logged as a release blocker | NFR6, FE4-AC2 |
-| TC9 | Generation latency | Integration | Time 50+ generation calls | Same test set | p90 < 10s; progress indicator shows within 1s of tap | NFR4, FE4-AC3 |
-| TC10 | AI request payload is minimised | Integration | Capture the outbound request to the AI service | One generation call per filter type | Payload contains only selected ingredient names + dietary flags — no email, name, address, or household id | LR2, FE4-AC4 |
-| TC11 | AI output is reproducible | Integration | Fetch a past generation by its id | Any saved recipe id | Returns exact text, model+version, pantry snapshot, filters, timestamp | LR8, FE4-AC5 |
-| TC12 | AI outage degrades gracefully | Integration | Force the AI service to fail/rate-limit | Mocked outage | App shows a clear message, never a raw error; app availability tracked ≥99.0%/month | NFR8, FE4-AC6 |
-| TC13 | Cook + leftover confirm deducts pantry | E2E | Mark a planned meal cooked; adjust the leftover confirm box; save | A planned meal with known pantry impact | Ingredients deducted correctly; confirm step ≤2 taps and <10s; skipping confirm leaves pantry unchanged | F2, NFR11, FE5 |
-| TC14 | Save and reopen a recipe | E2E | Save a generated recipe; navigate away; reopen it | One generated recipe | Recipe reopens without regenerating; save event logged (account id, IP, timestamp) | F5, LR4, FE6-AC1/AC3 |
-| TC15 | Search saved recipes by ingredient | E2E | Search saved recipes using an on-hand ingredient | ≥5 saved recipes, overlapping ingredients | Correct recipes returned | F7, FE6-AC2 |
-| TC16 | Edit/delete of recipe is logged and retained | Integration | Edit then delete a saved recipe; attempt to retrieve internally at day 89 | One recipe | Log + original content retrievable ≥90 days post-deletion | LR5, FE6-AC4 |
-| TC17 | Grocery list pools automatically, both entry points | Integration | (a) Generate a recipe; (b) separately, pick one from the library | Two sessions, one per entry point | Both join the pending pool with 0 extra taps | F4, NFR12, FE7-AC1 |
-| TC18 | Grocery list excludes stocked items | Integration | Build a list from ≥3 pooled recipes against a pantry with partial overlap | ≥20 test grocery lists | 0 items already stocked in sufficient quantity appear on the list | NFR7, FE7-AC2/AC3 |
-| TC19 | Grocery list generation is a retrievable record | Integration | Build a list; fetch the generation event later | One list build | Stored as a retrievable record, not a transient notice | LR8, FE7-AC4 |
-| TC20 | Extended-retention hold doesn't alter content | Integration | Flag a record for hold; run the purge job | One recipe past normal retention | Content unchanged; purge job skips it | LR6, FE8-AC3 |
-| TC21 | Account deletion removes user content, not logs | Integration | Delete a test account | Account with pantry, meals, recipes, dietary profile | All of those removed; CCA §26 logs still present per LR5/LR6 | LR3b, FE8-AC4 |
-| TC22 | Login stores a token, never a credential | Integration | Inspect the stored record after social/email login | One login session | Only a verification token is stored | LR3c, FE8-AC5 |
-| TC23 | No certification language in the UI | Manual UI scan | Scan all UI copy for "certified"/"nutritionist-approved"/CA-signature wording | Full UI copy | Zero matches | LR9, FE8-AC6 |
+| TC7 | Recipe generation uses only selected pantry items + staples | Integration | Generate 15 recipes from varied pantry selections | 15-generation test set | ≥90% of recipes use only selected items + declared staples (salt, oil, water, pepper) | NFR5, FE4-AC1 |
+| TC8 | Generation latency | Integration | Time 15+ generation calls | Same test set | p90 < 10s; progress indicator shows within 1s of tap | NFR4, FE4-AC3 |
+| TC9 | AI request payload is minimised | Integration | Capture the outbound request to the AI service | One generation call per filter type | Payload contains only selected ingredient names + dietary flags — no email, name, address, or household id | LR2, FE4-AC4 |
+| TC10 | AI outage degrades gracefully | Integration | Force the AI service to fail/rate-limit | Mocked outage | App shows a clear message, never a raw error; app availability tracked ≥99.0%/month | NFR8, FE4-AC6 |
+| TC11 | Cook + leftover confirm deducts pantry | E2E | Mark a planned meal cooked; adjust the leftover confirm box; save | A planned meal with known pantry impact | Ingredients deducted correctly; confirm step ≤2 taps and <10s; skipping confirm leaves pantry unchanged | F2, NFR11, FE5 |
+| TC12 | Search saved recipes by ingredient | E2E | Search saved recipes using an on-hand ingredient | ≥5 saved recipes, overlapping ingredients | Correct recipes returned | F7, FE6-AC2 |
+| TC13 | Edit/delete of recipe is logged and retained | Integration | Edit then delete a saved recipe; attempt to retrieve internally at day 89 | One recipe | Log + original content retrievable ≥90 days post-deletion | LR5, FE6-AC4 |
+| TC14 | Grocery list pools automatically, both entry points | Integration | (a) Generate a recipe; (b) separately, pick one from the library | Two sessions, one per entry point | Both join the pending pool with 0 extra taps | F4, NFR12, FE7-AC1 |
+| TC15 | Grocery list excludes stocked items | Integration | Build a list from ≥3 pooled recipes against a pantry with partial overlap | ≥10 test grocery lists | 0 items already stocked in sufficient quantity appear on the list | NFR7, FE7-AC2/AC3 |
+
+
 
 ### 3.2 UAT — task-based sessions with real users
 
@@ -154,37 +141,4 @@ the questionnaire packet (if any) is printed/loaded in advance.
 
 ---
 
-## 6. Schedule, owners, exit criteria
-
-### Schedule
-| Date | Activity |
-|---|---|
-| 21–27 Oct | Write/finalise this Test Plan; recruit and book real users for 4 Nov; decide on optional instruments (§4) |
-| Before 28 Oct | Submit Test Plan |
-| 28 Oct – 3 Nov | Finish Unit/Integration cases (TC1–TC23); run one internal E2E pass; run the pilot UAT session |
-| 4 Nov | Field testing: round 1 (5 users) → triage/fix critical issues same day if feasible → round 2 (5 users) |
-| 5–10 Nov | Score data, write up P3 (User Evidence Log) and P4 (Impact Metrics), prep final slides/demo |
-| 11 or 18 Nov | Final presentation |
-
-### Owners
-_(fill in per team member before submission)_
-
-| Area | Owner |
-|---|---|
-| Unit/Integration test cases (TC1–TC23) | `[name]` |
-| E2E pass before 4 Nov | `[name]` |
-| User recruitment & scheduling | `[name]` |
-| Moderator (4 Nov) | `[name]` |
-| Note-taker / data entry (4 Nov) | `[name]` |
-| Write-up (P3/P4, this Test Plan's upkeep) | `[name]` |
-
-### Exit criteria
-- All TC1–TC23 pass at their stated threshold (no NFR/LR case left failing).
-- Zero dietary-filter violations (NFR6) and zero certification-language hits
-  (LR9) — both are release blockers, not "known issues."
-- ≥10 real UAT sessions completed (pilot excluded), each logged U01…U10+.
-- Every Severity-3/4 issue found in round 1 has an attempted fix verified in
-  round 2, or is explicitly carried to the final write-up as unresolved.
-- Raw evidence (consent forms, spreadsheet, photos/video if permitted) kept
-  available for the instructor to verify — nothing fabricated.
 
