@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { manualSeen } from '../state';
 
 const STEPS = [
-  { title: 'Scan your receipt', body: 'Photograph a grocery receipt. The AI reads the item lines and pulls out each food item and quantity.' },
+  { title: 'Scan your receipt', body: 'Photograph a grocery receipt in any language. The AI reads the item lines, translates them and pulls out each food item and quantity.' },
   { title: 'Check what it found', body: 'Confirm the names and quantities. The scan date is saved on every item.' },
-  { title: 'Get a recipe', body: 'What2Cook suggests a meal using only what you already have in the pantry.' },
+  { title: 'Tell us the occasion', body: 'Drinks with friends? A romantic dinner? Our AI chef picks the kind of dish that fits, using only what you already have.' },
   { title: 'Cook, then shop', body: 'Mark it cooked and the pantry updates itself. Missing ingredients go to a shopping list with your stock already subtracted.' },
 ];
 

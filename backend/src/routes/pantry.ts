@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { db, newId, now, persist } from '../db.js';
 import { HttpError } from '../middleware.js';
 import { parseReceipt } from '../receipt.js';
+import { readReceiptPhoto, visionAvailable } from '../receipt-vision.js';
+import { addRecord } from '../consent.js';
 import type { PantryItem } from '../types.js';
 
 export const pantryRouter = Router();
@@ -80,21 +82,48 @@ pantryRouter.delete('/:id', (req, res) => {
 
 export const scanRouter = Router();
 
+/** Tells the scan screen whether the AI reader is configured. */
+scanRouter.get('/capabilities', (_req, res) => {
+  res.json({ vision: visionAvailable() });
+});
+
 /**
- * Receives the item text lines the phone read from a receipt (the photo itself
- * never leaves the device) and turns them into pantry items for review.
+ * Two ways in:
+ *  · `image`  — the photo goes to our AI service, which reads it and
+ *               translates the item lines into English (any language).
+ *  · `lines`  — the phone already read the text on-device (fallback when the
+ *               AI reader is unavailable); only text is sent.
+ * Either way the photo is never stored, and nothing but item lines is kept.
  */
-scanRouter.post('/', (req, res) => {
-  const lines: unknown = req.body?.lines;
-  if (!Array.isArray(lines) || !lines.every((l) => typeof l === 'string')) {
-    throw new HttpError(400, 'invalid_lines', 'Send the receipt as a list of text lines.');
+scanRouter.post('/', async (req, res) => {
+  const userId = req.user!.id;
+  const { image, lines } = req.body ?? {};
+  const pantry = userPantry(userId);
+  const withHave = <T extends { name: string; unit: string }>(items: T[]) =>
+    items.map((l) => ({ ...l, alreadyHave: pantry.some((p) => sameName(p.name, l.name) && p.unit === l.unit) }));
+
+  if (typeof image === 'string' && image.length > 100) {
+    if (!visionAvailable()) throw new HttpError(503, 'vision_unavailable', 'The AI reader is not configured on this server.');
+    // PDPA: record that a photo was sent to the AI service, and when.
+    addRecord(userId, 'ai_consent', 'granted', 'Receipt photo sent to AI service for reading');
+    try {
+      const out = await readReceiptPhoto(image);
+      res.json({
+        scannedAt: now(),
+        items: withHave(out.lines),
+        language: out.language,
+        translated: out.translated,
+        readBy: 'ai',
+      });
+      return;
+    } catch (e) {
+      console.warn(`Receipt vision failed: ${(e as Error).message.slice(0, 300)}`);
+      throw new HttpError(503, 'vision_failed', "The AI reader couldn't read that photo. Try again, or use the on-device reader.");
+    }
   }
-  const pantry = userPantry(req.user!.id);
-  res.json({
-    scannedAt: now(),
-    items: parseReceipt(lines).map((l) => ({
-      ...l,
-      alreadyHave: pantry.some((p) => sameName(p.name, l.name) && p.unit === l.unit),
-    })),
-  });
+
+  if (!Array.isArray(lines) || !lines.every((l) => typeof l === 'string')) {
+    throw new HttpError(400, 'invalid_lines', 'Send the receipt as a photo, or as a list of text lines.');
+  }
+  res.json({ scannedAt: now(), items: withHave(parseReceipt(lines)), language: 'English', translated: false, readBy: 'device' });
 });

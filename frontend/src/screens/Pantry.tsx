@@ -243,6 +243,7 @@ function ConsentSheet({ count, onClose, onGranted }: { count: number; onClose: (
           <div><span style={{ color: 'var(--green)', fontWeight: 800, marginRight: 10 }}>✓</span>The {count} ingredients you picked</div>
           <div><span style={{ color: 'var(--green)', fontWeight: 800, marginRight: 10 }}>✓</span>Quantities and units</div>
           <div><span style={{ color: 'var(--green)', fontWeight: 800, marginRight: 10 }}>✓</span>Your dietary filters</div>
+          <div><span style={{ color: 'var(--green)', fontWeight: 800, marginRight: 10 }}>✓</span>Receipt photos you scan, to read the item lines — then deleted</div>
         </div>
         <div style={{ height: 1, background: 'rgba(27,26,23,0.08)', margin: '16px 0' }} />
         <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: 0.6 }}>WE NEVER SEND</div>

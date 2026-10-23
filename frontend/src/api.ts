@@ -72,6 +72,14 @@ export interface Mood {
   emoji: string;
 }
 
+export interface ScanResponse {
+  scannedAt: string;
+  items: ScannedLine[];
+  language: string;
+  translated: boolean;
+  readBy: 'ai' | 'device';
+}
+
 export interface Diet {
   vegetarian: boolean;
   glutenFree: boolean;
@@ -195,8 +203,11 @@ export const api = {
     request<{ items: PantryItem[] }>('POST', '/pantry/bulk', { items, scannedAt }),
   updateItem: (id: string, patch: Partial<Ingredient>) => request<{ item: PantryItem }>('PATCH', `/pantry/${id}`, patch),
   deleteItem: (id: string) => request<void>('DELETE', `/pantry/${id}`),
-  /** Sends only item text lines read on the phone — never the photo. */
-  scan: (lines: string[]) => request<{ scannedAt: string; items: ScannedLine[] }>('POST', '/scan', { lines }),
+  scanCapabilities: () => request<{ vision: boolean }>('GET', '/scan/capabilities'),
+  /** AI reader: the photo is sent, read and translated, then discarded. */
+  scanPhoto: (image: string) => request<ScanResponse>('POST', '/scan', { image }),
+  /** Fallback: the phone read the text itself, so only text lines are sent. */
+  scanLines: (lines: string[]) => request<ScanResponse>('POST', '/scan', { lines }),
 
   recipes: (status: 'generated' | 'saved') => request<{ recipes: Recipe[] }>('GET', `/recipes?status=${status}`),
   recipe: (id: string) => request<{ recipe: Recipe }>('GET', `/recipes/${id}`),

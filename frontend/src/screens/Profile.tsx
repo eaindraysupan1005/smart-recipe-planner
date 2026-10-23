@@ -188,7 +188,7 @@ export function Privacy() {
             <div className="main">
               <div style={{ fontSize: 15.5, fontWeight: 600 }}>Send my pantry to the AI</div>
               <div className="meta" style={{ lineHeight: 1.45 }}>
-                Required to generate recipes.{' '}
+                Required to generate recipes and to read receipt photos.{' '}
                 {aiRecord ? `${aiRecord.action === 'granted' ? 'Granted' : 'Withdrawn'} ${fmtDateTime(aiRecord.at)}.` : 'Not granted yet.'}
               </div>
             </div>

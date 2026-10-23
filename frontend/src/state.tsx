@@ -74,6 +74,9 @@ export interface ScanDraft {
   textLines: number;
   removed: number;
   items: ScannedLine[];
+  language: string;
+  translated: boolean;
+  readBy: 'ai' | 'device';
 }
 
 interface AppCtx {

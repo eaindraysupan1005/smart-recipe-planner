@@ -90,38 +90,68 @@ receipt scan → pantry in → AI recipe → cook & confirm leftovers → grocer
 | J9 Shopping list | `/list` |
 | P1 Profile, P2/P3 Privacy & consent | `/profile`, `/profile/privacy` |
 
-## Receipt scanner (real camera + on-device OCR)
+## Receipt scanner (camera + AI reading, any language)
 
-1. **S1** opens the rear camera live (`getUserMedia`) inside the yellow frame;
-   the shutter captures exactly what is in the frame. No camera / permission
-   denied → the shutter opens the phone's native camera or photo picker.
-   Flash toggle appears when the device supports it.
-2. **S2** reads the photo **on the phone** with Tesseract.js
-   ([frontend/src/ocr.ts](frontend/src/ocr.ts)) — greyscale + contrast boost,
-   single-column page mode. The receipt header (shop, address, phone, date),
-   the footer (totals, payment, card) and any private line in between are
-   removed on the phone. **The photo is never uploaded.**
-3. Only the remaining item text lines go to `POST /api/scan`, where
-   [backend/src/receipt.ts](backend/src/receipt.ts) expands receipt
-   abbreviations (`CHKN THIGH FIL 500G` → Chicken thighs · 500 g), reads sizes,
-   pack counts, multi-buys and weighed produce, and merges duplicates. Lines it
-   can't match to a known food are flagged "check this" on the review screen.
+1. **S1** opens the rear camera live; the shutter captures what is in the frame.
+   No camera / permission denied → it falls back to the phone's own camera or
+   photo picker. Flash toggle appears when the device supports it.
+2. **S2** sends the photo to Gemini, which reads the item lines **and
+   translates them into English** — Thai, Japanese, Burmese, whatever the
+   receipt is printed in. The shop name, address, phone, date, card digits and
+   totals are never returned. The photo is not stored by us.
+   With no `GEMINI_API_KEY`, it falls back to on-device OCR (Tesseract.js) and
+   only text lines are sent.
+3. **S3** shows what it read, with a `Thai → English` badge when it translated,
+   and every line editable before it lands in the pantry.
 
-Test the camera on a phone (browsers only allow cameras on HTTPS or localhost):
+Tested on a Thai receipt: 7 of 7 items read, translated, with correct
+quantities and units, in about 8 seconds.
+
+## The AI chef (recipe dataset + occasion)
 
 ```bash
-npm run dev:phone
+npm run import:recipes -- ~/Downloads/archive/RAW_recipes.csv --limit 40000
 ```
 
-Open the `https://<your-LAN-IP>:5173` address it prints on the phone (same
-Wi-Fi) and accept the self-signed certificate warning. The first scan
-downloads the OCR engine + English model (a few MB) from the jsDelivr CDN; it is
-cached after that.
+Imports a Kaggle recipe CSV (Food.com, RecipeNLG or a generic layout — detected
+automatically) into `backend/data/recipes.json`: ingredients parsed into
+`{name, qty, unit}`, mapped to pantry foods, tagged with diet flags and the
+occasions each dish suits. The current import holds **40,000 recipes**.
 
-## AI service
+After picking ingredients the app asks **"What's the occasion?"** — Just me
+quickly ⚡ · Friends coming over 🎉 · Drinks & snacks 🍻 · Romantic dinner 🕯️ ·
+Comfort food 🍜 · Light & healthy 🥗 · Family meal 🍲. It is optional; Skip
+behaves as before.
 
-`backend/src/ai.ts` is a **mock** of the third-party AI recipe
-generation. It is deterministic, respects dietary filters (allergens are
+The chef then works in three steps:
+
+| Step | What happens | When |
+|---|---|---|
+| **Pick** | Gemini chooses the best dishes from the shortlist and says why each suits the occasion | the pantry covers a dataset recipe |
+| **Adapt** | Gemini rewrites the closest recipe around what you actually have | nothing matches well |
+| **Invent** | Gemini writes an original dish from your items | the dataset has nothing usable |
+| *(fallback)* | local scoring picks the best dataset match, and the screen says so | Gemini is unavailable |
+
+The same four ingredients give a completely different menu per occasion — that
+is the point of the feature. Every recipe records which step produced it, which
+dataset recipe it came from, the occasion and the model, so the output stays
+reproducible (ETA §26/28).
+
+### Gemini setup
+
+```bash
+cp backend/.env.example backend/.env   # then paste your key into it
+```
+
+`GEMINI_API_KEY` is read only by the backend, so the browser never sees it, and
+`.env` is git-ignored. Get a key at https://aistudio.google.com/apikey.
+The default model is `gemini-3.5-flash` (~2.5s); override with `GEMINI_MODEL`.
+Overloaded requests (429/503) retry twice, then fall back to local matching.
+
+## Local fallback generator
+
+`backend/src/ai.ts` builds a simple recipe from the picked items when there is
+no API key and the dataset has no match. It is deterministic, respects dietary filters (allergens are
 removed, never "reduced"), and only ever receives ingredient name/qty/unit plus
 dietary flags. Swap `extractReceipt` / `generateRecipe` for a real provider
 without touching the routes.

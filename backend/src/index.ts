@@ -16,8 +16,8 @@ watchDataFile();
 const app = express();
 app.set('trust proxy', true);
 app.use(cors());
-// Receipt photos are read on the phone; only text lines are ever posted here.
-app.use(express.json({ limit: '1mb' }));
+// Receipt photos are posted for AI reading, then discarded — never stored.
+app.use(express.json({ limit: '12mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 

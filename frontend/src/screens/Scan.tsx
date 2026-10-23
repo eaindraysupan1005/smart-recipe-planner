@@ -110,7 +110,7 @@ export function Scan() {
 
       <div style={{ padding: '0 22px 30px' }}>
         <div style={{ fontSize: 12, lineHeight: 1.55, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>
-          The photo is read on your phone and never uploaded. Store name, card digits and totals are removed before the item lines are sent.
+          The photo goes to our AI reader, which pulls out the item lines — in any language — and is then discarded. The shop name, card digits, date and totals are never kept.
         </div>
         {error && <div className="error" style={{ marginBottom: 12 }}>{error}</div>}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -139,6 +139,7 @@ export function ScanReading() {
   const [stage, setStage] = useState(0); // 0 prepare · 1 read · 2 strip · 3 match · 4 done
   const [ocrPct, setOcrPct] = useState(0);
   const [info, setInfo] = useState<{ textLines: number; removed: number } | null>(null);
+  const [mode, setMode] = useState<'ai' | 'device'>('ai');
   const [error, setError] = useState('');
   const started = useRef(false);
   const image = useRef(scanImage);
@@ -155,24 +156,42 @@ export function ScanReading() {
     setScanImage(null); // the photo lives only in this screen's memory
     (async () => {
       try {
-        let all: string[];
-        let textLines: number;
-        let lines: string[];
-        let removed: number;
-        if (image.current !== SAMPLE) {
-          setStage(1);
-          const r = await readReceipt(image.current!, (p) => setOcrPct(p.stage === 'loading' ? p.progress * 0.15 : 0.15 + p.progress * 0.85));
-          ({ lines, textLines, removed } = r);
-        } else {
-          all = SAMPLE_RECEIPT;
-          textLines = all.length;
-          ({ kept: lines, removed } = stripPrivate(all));
-        }
+        const photo = image.current;
         image.current = null;
-        setInfo({ textLines, removed });
+
+        // Sample receipt: skip straight to the parser with known text.
+        if (photo === SAMPLE) {
+          const { kept, removed } = stripPrivate(SAMPLE_RECEIPT);
+          setInfo({ textLines: SAMPLE_RECEIPT.length, removed });
+          setStage(3);
+          const res = await api.scanLines(kept);
+          setScanDraft({ ...res, textLines: SAMPLE_RECEIPT.length, removed });
+          setStage(4);
+          return;
+        }
+
+        const { vision } = await api.scanCapabilities().catch(() => ({ vision: false }));
+        if (vision) {
+          setMode('ai');
+          setStage(1);
+          const res = await api.scanPhoto(photo!);
+          setInfo({ textLines: res.items.length, removed: 0 });
+          setStage(3);
+          setScanDraft({ ...res, textLines: res.items.length, removed: 0 });
+          setStage(4);
+          return;
+        }
+
+        // No AI reader configured: read it on the phone instead.
+        setMode('device');
+        setStage(1);
+        const r = await readReceipt(photo!, (p) => setOcrPct(p.stage === 'loading' ? p.progress * 0.15 : 0.15 + p.progress * 0.85));
+        setInfo({ textLines: r.textLines, removed: r.removed });
         setStage(3);
-        const res = lines.length ? await api.scan(lines) : { scannedAt: new Date().toISOString(), items: [] };
-        setScanDraft({ ...res, textLines, removed });
+        const res = r.lines.length
+          ? await api.scanLines(r.lines)
+          : { scannedAt: new Date().toISOString(), items: [], language: 'English', translated: false, readBy: 'device' as const };
+        setScanDraft({ ...res, textLines: r.textLines, removed: r.removed });
         setStage(4);
       } catch (e) {
         setError(e instanceof ApiError ? e.message : 'We could not read that photo. Try again in better light.');
@@ -181,15 +200,22 @@ export function ScanReading() {
   }, [nav, setScanDraft, setScanImage]);
 
   const done = stage >= 4 && !!scanDraft;
-  const pct = done ? 100 : stage <= 1 ? 5 + ocrPct * 80 : 90;
+  const pct = done ? 100 : mode === 'ai' ? (stage <= 1 ? 45 : 85) : stage <= 1 ? 5 + ocrPct * 80 : 90;
   const found = scanDraft?.items.length ?? 0;
 
-  const steps = [
-    'Photo kept on your phone',
-    stage === 1 ? `Reading text on your phone… ${Math.round(ocrPct * 100)}%` : info ? `${info.textLines} text lines found` : 'Reading text on your phone',
-    info ? `Store name, card digits and totals removed (${info.removed} lines)` : 'Store name, card digits and totals removed',
-    'Matching lines to food items',
-  ];
+  const steps = mode === 'ai'
+    ? [
+        'Photo sent to our AI reader',
+        scanDraft ? `Receipt read${scanDraft.translated ? ` (${scanDraft.language}, translated)` : ''}` : 'Reading the receipt…',
+        'Shop name, card digits and totals left out',
+        'Matching lines to food items',
+      ]
+    : [
+        'Photo kept on your phone',
+        stage === 1 ? `Reading text on your phone… ${Math.round(ocrPct * 100)}%` : info ? `${info.textLines} text lines found` : 'Reading text on your phone',
+        info ? `Shop name, card digits and totals removed (${info.removed} lines)` : 'Shop name, card digits and totals removed',
+        'Matching lines to food items',
+      ];
 
   return (
     <div className="screen">
@@ -216,7 +242,9 @@ export function ScanReading() {
             <div style={{ fontSize: 13.5, lineHeight: 1.5, color: 'var(--ink-60)', marginTop: 6 }}>
               {done && !found
                 ? "We couldn't make out any food lines. Flatten the receipt, use brighter light, and fill the frame."
-                : 'The first scan downloads the reader (a few seconds). You confirm everything before it lands in your pantry.'}
+                : mode === 'ai'
+                  ? 'Usually under 10 seconds, in any language. You confirm everything before it lands in your pantry.'
+                  : 'The first scan downloads the reader (a few seconds). You confirm everything before it lands in your pantry.'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 16 }}>
               <ProgressRing pct={pct} />
@@ -325,7 +353,10 @@ export function ScanReview() {
         <div className="note" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, padding: '13px 15px' }}>
           <div style={{ flex: '0 0 20px', width: 20, height: 20, borderRadius: 6, background: 'var(--ink)', color: 'var(--yellow)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>🕘</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 700 }}>Scanned {fmtDateTime(scannedAt)}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 700 }}>
+              Scanned {fmtDateTime(scannedAt)}
+              {scanDraft.translated && <span className="badge" style={{ marginLeft: 8 }}>{scanDraft.language} → English</span>}
+            </div>
             <div style={{ fontSize: 12, lineHeight: 1.45, color: 'var(--ink-60)', marginTop: 2 }}>Every item is saved with this date, so you always know how long it has been in your pantry.</div>
           </div>
         </div>
