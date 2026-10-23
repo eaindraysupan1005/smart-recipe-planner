@@ -4,6 +4,7 @@ import { HttpError } from '../middleware.js';
 import { consentState } from '../consent.js';
 import { activeFilters, AiUnavailableError } from '../ai.js';
 import { cook, type ChefResult } from '../chef.js';
+import { complianceTags } from '../allergens.js';
 import { MOODS } from '../moods.js';
 import { getDiet } from './profile.js';
 import { userPantry } from './pantry.js';
@@ -52,6 +53,7 @@ async function runGeneration(
   userId: string,
   itemIds: string[],
   moodId: string | null,
+  moodText: string | null,
   variant: number,
   simulateFailure: boolean,
   regeneratedFrom?: string,
@@ -73,7 +75,7 @@ async function runGeneration(
 
   let outcome;
   try {
-    outcome = await cook({ picked: snapshot, diet, moodId, variant });
+    outcome = await cook({ picked: snapshot, diet, moodId, moodText, variant });
   } catch (e) {
     if (e instanceof AiUnavailableError) {
       throw new HttpError(503, 'ai_unavailable', "We couldn't reach the recipe service. Nothing was lost.");
@@ -98,11 +100,13 @@ async function runGeneration(
       name: r.name,
       minutes: r.minutes,
       servings: r.servings,
-      tags: filters.map((f) => `${f} ✓`),
+      // Only tick a filter the dish actually satisfies — the rest are warnings.
+      tags: complianceTags(filters, r.warnings),
       ingredients: r.ingredients,
       staples: r.staples,
       steps: r.steps,
       excluded: r.excluded,
+      warnings: r.warnings,
       why: r.why,
       missing: r.missing,
       status: 'generated',
@@ -115,7 +119,8 @@ async function runGeneration(
         durationMs: outcome.durationMs,
         variant,
         regeneratedFrom,
-        mood: moodId ?? undefined,
+        mood: outcome.moodId ?? moodId ?? undefined,
+        moodText: moodText ?? undefined,
         method: r.method,
         sourceRecipeId: r.sourceRecipeId,
         sourceRecipeName: r.sourceRecipeName,
@@ -144,11 +149,12 @@ recipesRouter.get('/moods', (_req, res) => {
 });
 
 recipesRouter.post('/generate', async (req, res) => {
-  const { itemIds, mood } = req.body ?? {};
+  const { itemIds, mood, moodText } = req.body ?? {};
   if (!Array.isArray(itemIds)) throw new HttpError(400, 'nothing_picked', 'Pick at least one pantry item to cook with.');
   const moodId = typeof mood === 'string' && MOODS.some((m) => m.id === mood) ? mood : null;
+  const typed = typeof moodText === 'string' && moodText.trim() ? moodText.trim().slice(0, 300) : null;
   const variant = Math.floor(Math.random() * 3);
-  const made = await runGeneration(req.user!.id, itemIds, moodId, variant, req.header('x-simulate-ai-failure') === '1');
+  const made = await runGeneration(req.user!.id, itemIds, moodId, typed, variant, req.header('x-simulate-ai-failure') === '1');
   const pantry = userPantry(req.user!.id);
   res.status(201).json({ recipes: made.map((r) => withCheck(r, pantry)), recipe: withCheck(made[0], pantry) });
 });
@@ -160,6 +166,7 @@ recipesRouter.post('/:id/regenerate', async (req, res) => {
     userId,
     from.pickedItemIds,
     from.generation.mood ?? null,
+    from.generation.moodText ?? null,
     from.generation.variant + 1,
     req.header('x-simulate-ai-failure') === '1',
     from.id,

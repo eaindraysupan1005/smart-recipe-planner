@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api, fmtDay, fmtQty, type Recipe } from '../api';
 import { useApp } from '../state';
 import { Back, Loading, TabScreen } from '../components/ui';
+import { WarningBadge } from '../components/Warnings';
 
 /** R2 — saved recipes, searchable by name or ingredient. */
 export function Saved() {
@@ -43,6 +44,7 @@ export function Saved() {
                       {r.minutes} min · saved {fmtDay(r.savedAt!)}
                       {r.lastCookedAt ? ` · cooked ${fmtDay(r.lastCookedAt)}` : ''}
                     </div>
+                    <div><WarningBadge warnings={r.warnings} /></div>
                     <span className={`pill ${need ? 'red' : 'green'}`} style={{ display: 'inline-block', marginTop: 9, fontSize: 12, fontWeight: 700, padding: '5px 10px' }}>
                       {need ? `Missing ${need} ingredient${need > 1 ? 's' : ''}` : 'You have everything'}
                     </span>

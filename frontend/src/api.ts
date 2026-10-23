@@ -25,6 +25,13 @@ export interface Ingredient {
   unit: string;
 }
 
+export interface Warning {
+  key: string;
+  label: string;
+  severity: 'allergy' | 'diet' | 'info';
+  ingredients: string[];
+}
+
 export interface Recipe {
   id: string;
   name: string;
@@ -39,6 +46,7 @@ export interface Recipe {
   why?: string;
   servings?: number;
   missing?: string[];
+  warnings?: Warning[];
   generation: {
     model: string;
     filters: string[];
@@ -47,6 +55,7 @@ export interface Recipe {
     variant: number;
     regeneratedFrom?: string;
     mood?: string;
+    moodText?: string;
     method?: 'picked' | 'adapted' | 'invented' | 'local';
     sourceRecipeId?: string;
     sourceRecipeName?: string;
@@ -212,8 +221,8 @@ export const api = {
   recipes: (status: 'generated' | 'saved') => request<{ recipes: Recipe[] }>('GET', `/recipes?status=${status}`),
   recipe: (id: string) => request<{ recipe: Recipe }>('GET', `/recipes/${id}`),
   moods: () => request<{ moods: Mood[] }>('GET', '/recipes/moods'),
-  generate: (itemIds: string[], mood: string | null, simulateFailure = false) =>
-    request<{ recipes: Recipe[]; recipe: Recipe }>('POST', '/recipes/generate', { itemIds, mood }, simulateFailure ? { 'x-simulate-ai-failure': '1' } : {}),
+  generate: (itemIds: string[], mood: string | null, moodText: string | null, simulateFailure = false) =>
+    request<{ recipes: Recipe[]; recipe: Recipe }>('POST', '/recipes/generate', { itemIds, mood, moodText }, simulateFailure ? { 'x-simulate-ai-failure': '1' } : {}),
   regenerate: (id: string) => request<{ recipe: Recipe }>('POST', `/recipes/${id}/regenerate`),
   saveRecipe: (id: string) => request<{ recipe: Recipe }>('POST', `/recipes/${id}/save`),
   deleteRecipe: (id: string) => request<void>('DELETE', `/recipes/${id}`),

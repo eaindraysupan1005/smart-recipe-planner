@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, type Recipe } from '../api';
 import { useApp } from '../state';
 import { Loading, TabScreen } from '../components/ui';
+import { WarningBadge } from '../components/Warnings';
 
 /** J7 — AI suggestions: keep the ones you want, delete the rest. */
 export function Recipes() {
@@ -43,7 +44,8 @@ export function Recipes() {
                 <div onClick={() => nav(`/recipes/${r.id}`)} style={{ cursor: 'pointer' }}>
                   <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.25 }}>{r.name}</div>
                   <div className="sub" style={{ marginTop: 5 }}>
-                    {[`${r.minutes} min`, r.servings ? `serves ${r.servings}` : '', ...r.generation.filters.map((f) => f.toLowerCase())].filter(Boolean).join(' · ')}
+                    {/* r.tags only lists the filters this dish actually meets. */}
+                    {[`${r.minutes} min`, r.servings ? `serves ${r.servings}` : '', ...r.tags.map((t) => t.replace(' ✓', '').toLowerCase())].filter(Boolean).join(' · ')}
                   </div>
                   {r.why && (
                     <div className="why" style={{ marginTop: 10 }}>
@@ -51,6 +53,7 @@ export function Recipes() {
                       <span>{r.why}</span>
                     </div>
                   )}
+                  <div><WarningBadge warnings={r.warnings} /></div>
                   {!!r.missing?.length && (
                     <div className="sub" style={{ marginTop: 8, color: 'var(--red)' }}>Needs: {r.missing.join(', ')}</div>
                   )}

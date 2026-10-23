@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api, ApiError, fmtQty, type Deduction, type Recipe } from '../api';
 import { useApp } from '../state';
 import { Back, CheckIcon, Loading, RefreshIcon, Sheet, TabScreen } from '../components/ui';
+import { WarningList } from '../components/Warnings';
 
 const COOKING_LINES = [
   'Reading your pantry…',
@@ -16,7 +17,7 @@ const COOKING_LINES = [
 export function Generate() {
   const nav = useNavigate();
   const [params] = useSearchParams();
-  const { selected, mood, showToast } = useApp();
+  const { selected, mood, moodText, showToast } = useApp();
   const [error, setError] = useState('');
   const [line, setLine] = useState(0);
   const started = useRef(false);
@@ -29,7 +30,7 @@ export function Generate() {
       return;
     }
     api
-      .generate(selected, mood, params.get('fail') === '1')
+      .generate(selected, mood, moodText || null, params.get('fail') === '1')
       .then(({ recipes, recipe }) => {
         // Several suggestions go to the list; a single one opens directly.
         if (recipes && recipes.length > 1) nav('/recipes', { replace: true });
@@ -42,7 +43,7 @@ export function Generate() {
           nav('/pantry', { replace: true });
         } else setError(e instanceof ApiError ? e.message : 'Something went wrong.');
       });
-  }, [nav, params, selected, mood, showToast]);
+  }, [nav, params, selected, mood, moodText, showToast]);
 
   // Rotate the status lines while the chef works.
   useEffect(() => {
@@ -167,6 +168,8 @@ export function RecipeDetail() {
           ))}
         </div>
 
+        <WarningList warnings={recipe.warnings} />
+
         {recipe.why && (
           <div className="why">
             <span className="chef" aria-hidden>👨‍🍳</span>
@@ -192,7 +195,7 @@ export function RecipeDetail() {
             <div key={u.name} className="row">
               <div className="main name">
                 {u.name}
-                <span style={{ color: 'var(--ink-55)', fontWeight: 400 }}> · {fmtQty(u.qty, u.unit)}</span>
+                {u.qty > 0 && <span style={{ color: 'var(--ink-55)', fontWeight: 400 }}> · {fmtQty(u.qty, u.unit)}</span>}
               </div>
             </div>
           ))}

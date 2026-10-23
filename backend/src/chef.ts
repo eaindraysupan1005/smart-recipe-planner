@@ -20,7 +20,8 @@ import { askJson, geminiModel, GeminiError, hasGeminiKey } from './gemini.js';
 import { MOODS, findMood, type Mood } from './moods.js';
 import { SAMPLE_RECIPES } from './sample-recipes.js';
 import { STAPLES } from './ingredient-text.js';
-import { activeFilters, excludedFor, generateRecipe } from './ai.js';
+import { activeFilters, generateRecipe } from './ai.js';
+import { conflicts, hasAllergyWarning, warningsFor, type Warning } from './allergens.js';
 import type { DatasetRecipe, RecipeDataset } from './dataset-types.js';
 import type { DietProfile, Ingredient } from './types.js';
 
@@ -54,13 +55,24 @@ export const reloadDataset = (): void => {
 
 const norm = (s: string) => s.trim().toLowerCase();
 
-function dietOk(r: DatasetRecipe, diet: DietProfile | undefined): boolean {
-  if (!diet) return true;
-  if (diet.vegetarian && !r.vegetarian) return false;
-  if (diet.glutenFree && !r.glutenFree) return false;
-  // Allergens are checked per-ingredient, never "reduced" (NFR5).
-  const names = r.ingredients.map((i) => i.name);
-  return !names.some((n) => excludedFor(n, diet));
+/**
+ * How badly a recipe clashes with the profile. Nothing is hidden: a clash
+ * pushes the dish down the list and earns a warning badge instead.
+ *
+ * `accepted` holds allergens the cook themselves put in the basket — picking
+ * peanut butter is a deliberate choice for this meal, so we stop fighting it
+ * and let the warning do the talking.
+ */
+function clashPenalty(r: DatasetRecipe, diet: DietProfile | undefined, accepted: Set<string>): number {
+  if (!diet) return 0;
+  const w = warningsFor(r.ingredients, diet, { name: r.name }).filter((x) => !accepted.has(x.key));
+  if (hasAllergyWarning(w)) return 400; // never the first thing we suggest
+  return conflicts(w).length * 60;
+}
+
+/** Allergen flags the cook triggered themselves by picking the ingredient. */
+function acceptedFlags(picked: Ingredient[], diet: DietProfile | undefined): Set<string> {
+  return new Set(warningsFor(picked, diet).map((w) => w.key));
 }
 
 export interface Candidate {
@@ -73,10 +85,10 @@ export interface Candidate {
 /** Ranks dataset recipes by how much of the selected pantry they use. */
 export function shortlist(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, limit = 24): Candidate[] {
   const pickedKeys = new Set(picked.map((p) => norm(p.name)));
+  const accepted = acceptedFlags(picked, diet);
   const out: Candidate[] = [];
 
   for (const r of dataset().recipes) {
-    if (!dietOk(r, diet)) continue;
     const have: string[] = [];
     const missing: string[] = [];
     for (const k of r.keys) {
@@ -86,7 +98,7 @@ export function shortlist(picked: Ingredient[], diet: DietProfile | undefined, m
     if (!have.length) continue;
 
     const coverage = have.length / Math.max(1, r.keys.length);
-    let score = have.length * 10 + coverage * 20 - missing.length * 4;
+    let score = have.length * 10 + coverage * 20 - missing.length * 4 - clashPenalty(r, diet, accepted);
     if (mood) {
       if (r.moods.includes(mood.id)) score += 18;
       if (mood.maxMinutes && r.minutes <= mood.maxMinutes) score += 6;
@@ -113,6 +125,8 @@ export interface ChefResult {
   why: string;
   missing: string[];
   excluded: { name: string; reason: string }[];
+  /** Allergen / dietary flags for the cook to see. Nothing is removed. */
+  warnings: Warning[];
   method: ChefMethod;
   sourceRecipeId?: string;
   sourceRecipeName?: string;
@@ -121,19 +135,27 @@ export interface ChefResult {
 const SYSTEM = `You are a professional chef with 20 years in restaurant and home kitchens.
 You choose dishes for the occasion, not just for the ingredients.
 Rules you never break:
-- Allergies and dietary filters are absolute. Never include an excluded ingredient, in any amount, and never suggest it as an option.
+- Respect their allergies and dietary filters: strongly prefer dishes that are safe for them.
+- If the best dish for the occasion does contain something they avoid, you may still suggest it, but say so plainly in "why" — never hide it or pretend the ingredient is absent.
 - Prefer what the cook already has. Basic staples (salt, pepper, oil, water, sugar, flour, stock, vinegar) can be assumed.
 - Be honest about anything they would need to buy.
 - Keep steps short, practical and in the order a cook would do them.
 Reply with JSON only, no prose outside the JSON.`;
 
-function pantryBlock(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined): string {
+function pantryBlock(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, moodText?: string): string {
   const lines = [
     `PANTRY THEY PICKED: ${picked.map((p) => `${p.name} (${p.qty}${p.unit ? ' ' + p.unit : ''})`).join(', ')}`,
   ];
   const filters = activeFilters(diet);
-  lines.push(`DIETARY RULES (absolute): ${filters.length ? filters.join(', ') : 'none'}`);
-  lines.push(mood ? `OCCASION: ${mood.label} — ${mood.hint} Cooking for about ${mood.serves}.` : 'OCCASION: not specified; assume an ordinary meal for 2.');
+  lines.push(`DIETARY RULES: ${filters.length ? filters.join(', ') : 'none'}`);
+  if (moodText) {
+    // Their own words come first — the chip is only our best guess at it.
+    lines.push(`THE COOK SAYS: "${moodText}"`);
+    lines.push('Read that for the occasion, the mood, how many people, how much effort they want, and any craving or cuisine they mention. Treat it as the main instruction.');
+    if (mood) lines.push(`(Closest preset occasion: ${mood.label}.)`);
+  } else {
+    lines.push(mood ? `OCCASION: ${mood.label} — ${mood.hint} Cooking for about ${mood.serves}.` : 'OCCASION: not specified; assume an ordinary meal for 2.');
+  }
   return lines.join('\n');
 }
 
@@ -154,26 +176,23 @@ function cleanIngredients(list: AiRecipeShape['ingredients']): Ingredient[] {
     .filter((i) => i.name);
 }
 
-/** Final safety net: never return a dish containing an excluded ingredient. */
-function assertDietSafe(result: ChefResult, diet: DietProfile | undefined): ChefResult {
-  if (!diet) return result;
-  const bad = result.ingredients.filter((i) => excludedFor(i.name, diet));
-  if (!bad.length) return result;
-  return {
-    ...result,
-    ingredients: result.ingredients.filter((i) => !bad.includes(i)),
-    excluded: [...result.excluded, ...bad.map((b) => ({ name: b.name, reason: excludedFor(b.name, diet) ?? 'dietary filter' }))],
-  };
+/**
+ * Final pass: label every dish with what it contains, checked against the
+ * profile. We never silently drop an ingredient — an unflagged allergen is
+ * the real danger, so the warning is attached and shown.
+ */
+function withWarnings(result: ChefResult, diet: DietProfile | undefined): ChefResult {
+  return { ...result, warnings: warningsFor(result.ingredients, diet, { name: result.name, steps: result.steps }) };
 }
 
 // ── The three steps ────────────────────────────────────────────────────────
 
-async function pickFromDataset(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, candidates: Candidate[], count: number): Promise<ChefResult[]> {
+async function pickFromDataset(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, moodText: string | undefined, candidates: Candidate[], count: number): Promise<ChefResult[]> {
   const menu = candidates
     .map((c, i) => `${i + 1}. [${c.recipe.id}] ${c.recipe.name} — ${c.recipe.minutes} min, serves ${c.recipe.servings}, uses: ${c.recipe.keys.join(', ')}${c.missing.length ? ` | they lack: ${c.missing.join(', ')}` : ' | they have everything'}`)
     .join('\n');
 
-  const prompt = `${pantryBlock(picked, diet, mood)}
+  const prompt = `${pantryBlock(picked, diet, mood, moodText)}
 
 SHORTLIST FROM OUR RECIPE DATABASE:
 ${menu}
@@ -196,6 +215,7 @@ Reply as JSON: {"choices":[{"sourceId":"<id from the list>","why":"<one sentence
       why: String(choice.why ?? '').slice(0, 160),
       missing: c.missing,
       excluded: [],
+      warnings: [],
       method: 'picked',
       sourceRecipeId: c.recipe.id,
       sourceRecipeName: c.recipe.name,
@@ -204,8 +224,8 @@ Reply as JSON: {"choices":[{"sourceId":"<id from the list>","why":"<one sentence
   return out;
 }
 
-async function adaptRecipe(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, base: Candidate): Promise<ChefResult> {
-  const prompt = `${pantryBlock(picked, diet, mood)}
+async function adaptRecipe(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, moodText: string | undefined, base: Candidate): Promise<ChefResult> {
+  const prompt = `${pantryBlock(picked, diet, mood, moodText)}
 
 CLOSEST RECIPE IN OUR DATABASE (id ${base.recipe.id}):
 Name: ${base.recipe.name}
@@ -227,14 +247,15 @@ Reply as JSON: {"name":"","minutes":0,"servings":0,"why":"<max 20 words>","ingre
     why: String(r.why ?? '').slice(0, 160),
     missing: (r.missing ?? []).map(String).slice(0, 8),
     excluded: [],
+    warnings: [],
     method: 'adapted',
     sourceRecipeId: base.recipe.id,
     sourceRecipeName: base.recipe.name,
   };
 }
 
-async function inventRecipe(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined): Promise<ChefResult> {
-  const prompt = `${pantryBlock(picked, diet, mood)}
+async function inventRecipe(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, moodText: string | undefined): Promise<ChefResult> {
+  const prompt = `${pantryBlock(picked, diet, mood, moodText)}
 
 Nothing in our database fits. Write one original dish using only what they picked plus basic staples.
 Reply as JSON: {"name":"","minutes":0,"servings":0,"why":"<max 20 words>","ingredients":[{"name":"","qty":0,"unit":""}],"steps":["",""],"missing":[]}`;
@@ -250,6 +271,7 @@ Reply as JSON: {"name":"","minutes":0,"servings":0,"why":"<max 20 words>","ingre
     why: String(r.why ?? '').slice(0, 160),
     missing: (r.missing ?? []).map(String).slice(0, 8),
     excluded: [],
+    warnings: [],
     method: 'invented',
     sourceRecipeId: undefined,
   };
@@ -277,6 +299,7 @@ async function localFallback(picked: Ingredient[], diet: DietProfile | undefined
       why: localWhy(c, mood),
       missing: c.missing,
       excluded: [],
+      warnings: [],
       method: 'local' as const,
       sourceRecipeId: c.recipe.id,
       sourceRecipeName: c.recipe.name,
@@ -293,6 +316,7 @@ async function localFallback(picked: Ingredient[], diet: DietProfile | undefined
     why: 'Built from your ingredients while the chef service is unavailable.',
     missing: [],
     excluded: made.excluded,
+    warnings: [],
     method: 'local',
   }];
 }
@@ -301,12 +325,48 @@ export interface CookOptions {
   picked: Ingredient[];
   diet: DietProfile | undefined;
   moodId?: string | null;
+  /** Whatever the cook typed, e.g. "friends over, want something spicy". */
+  moodText?: string | null;
   count?: number;
   variant?: number;
 }
 
+/**
+ * Offline reading of the typed occasion: score each preset by the words it
+ * shares with what they wrote. Only used when Gemini is unavailable — with
+ * the AI, their sentence goes to the chef as-is.
+ */
+export function moodFromText(text: string): Mood | undefined {
+  const t = ` ${text.toLowerCase()} `;
+  let best: { mood: Mood; score: number } | undefined;
+  for (const m of MOODS) {
+    let score = 0;
+    for (const tag of [...m.tags, ...m.label.toLowerCase().split(/\s+/)]) {
+      if (tag.length > 2 && t.includes(tag.replace(/-/g, ' '))) score += 2;
+    }
+    for (const [word, id] of HINT_WORDS) {
+      if (m.id === id && t.includes(word)) score += 3;
+    }
+    if (!best || score > best.score) best = { mood: m, score };
+  }
+  return best && best.score > 0 ? best.mood : undefined;
+}
+
+/** Everyday words that point at an occasion. */
+const HINT_WORDS: [string, string][] = [
+  ['drink', 'drinks'], ['beer', 'drinks'], ['wine', 'drinks'], ['alcohol', 'drinks'], ['snack', 'drinks'], ['whisky', 'drinks'],
+  ['friend', 'friends'], ['guest', 'friends'], ['party', 'friends'], ['gathering', 'friends'], ['people over', 'friends'], ['potluck', 'friends'],
+  ['date', 'romantic'], ['romantic', 'romantic'], ['girlfriend', 'romantic'], ['boyfriend', 'romantic'], ['anniversary', 'romantic'], ['impress', 'romantic'], ['valentine', 'romantic'],
+  ['tired', 'comfort'], ['cold', 'comfort'], ['sad', 'comfort'], ['rainy', 'comfort'], ['hungover', 'comfort'], ['cosy', 'comfort'], ['cozy', 'comfort'], ['warm', 'comfort'],
+  ['quick', 'quick'], ['alone', 'quick'], ['lazy', 'quick'], ['hurry', 'quick'], ['fast', 'quick'], ['myself', 'quick'], ['busy', 'quick'],
+  ['healthy', 'light'], ['light', 'light'], ['diet', 'light'], ['fresh', 'light'], ['gym', 'light'], ['salad', 'light'],
+  ['family', 'family'], ['kids', 'family'], ['children', 'family'], ['dinner for', 'family'], ['everyone', 'family'],
+];
+
 export interface CookOutcome {
   results: ChefResult[];
+  /** The preset we matched their words to, if any. */
+  moodId?: string;
   model: string;
   usedAi: boolean;
   datasetSource: string;
@@ -319,11 +379,14 @@ export interface CookOutcome {
 /** Runs the cascade and always returns at least one recipe. */
 export async function cook(opts: CookOptions): Promise<CookOutcome> {
   const started = Date.now();
-  const mood = findMood(opts.moodId);
+  const moodText = opts.moodText?.trim().slice(0, 300) || undefined;
+  // A typed occasion wins; the preset is a fallback for local ranking.
+  const mood = findMood(opts.moodId) ?? (moodText ? moodFromText(moodText) : undefined);
   const count = opts.count ?? 3;
   const candidates = shortlist(opts.picked, opts.diet, mood);
   const ds = dataset();
   const base = {
+    moodId: mood?.id,
     model: hasGeminiKey() ? geminiModel() : 'local-fallback',
     datasetSource: ds.source,
     datasetSize: ds.count,
@@ -332,7 +395,7 @@ export async function cook(opts: CookOptions): Promise<CookOutcome> {
 
   const finish = (results: ChefResult[], usedAi: boolean, note?: string): CookOutcome => ({
     ...base,
-    results: results.map((r) => assertDietSafe(r, opts.diet)).filter((r) => r.ingredients.length),
+    results: results.map((r) => withWarnings(r, opts.diet)).filter((r) => r.ingredients.length),
     usedAi,
     durationMs: Date.now() - started,
     ...(note ? { note } : {}),
@@ -346,15 +409,15 @@ export async function cook(opts: CookOptions): Promise<CookOutcome> {
     // 1 · PICK — only worth asking if something actually matches.
     const strong = candidates.filter((c) => c.missing.length <= 2);
     if (strong.length >= 2) {
-      const picked = await pickFromDataset(opts.picked, opts.diet, mood, strong.slice(0, 18), count);
+      const picked = await pickFromDataset(opts.picked, opts.diet, mood, moodText, strong.slice(0, 18), count);
       if (picked.length) return finish(picked, true);
     }
     // 2 · ADAPT — closest recipe, rewritten around the pantry.
     if (candidates.length) {
-      return finish([await adaptRecipe(opts.picked, opts.diet, mood, candidates[0])], true);
+      return finish([await adaptRecipe(opts.picked, opts.diet, mood, moodText, candidates[0])], true);
     }
     // 3 · INVENT — nothing in the dataset to anchor to.
-    return finish([await inventRecipe(opts.picked, opts.diet, mood)], true);
+    return finish([await inventRecipe(opts.picked, opts.diet, mood, moodText)], true);
   } catch (e) {
     const why = e instanceof GeminiError ? e.message : 'AI chef unavailable';
     console.warn(`Chef fell back to local matching: ${why}`);
