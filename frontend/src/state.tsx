@@ -74,11 +74,18 @@ export interface ScanDraft {
   textLines: number;
   removed: number;
   items: ScannedLine[];
+  language: string;
+  translated: boolean;
+  readBy: 'ai' | 'device';
 }
 
 interface AppCtx {
   selected: string[];
   setSelected: (ids: string[] | ((prev: string[]) => string[])) => void;
+  mood: string | null;
+  setMood: (m: string | null) => void;
+  moodText: string;
+  setMoodText: (t: string) => void;
   scanImage: string | null;
   setScanImage: (img: string | null) => void;
   scanDraft: ScanDraft | null;
@@ -93,6 +100,8 @@ const App = createContext<AppCtx | null>(null);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const [mood, setMood] = useState<string | null>(null);
+  const [moodText, setMoodText] = useState('');
   const [scanImage, setScanImage] = useState<string | null>(null);
   const [scanDraft, setScanDraft] = useState<ScanDraft | null>(null);
   const [justCooked, setJustCooked] = useState(false);
@@ -106,8 +115,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ selected, setSelected, scanImage, setScanImage, scanDraft, setScanDraft, justCooked, setJustCooked, toast, showToast }),
-    [selected, scanImage, scanDraft, justCooked, toast, showToast],
+    () => ({ selected, setSelected, mood, setMood, moodText, setMoodText, scanImage, setScanImage, scanDraft, setScanDraft, justCooked, setJustCooked, toast, showToast }),
+    [selected, mood, moodText, scanImage, scanDraft, justCooked, toast, showToast],
   );
   return <App.Provider value={value}>{children}</App.Provider>;
 }

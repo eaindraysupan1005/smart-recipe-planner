@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, type Recipe } from '../api';
 import { useApp } from '../state';
 import { Loading, TabScreen } from '../components/ui';
+import { WarningBadge } from '../components/Warnings';
 
 /** J7 — AI suggestions: keep the ones you want, delete the rest. */
 export function Recipes() {
@@ -31,7 +32,7 @@ export function Recipes() {
       <div className="pad">
         <h1 className="h1">Recipes</h1>
         <div className="sub" style={{ marginTop: 4, lineHeight: 1.5, fontSize: 13.5 }}>
-          Fresh from the AI, based on what you picked. Keep the ones you want — delete the rest.
+          Chosen by the chef for your ingredients and the occasion. Keep the ones you want — delete the rest.
         </div>
 
         {!list ? (
@@ -43,8 +44,19 @@ export function Recipes() {
                 <div onClick={() => nav(`/recipes/${r.id}`)} style={{ cursor: 'pointer' }}>
                   <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.25 }}>{r.name}</div>
                   <div className="sub" style={{ marginTop: 5 }}>
-                    {[`${r.minutes} min`, ...r.generation.filters.map((f) => f.toLowerCase()), `uses ${r.ingredients.length} of your picks`].join(' · ')}
+                    {/* r.tags only lists the filters this dish actually meets. */}
+                    {[`${r.minutes} min`, r.servings ? `serves ${r.servings}` : '', ...r.tags.map((t) => t.replace(' ✓', '').toLowerCase())].filter(Boolean).join(' · ')}
                   </div>
+                  {r.why && (
+                    <div className="why" style={{ marginTop: 10 }}>
+                      <span className="chef" aria-hidden>👨‍🍳</span>
+                      <span>{r.why}</span>
+                    </div>
+                  )}
+                  <div><WarningBadge warnings={r.warnings} /></div>
+                  {!!r.missing?.length && (
+                    <div className="sub" style={{ marginTop: 8, color: 'var(--red)' }}>Needs: {r.missing.join(', ')}</div>
+                  )}
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 13 }}>
                   <button className="btn" style={{ height: 42, borderRadius: 11, fontSize: 13.5 }} onClick={() => save(r)}>Add to Favorite</button>

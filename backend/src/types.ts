@@ -64,6 +64,17 @@ export interface GenerationRecord {
   durationMs: number;
   variant: number;
   regeneratedFrom?: string;
+  /** The occasion the user picked, if any. */
+  mood?: string;
+  /** What the cook typed, in their own words. */
+  moodText?: string;
+  /** How the chef produced this: dataset pick, adaptation, invention, local. */
+  method?: string;
+  /** Dataset recipe it came from, for reproducibility (ETA). */
+  sourceRecipeId?: string;
+  sourceRecipeName?: string;
+  datasetSource?: string;
+  usedAi?: boolean;
 }
 
 export interface Recipe {
@@ -76,6 +87,13 @@ export interface Recipe {
   staples: string[];
   steps: string[];
   excluded: { name: string; reason: string }[];
+  /** One line on why this dish suits the occasion. */
+  why?: string;
+  /** Allergen / dietary flags. Shown, never used to hide the recipe. */
+  warnings?: { key: string; label: string; severity: 'allergy' | 'diet' | 'info'; ingredients: string[] }[];
+  servings?: number;
+  /** Ingredients the recipe needs that the pantry does not have. */
+  missing?: string[];
   status: 'generated' | 'saved';
   pickedItemIds: string[];
   generation: GenerationRecord;

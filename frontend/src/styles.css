@@ -225,3 +225,91 @@ button { cursor: pointer; }
   position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 30; background: var(--ink); color: #fff; width: max-content;
   padding: 11px 16px; border-radius: 12px; font-size: 13.5px; font-weight: 600; max-width: 380px; animation: rise 0.2s ease-out;
 }
+
+/* ── Chef / scanner loading animation ── */
+.pot { position: relative; width: 84px; height: 76px; }
+.pot-body {
+  position: absolute; bottom: 0; left: 6px; width: 72px; height: 42px;
+  border-radius: 0 0 20px 20px; background: var(--yellow);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.06);
+}
+.pot-body::before {
+  content: ''; position: absolute; top: -7px; left: -6px; width: 84px; height: 10px;
+  border-radius: 99px; background: var(--ink);
+}
+.steam {
+  position: absolute; bottom: 44px; width: 7px; height: 20px; border-radius: 99px;
+  background: rgba(27, 26, 23, 0.18); opacity: 0;
+  animation: steam 2.4s ease-in-out infinite;
+}
+.steam.s1 { left: 22px; }
+.steam.s2 { left: 38px; animation-delay: 0.5s; }
+.steam.s3 { left: 54px; animation-delay: 1s; }
+@keyframes steam {
+  0% { opacity: 0; transform: translateY(6px) scaleY(0.6); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-18px) scaleY(1.3); }
+}
+
+.shimmer-list { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.shimmer {
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(27,26,23,0.07) 25%, rgba(27,26,23,0.14) 37%, rgba(27,26,23,0.07) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } }
+
+/* Scanner progress ring */
+.ring { position: relative; width: 92px; height: 92px; }
+.ring svg { transform: rotate(-90deg); }
+.ring .track { stroke: rgba(27, 26, 23, 0.1); }
+.ring .bar { stroke: var(--yellow); stroke-linecap: round; transition: stroke-dashoffset 0.3s ease; }
+.ring .pct {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 800; letter-spacing: -0.5px;
+}
+
+/* Mood cards */
+.mood-card { border: 1px solid var(--line); transition: border-color 0.15s, background 0.15s; }
+.mood-card:hover { border-color: var(--yellow); }
+.mood-card.on { border-color: var(--ink); background: var(--yellow-row); }
+
+.why {
+  display: flex; gap: 9px; align-items: flex-start; margin-top: 14px; padding: 13px 14px;
+  border-radius: 14px; background: var(--yellow-soft); font-size: 13.5px; line-height: 1.5;
+}
+.why .chef { flex: 0 0 auto; font-size: 15px; }
+.badge {
+  display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700;
+  background: var(--sand); color: var(--ink-60); letter-spacing: 0.2px;
+}
+
+/* ── Allergen / dietary warnings ── */
+.warn-chip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 99px;
+  font-size: 12px; font-weight: 700; line-height: 1.3;
+}
+.warn-chip.allergy { background: var(--red); color: #fff; }
+.warn-chip.diet { background: #fdeacd; color: #8a5a00; }
+.warn-chip.info { background: var(--sand); color: var(--ink-60); font-weight: 600; }
+
+.warn-box {
+  display: flex; gap: 10px; align-items: flex-start; padding: 13px 14px; border-radius: 14px;
+  font-size: 13.5px; line-height: 1.5; margin-bottom: 8px;
+}
+.warn-box.allergy { background: var(--red-soft); border: 1.5px solid var(--red); color: #7d2516; }
+.warn-box.diet { background: #fff6e6; border: 1px solid #e8c483; color: #7a5200; }
+.warn-box.info { background: var(--sand); color: var(--ink-60); }
+.warn-icon { flex: 0 0 auto; font-size: 15px; line-height: 1.4; }
+
+/* Free-text occasion box */
+.mood-text {
+  width: 100%; min-height: 86px; resize: vertical; border: 1.5px solid var(--line-input);
+  border-radius: 14px; background: #fff; padding: 13px 15px; font-size: 15.5px; line-height: 1.45;
+  font-family: inherit; outline: none;
+}
+.mood-text:focus { border-color: var(--ink); }
+.mood-examples { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }

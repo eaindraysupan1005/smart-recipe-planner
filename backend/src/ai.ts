@@ -39,7 +39,8 @@ export function activeFilters(diet: DietProfile | undefined): string[] {
   return f;
 }
 
-function exclusionReason(name: string, diet: DietProfile | undefined): string | null {
+/** Why a dietary filter rules this ingredient out, or null if it is fine. */
+export function excludedFor(name: string, diet: DietProfile | undefined): string | null {
   if (!diet) return null;
   for (const a of diet.allergies) if (has(name, ALLERGEN_WORDS[a] ?? [a.toLowerCase()])) return `${a} allergy`;
   if (diet.vegetarian && has(name, MEAT_WORDS)) return 'vegetarian';
@@ -177,7 +178,7 @@ export async function generateRecipe(
   const excluded: { name: string; reason: string }[] = [];
   const usable: Ingredient[] = [];
   for (const p of picked) {
-    const why = exclusionReason(p.name, diet);
+    const why = excludedFor(p.name, diet);
     if (why) excluded.push({ name: p.name, reason: why });
     else usable.push(p);
   }

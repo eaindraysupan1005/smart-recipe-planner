@@ -25,6 +25,13 @@ export interface Ingredient {
   unit: string;
 }
 
+export interface Warning {
+  key: string;
+  label: string;
+  severity: 'allergy' | 'diet' | 'info';
+  ingredients: string[];
+}
+
 export interface Recipe {
   id: string;
   name: string;
@@ -36,7 +43,25 @@ export interface Recipe {
   excluded: { name: string; reason: string }[];
   status: 'generated' | 'saved';
   pickedItemIds: string[];
-  generation: { model: string; filters: string[]; createdAt: string; durationMs: number; variant: number; regeneratedFrom?: string };
+  why?: string;
+  servings?: number;
+  missing?: string[];
+  warnings?: Warning[];
+  generation: {
+    model: string;
+    filters: string[];
+    createdAt: string;
+    durationMs: number;
+    variant: number;
+    regeneratedFrom?: string;
+    mood?: string;
+    moodText?: string;
+    method?: 'picked' | 'adapted' | 'invented' | 'local';
+    sourceRecipeId?: string;
+    sourceRecipeName?: string;
+    datasetSource?: string;
+    usedAi?: boolean;
+  };
   savedAt?: string;
   lastCookedAt?: string;
   check: { have: (Ingredient & { stock: string })[]; need: Ingredient[] };
@@ -47,6 +72,21 @@ export interface ScannedLine extends Ingredient {
   /** false when the line didn't match a known food — worth a second look. */
   confident: boolean;
   alreadyHave: boolean;
+}
+
+export interface Mood {
+  id: string;
+  label: string;
+  blurb: string;
+  emoji: string;
+}
+
+export interface ScanResponse {
+  scannedAt: string;
+  items: ScannedLine[];
+  language: string;
+  translated: boolean;
+  readBy: 'ai' | 'device';
 }
 
 export interface Diet {
@@ -172,13 +212,17 @@ export const api = {
     request<{ items: PantryItem[] }>('POST', '/pantry/bulk', { items, scannedAt }),
   updateItem: (id: string, patch: Partial<Ingredient>) => request<{ item: PantryItem }>('PATCH', `/pantry/${id}`, patch),
   deleteItem: (id: string) => request<void>('DELETE', `/pantry/${id}`),
-  /** Sends only item text lines read on the phone — never the photo. */
-  scan: (lines: string[]) => request<{ scannedAt: string; items: ScannedLine[] }>('POST', '/scan', { lines }),
+  scanCapabilities: () => request<{ vision: boolean }>('GET', '/scan/capabilities'),
+  /** AI reader: the photo is sent, read and translated, then discarded. */
+  scanPhoto: (image: string) => request<ScanResponse>('POST', '/scan', { image }),
+  /** Fallback: the phone read the text itself, so only text lines are sent. */
+  scanLines: (lines: string[]) => request<ScanResponse>('POST', '/scan', { lines }),
 
   recipes: (status: 'generated' | 'saved') => request<{ recipes: Recipe[] }>('GET', `/recipes?status=${status}`),
   recipe: (id: string) => request<{ recipe: Recipe }>('GET', `/recipes/${id}`),
-  generate: (itemIds: string[], simulateFailure = false) =>
-    request<{ recipe: Recipe }>('POST', '/recipes/generate', { itemIds }, simulateFailure ? { 'x-simulate-ai-failure': '1' } : {}),
+  moods: () => request<{ moods: Mood[] }>('GET', '/recipes/moods'),
+  generate: (itemIds: string[], mood: string | null, moodText: string | null, simulateFailure = false) =>
+    request<{ recipes: Recipe[]; recipe: Recipe }>('POST', '/recipes/generate', { itemIds, mood, moodText }, simulateFailure ? { 'x-simulate-ai-failure': '1' } : {}),
   regenerate: (id: string) => request<{ recipe: Recipe }>('POST', `/recipes/${id}/regenerate`),
   saveRecipe: (id: string) => request<{ recipe: Recipe }>('POST', `/recipes/${id}/save`),
   deleteRecipe: (id: string) => request<void>('DELETE', `/recipes/${id}`),

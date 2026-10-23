@@ -1,10 +1,9 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
+import { DATA_DIR, dataFile } from './paths.js';
 import type { DB } from './types.js';
 
-const DATA_DIR = process.env.DATA_DIR ?? path.resolve(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'db.json');
+const DATA_FILE = dataFile('db.json');
 
 const empty = (): DB => ({
   users: [],

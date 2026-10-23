@@ -9,6 +9,7 @@ import { Pantry } from './screens/Pantry';
 import { AddItem } from './screens/AddItem';
 import { Scan, ScanReading, ScanReview } from './screens/Scan';
 import { Generate, RecipeDetail, Unavailable } from './screens/Recipe';
+import { MoodPicker } from './screens/Mood';
 import { Recipes } from './screens/Recipes';
 import { Saved, SavedCheck } from './screens/Saved';
 import { Grocery } from './screens/Grocery';
@@ -59,6 +60,7 @@ export function App() {
         <Route path="/scan/review" element={authed(<ScanReview />)} />
 
         <Route path="/recipes" element={authed(<Recipes />)} />
+        <Route path="/recipes/mood" element={authed(<MoodPicker />)} />
         <Route path="/recipes/generate" element={authed(<Generate />)} />
         <Route path="/recipes/unavailable" element={authed(<Unavailable />)} />
         <Route path="/recipes/:id" element={authed(<RecipeDetail />)} />
