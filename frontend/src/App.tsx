@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { manualSeen, useAuth } from './state';
 import { Loading, Toast } from './components/ui';
 import { Manual } from './screens/Manual';
-import { Signup } from './screens/Signup';
+import { AuthCallback, SignIn } from './screens/SignIn';
 import { Diet } from './screens/Diet';
 import { Pantry } from './screens/Pantry';
 import { AddItem } from './screens/AddItem';
@@ -18,7 +18,7 @@ import { Privacy, Profile } from './screens/Profile';
 function RequireAuth({ children }: { children: ReactNode }) {
   const { user, ready } = useAuth();
   if (!ready) return <Loading />;
-  if (!user) return <Navigate to={manualSeen.get() ? '/signup' : '/welcome'} replace />;
+  if (!user) return <Navigate to={manualSeen.get() ? '/signin' : '/welcome'} replace />;
   return <>{children}</>;
 }
 
@@ -50,7 +50,10 @@ export function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/welcome" element={<PublicOnly><Manual /></PublicOnly>} />
-        <Route path="/signup" element={<PublicOnly><Signup /></PublicOnly>} />
+        <Route path="/signin" element={<PublicOnly><SignIn /></PublicOnly>} />
+        {/* Old link kept working: /signup opens the create-account mode. */}
+        <Route path="/signup" element={<Navigate to="/signin?mode=signup" replace />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         <Route path="/onboarding/diet" element={authed(<Diet />)} />
         <Route path="/pantry" element={authed(<Pantry />)} />

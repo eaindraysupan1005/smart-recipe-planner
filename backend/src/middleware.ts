@@ -21,11 +21,19 @@ export class HttpError extends Error {
   }
 }
 
-/** Dummy auth — a bearer token maps to a user. No passwords are ever stored. */
+/**
+ * Bearer token → session → user. Expired sessions are rejected and swept.
+ * Only the opaque token is stored; passwords live as scrypt hashes on the user.
+ */
 export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
   const header = req.header('authorization') ?? '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
-  const session = db.sessions.find((s) => s.token === token);
+  const session = token ? db.sessions.find((s) => s.token === token) : undefined;
+  if (session?.expiresAt && session.expiresAt <= now()) {
+    db.sessions = db.sessions.filter((s) => s.token !== token);
+    persist();
+    return next(new HttpError(401, 'session_expired', 'Your session has expired. Please sign in again.'));
+  }
   const user = session && db.users.find((u) => u.id === session.userId);
   if (!user) return next(new HttpError(401, 'unauthenticated', 'Please sign in again.'));
   req.user = user;

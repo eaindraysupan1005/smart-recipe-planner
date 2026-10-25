@@ -3,6 +3,10 @@ export interface User {
   email: string;
   name: string;
   createdAt: string;
+  picture?: string;
+  emailVerified?: boolean;
+  hasPassword?: boolean;
+  signInMethods?: string[];
   aiConsent: boolean;
   aiConsentAt: string | null;
   dietConsent: boolean;
@@ -194,6 +198,11 @@ export const api = {
   signup: (email: string, password: string, acceptTerms: boolean) =>
     request<AuthResult>('POST', '/auth/signup', { email, password, acceptTerms }),
   login: (email: string, password: string) => request<AuthResult>('POST', '/auth/login', { email, password }),
+  providers: () => request<{ google: boolean }>('GET', '/auth/providers'),
+  /** Swaps the one-time code from the OAuth redirect for a session token. */
+  exchange: (code: string) => request<AuthResult>('POST', '/auth/exchange', { code }),
+  setPassword: (currentPassword: string | null, newPassword: string) =>
+    request<{ user: User }>('POST', '/auth/password', { currentPassword, newPassword }),
   logout: () => request<void>('POST', '/auth/logout'),
   me: () => request<{ user: User }>('GET', '/auth/me'),
   updateMe: (name: string) => request<{ user: User }>('PATCH', '/auth/me', { name }),

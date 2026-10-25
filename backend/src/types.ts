@@ -3,13 +3,23 @@ export interface User {
   email: string;
   name: string;
   createdAt: string;
+  /** scrypt hash — never the password itself. Absent for Google-only accounts. */
+  passwordHash?: string;
+  /** Google account id, so we recognise them next time. No Google tokens kept. */
+  googleId?: string;
+  picture?: string;
+  emailVerified?: boolean;
+  lastLoginAt?: string;
 }
 
-/** Dummy auth: we store only an opaque session token, never a password (PDPA). */
+/** A signed-in session. The token is opaque and expires. */
 export interface Session {
   token: string;
   userId: string;
   createdAt: string;
+  expiresAt: string;
+  /** How they signed in, shown on the profile screen. */
+  method?: 'password' | 'google';
 }
 
 export type RecordKind =

@@ -313,3 +313,33 @@ button { cursor: pointer; }
 }
 .mood-text:focus { border-color: var(--ink); }
 .mood-examples { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+
+/* ── Sign in ── */
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 54px; border-radius: 14px; border: 1.5px solid rgba(27, 26, 23, 0.16); background: #fff;
+  font-size: 15.5px; font-weight: 600; color: var(--ink); text-decoration: none;
+  margin: 26px 0 0; transition: background 0.15s, border-color 0.15s;
+}
+.btn-google:hover { background: #fdfbf5; border-color: rgba(27, 26, 23, 0.3); }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 18px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.divider span { font-size: 12.5px; color: var(--ink-45); }
+
+.reveal {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: 0; padding: 8px 10px; font-size: 13px; font-weight: 700; color: var(--ink-55);
+}
+.reveal:hover { color: var(--ink); }
+
+.strength { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.strength .bars { display: flex; gap: 4px; flex: 1; }
+.strength .bars span {
+  flex: 1; height: 4px; border-radius: 99px; background: rgba(27, 26, 23, 0.12);
+}
+.strength .bars span.on { background: var(--yellow); }
+.strength .bars span.on.s1 { background: var(--red); }
+.strength .bars span.on.s2 { background: #e8a33d; }
+.strength .bars span.on.s3,
+.strength .bars span.on.s4 { background: var(--green); }

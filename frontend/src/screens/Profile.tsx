@@ -50,7 +50,7 @@ export function Profile() {
   const deleteAccount = async () => {
     await api.deleteAccount();
     await signOut();
-    nav('/signup', { replace: true });
+    nav('/signin', { replace: true });
   };
 
   return (
@@ -92,7 +92,7 @@ export function Profile() {
         <div className="section"><span>Account</span></div>
         <div className="card">
           <NavRow title="Download my data" onClick={download} />
-          <button className="row clickable" style={{ padding: '15px 16px' }} onClick={async () => { await signOut(); nav('/signup'); }}>
+          <button className="row clickable" style={{ padding: '15px 16px' }} onClick={async () => { await signOut(); nav('/signin'); }}>
             <div className="main" style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--red)' }}>Sign out</div>
           </button>
           <button className="row clickable" style={{ padding: '15px 16px' }} onClick={() => setConfirmDelete(true)}>

@@ -3,16 +3,18 @@
  *
  * Creates (or resets) one demo account that already has a pantry, a saved
  * recipe, an AI suggestion and a shopping list, so the demo never starts on an
- * empty screen. Sign in with the email below and ANY password (dummy auth).
+ * empty screen. Sign in with the email and password printed when this runs.
  *
  * Run with --fresh to wipe the whole database first.
  */
 import { db, flush, initDb, newId, now, persist } from './db.js';
+import { hashPassword } from './auth-password.js';
 import { addRecord, VERSIONS } from './consent.js';
 import { MODEL_VERSION } from './ai.js';
 import type { GroceryItem, PantryItem, Recipe } from './types.js';
 
 export const DEMO_EMAIL = 'demo@what2cook.app';
+export const DEMO_PASSWORD = 'CookWith.Me2026';
 const DEMO_NAME = 'Susan';
 
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
@@ -43,7 +45,7 @@ function wipeUser(userId: string) {
   db.records = not(db.records);
 }
 
-export function seed(fresh = false): void {
+export async function seed(fresh = false): Promise<void> {
   if (fresh) {
     db.users = [];
     db.sessions = [];
@@ -56,10 +58,13 @@ export function seed(fresh = false): void {
     db.accessLogs = [];
   }
 
+  const passwordHash = await hashPassword(DEMO_PASSWORD);
   let user = db.users.find((u) => u.email.toLowerCase() === DEMO_EMAIL);
-  if (user) wipeUser(user.id);
-  else {
-    user = { id: newId(), email: DEMO_EMAIL, name: DEMO_NAME, createdAt: daysAgo(30) };
+  if (user) {
+    wipeUser(user.id);
+    user.passwordHash = passwordHash;
+  } else {
+    user = { id: newId(), email: DEMO_EMAIL, name: DEMO_NAME, createdAt: daysAgo(30), passwordHash, emailVerified: true };
     db.users.push(user);
   }
   const userId = user.id;
@@ -193,8 +198,8 @@ export function seed(fresh = false): void {
 // Run directly: `npm run seed [-- --fresh]`
 const fresh = process.argv.includes('--fresh');
 await initDb();
-seed(fresh);
+await seed(fresh);
 await flush();
 console.log(`Seeded demo data${fresh ? ' (fresh database)' : ''}.`);
-console.log(`  Sign in: ${DEMO_EMAIL}  ·  password: anything`);
+console.log(`  Sign in: ${DEMO_EMAIL}  ·  password: ${DEMO_PASSWORD}`);
 console.log(`  ${db.pantry.length} pantry items · ${db.recipes.length} recipes · ${db.grocery.length} shopping items`);

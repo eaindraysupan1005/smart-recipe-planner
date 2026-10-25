@@ -13,7 +13,7 @@ export function Manual({ fromProfile = false }: { fromProfile?: boolean }) {
   const nav = useNavigate();
   const done = () => {
     manualSeen.set();
-    nav(fromProfile ? '/profile' : '/signup');
+    nav(fromProfile ? '/profile' : '/signin?mode=signup');
   };
   return (
     <div className="screen">
