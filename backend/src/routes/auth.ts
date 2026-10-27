@@ -3,8 +3,9 @@ import crypto from 'node:crypto';
 import { db, newId, now, persist } from '../db.js';
 import { HttpError, requireAuth } from '../middleware.js';
 import { addRecord, consentState, VERSIONS } from '../consent.js';
-import { checkPassword, clearAttempts, hashPassword, noteFailure, tooManyAttempts, verifyPassword } from '../auth-password.js';
+import { burnSameWork, checkPassword, clearAttempts, hashPassword, noteFailure, tooManyAttempts, verifyPassword } from '../auth-password.js';
 import { finish, googleConfigured, OAuthError, publicUrl, startUrl } from '../oauth-google.js';
+import { signupLimit } from '../rate-limit.js';
 import type { Session, User } from '../types.js';
 
 export const authRouter = Router();
@@ -51,6 +52,15 @@ function nameFromEmail(email: string): string {
   return local.charAt(0).toUpperCase() + local.slice(1);
 }
 
+/**
+ * Only a path inside this app. A value starting with "//" or "/\" is a
+ * protocol-relative URL that would redirect the browser to another site.
+ */
+function safeReturnTo(value: unknown): string {
+  if (typeof value !== 'string') return '/';
+  return /^\/(?![/\\])[A-Za-z0-9\-._~!$&'()*+,;=:@/%?#]*$/.test(value) ? value : '/';
+}
+
 function acceptTermsFor(userId: string): void {
   addRecord(userId, 'terms', 'granted', `Terms of Service ${VERSIONS.terms}`);
   addRecord(userId, 'disclaimer', 'granted', `AI & Food Safety Disclaimer ${VERSIONS.disclaimer}`);
@@ -58,7 +68,7 @@ function acceptTermsFor(userId: string): void {
 
 // ── Email + password ───────────────────────────────────────────────────────
 
-authRouter.post('/signup', async (req, res) => {
+authRouter.post('/signup', signupLimit, async (req, res) => {
   const { email, password, acceptTerms } = req.body ?? {};
   const mail = normalEmail(email);
   if (!mail) throw new HttpError(400, 'invalid_email', 'Enter a valid email address.');
@@ -100,8 +110,11 @@ authRouter.post('/login', async (req, res) => {
   }
 
   const user = findByEmail(mail);
-  // Same reply either way, so this cannot be used to discover who has an account.
-  const ok = user?.passwordHash ? await verifyPassword(String(password ?? ''), user.passwordHash) : false;
+  // Same reply AND the same amount of work either way, so neither the message
+  // nor the response time reveals who has an account.
+  let ok = false;
+  if (user?.passwordHash) ok = await verifyPassword(String(password ?? ''), user.passwordHash);
+  else await burnSameWork(String(password ?? ''));
   if (!user || !ok) {
     noteFailure(key);
     if (user && !user.passwordHash) {
@@ -137,7 +150,7 @@ authRouter.get('/providers', (_req, res) => {
 
 authRouter.get('/google', (req, res) => {
   if (!googleConfigured()) throw new HttpError(503, 'google_unconfigured', 'Google sign-in is not set up on this server.');
-  const returnTo = typeof req.query.returnTo === 'string' && req.query.returnTo.startsWith('/') ? req.query.returnTo : '/';
+  const returnTo = safeReturnTo(req.query.returnTo);
   res.redirect(startUrl(returnTo));
 });
 

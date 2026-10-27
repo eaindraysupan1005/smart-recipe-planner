@@ -26,6 +26,17 @@ export async function hashPassword(password: string): Promise<string> {
   return `scrypt$${N}$${r}$${p}$${salt.toString('base64')}$${key.toString('base64')}`;
 }
 
+/**
+ * A throwaway hash with the same cost as a real one. Verifying against this
+ * when the account does not exist keeps the response time flat, so an attacker
+ * cannot tell registered emails from unknown ones by timing the reply.
+ */
+let decoyHash: string | null = null;
+export async function burnSameWork(password: string): Promise<void> {
+  decoyHash ??= await hashPassword('decoy-account-no-one-can-sign-in-with');
+  await verifyPassword(password, decoyHash);
+}
+
 /** Constant-time check, so a wrong password takes as long as a right one. */
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
   const parts = stored.split('$');

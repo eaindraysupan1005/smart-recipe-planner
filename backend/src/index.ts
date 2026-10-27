@@ -16,7 +16,21 @@ watchDataFile();
 
 const app = express();
 app.set('trust proxy', true);
-app.use(cors());
+/**
+ * In production the app and API share an origin, so no cross-origin access is
+ * needed at all. Dev runs the Vite server on another port, so allow that one.
+ * A wildcard would let any website call this API with a stolen token.
+ */
+const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:5173,https://localhost:5173')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, cb) => cb(null, !origin || allowedOrigins.includes(origin)),
+    credentials: true,
+  }),
+);
 // Receipt photos are posted for AI reading, then discarded — never stored.
 app.use(express.json({ limit: '12mb' }));
 

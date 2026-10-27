@@ -4,6 +4,7 @@ import { HttpError } from '../middleware.js';
 import { parseReceipt } from '../receipt.js';
 import { readReceiptPhoto, visionAvailable } from '../receipt-vision.js';
 import { addRecord } from '../consent.js';
+import { scanLimit } from '../rate-limit.js';
 import type { PantryItem } from '../types.js';
 
 export const pantryRouter = Router();
@@ -95,7 +96,7 @@ scanRouter.get('/capabilities', (_req, res) => {
  *               AI reader is unavailable); only text is sent.
  * Either way the photo is never stored, and nothing but item lines is kept.
  */
-scanRouter.post('/', async (req, res) => {
+scanRouter.post('/', scanLimit, async (req, res) => {
   const userId = req.user!.id;
   const { image, lines } = req.body ?? {};
   const pantry = userPantry(userId);

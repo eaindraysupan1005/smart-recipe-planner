@@ -5,6 +5,7 @@ import { consentState } from '../consent.js';
 import { activeFilters, AiUnavailableError } from '../ai.js';
 import { cook, type ChefResult } from '../chef.js';
 import { complianceTags } from '../allergens.js';
+import { aiLimit } from '../rate-limit.js';
 import { MOODS } from '../moods.js';
 import { getDiet } from './profile.js';
 import { userPantry } from './pantry.js';
@@ -148,7 +149,7 @@ recipesRouter.get('/moods', (_req, res) => {
   res.json({ moods: MOODS.map(({ id, label, blurb, emoji }) => ({ id, label, blurb, emoji })) });
 });
 
-recipesRouter.post('/generate', async (req, res) => {
+recipesRouter.post('/generate', aiLimit, async (req, res) => {
   const { itemIds, mood, moodText } = req.body ?? {};
   if (!Array.isArray(itemIds)) throw new HttpError(400, 'nothing_picked', 'Pick at least one pantry item to cook with.');
   const moodId = typeof mood === 'string' && MOODS.some((m) => m.id === mood) ? mood : null;
@@ -159,9 +160,9 @@ recipesRouter.post('/generate', async (req, res) => {
   res.status(201).json({ recipes: made.map((r) => withCheck(r, pantry)), recipe: withCheck(made[0], pantry) });
 });
 
-recipesRouter.post('/:id/regenerate', async (req, res) => {
+recipesRouter.post('/:id/regenerate', aiLimit, async (req, res) => {
   const userId = req.user!.id;
-  const from = findRecipe(userId, req.params.id);
+  const from = findRecipe(userId, String(req.params.id));
   const made = await runGeneration(
     userId,
     from.pickedItemIds,
