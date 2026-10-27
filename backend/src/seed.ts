@@ -7,7 +7,7 @@
  *
  * Run with --fresh to wipe the whole database first.
  */
-import { db, newId, now, persist } from './db.js';
+import { db, flush, initDb, newId, now, persist } from './db.js';
 import { addRecord, VERSIONS } from './consent.js';
 import { MODEL_VERSION } from './ai.js';
 import type { GroceryItem, PantryItem, Recipe } from './types.js';
@@ -192,9 +192,9 @@ export function seed(fresh = false): void {
 
 // Run directly: `npm run seed [-- --fresh]`
 const fresh = process.argv.includes('--fresh');
+await initDb();
 seed(fresh);
-setTimeout(() => {
-  console.log(`Seeded demo data${fresh ? ' (fresh database)' : ''}.`);
-  console.log(`  Sign in: ${DEMO_EMAIL}  ·  password: anything`);
-  console.log(`  ${db.pantry.length} pantry items · ${db.recipes.length} recipes · ${db.grocery.length} shopping items`);
-}, 100);
+await flush();
+console.log(`Seeded demo data${fresh ? ' (fresh database)' : ''}.`);
+console.log(`  Sign in: ${DEMO_EMAIL}  ·  password: anything`);
+console.log(`  ${db.pantry.length} pantry items · ${db.recipes.length} recipes · ${db.grocery.length} shopping items`);

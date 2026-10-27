@@ -69,7 +69,32 @@ npm run dev
 Auth is a **dummy**: any email and any password work. No password is ever
 stored — only an opaque session token (PDPA rule).
 
-Data lives in `backend/data/db.json` (git-ignored). Delete the file to reset.
+Data lives in `backend/data/db.json` (git-ignored) unless Supabase is configured
+— see below. Delete the file to reset.
+
+## Database (Supabase)
+
+With no Supabase settings the app keeps using `backend/data/db.json`. To store
+data in Supabase Postgres instead:
+
+1. Create a project at https://supabase.com/dashboard (free tier is fine).
+2. **SQL Editor** → paste all of `backend/supabase/schema.sql` → **Run**.
+3. **Project Settings → API**: copy the project URL and the **secret** key
+   (`service_role`, or `sb_secret_…`).
+4. `cp backend/.env.example backend/.env`, then fill in `SUPABASE_URL` and
+   `SUPABASE_SERVICE_ROLE_KEY`. The key stays on the server; `.env` is git-ignored.
+5. `npm run db:check -w backend` — prints a row count per table when connected.
+6. `npm run seed`, then `npm run dev`. The server logs `Storage: Supabase (…)`.
+
+How it works: the server loads every table into memory at startup, routes work
+on that as before, and each change is written through to Postgres (only the
+rows that changed). RLS is on with no policies, so the public anon key can read
+nothing. Access logs and acceptance records have no foreign key to `users`, so
+they survive account deletion (CCA §26 / ETA).
+
+Limits: one server instance only, and after `npm run seed` **restart the
+server** — in Supabase mode it does not reload from outside like it does for
+`db.json`.
 
 ## Core workflow
 

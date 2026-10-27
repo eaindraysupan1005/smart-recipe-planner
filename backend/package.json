@@ -9,9 +9,11 @@
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed": "tsx src/seed.ts",
+    "db:check": "tsx src/db-check.ts",
     "import:recipes": "tsx src/import-dataset.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   },

@@ -6,20 +6,7 @@
  *   GEMINI_API_KEY=...            required for AI features
  *   GEMINI_MODEL=gemini-2.5-flash override the model if needed
  */
-import fs from 'node:fs';
-import { ENV_FILE } from './paths.js';
-
-/** Tiny .env reader — avoids a dependency for one file. */
-function loadEnv(): void {
-  if (!fs.existsSync(ENV_FILE)) return;
-  for (const line of fs.readFileSync(ENV_FILE, 'utf8').split(/\r?\n/)) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-    if (!m) continue;
-    const value = m[2].replace(/^["']|["']$/g, '');
-    if (!(m[1] in process.env)) process.env[m[1]] = value;
-  }
-}
-loadEnv();
+import './env.js';
 
 const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash';
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
