@@ -3,7 +3,7 @@ import cors from 'cors';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { watchDataFile } from './db.js';
+import { flush, initDb, watchDataFile } from './db.js';
 import { accessLog, errorHandler, requireAuth } from './middleware.js';
 import { authRouter } from './routes/auth.js';
 import { profileRouter } from './routes/profile.js';
@@ -11,6 +11,7 @@ import { pantryRouter, scanRouter } from './routes/pantry.js';
 import { recipesRouter } from './routes/recipes.js';
 import { groceryRouter } from './routes/grocery.js';
 
+await initDb();
 watchDataFile();
 
 const app = express();
@@ -52,3 +53,12 @@ app.listen(port, () => {
   const served = fs.existsSync(path.join(webRoot, 'index.html'));
   console.log(served ? `What2Cook running on http://localhost:${port}` : `What2Cook API listening on http://localhost:${port}`);
 });
+
+// Write anything still waiting in the debounce window before the process exits.
+for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+  process.on(signal, () => {
+    flush()
+      .catch((e: Error) => console.error(e.message))
+      .finally(() => process.exit(0));
+  });
+}
