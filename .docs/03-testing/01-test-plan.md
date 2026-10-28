@@ -75,13 +75,85 @@ Written as scenarios the user has to solve, not button instructions — the
 "trap" the course slide warns against. Same 5 tasks, same order, for every
 participant; easy → hard.
 
-| # | Task (as read to the user) | Success criterion | Journey / entry point |
-|---|---|---|---|
-| T1 | "You just got back from the store with a receipt. Get those items into the app." | Items + quantities appear in the pantry with no typing, in under 1 minute; user confirms before saving (F1, NFR2, NFR3) | Journey 1 start |
-| T2 | "You have a few things sitting in your fridge you want to use up before they go bad. Get a recipe out of what you already have." | A recipe is generated from only the items selected (+staples), honouring any dietary filter set earlier (F3, F6) | Journey 1 |
-| T3 | "You just finished cooking that meal. Let the app know what's left." | Marked cooked, pantry deducted, leftovers confirmed in ≤2 taps / <10s (F2, NFR11) | Journey 1 |
-| T4 | "You're about to go shopping for what you're missing for the meals you've planned. Pull up what you need." | Grocery list shown; contains none of what's already stocked (F4, NFR7) | Journey 1 end |
-| T5 | "You remember saving a recipe before that used something you have right now. Find it and get it ready to shop for." | Search by ingredient returns the right recipe; selecting it joins the grocery-list pool automatically, no scan or generation needed (F7, F4, NFR12) | Journey 2 (secondary entry) |
+Each task below is written as a test case using the team's test case
+template (Scenario ID / Case ID / Description / Priority / Pre-Requisite /
+Post-Requisite, then step-by-step Action / Inputs / Expected Output / Actual
+Output / Test Device / Test Result / Test Comments). The **moderator reads
+only the scenario line** to the user — never the Action/Inputs steps —
+and never helps or points; the note-taker fills in **Actual Output**, **Test
+Result** (Pass/Fail) and **Test Comments** live during the session, per task,
+per user (duplicate each block once per participant, U01…).
+
+#### T1 — Receipt scan builds the pantry
+
+| Test Scenario ID | Test Case ID | Test Case Description | Test Priority | Pre-Requisite | Post-Requisite | Target Completion Time |
+|---|---|---|---|---|---|---|
+| UAT-T1 | UAT-T1A | "You just got back from the store with a receipt. Get those items into the app." | High | Logged-in account; a real/photographed grocery receipt | Pantry holds the scanned items, ready for T2 | ≤ 1 min (scan to saved) |
+
+| S.No | Action | Inputs | Expected Output | Actual Output | Test Device | Test Result | Test Comments |
+|---|---|---|---|---|---|---|---|
+| 1 | Open the receipt scanner | Logged-in account | Scanner camera/upload screen opens | | | | |
+| 2 | Photograph or upload the receipt | Receipt (Thai or international format, incl. abbreviated names) | Items + quantities are parsed and listed for review | | | | |
+| 3 | Review the parsed list and correct any misread item | User corrections, if any | List accurately reflects the receipt; ≥85% of line items read correctly before any correction | | | | |
+| 4 | Confirm and save | Confirm tap | Pantry shows all items + quantities with **zero manual typing**, total time ≤ 1 min (F1, NFR2, NFR3) | | | | |
+
+**Pass:** all 4 steps succeed as expected above. **Fail:** any item typed in manually instead of corrected from the scan; save completes with no confirm step; total time > 1 min; <85% of line items read correctly.
+
+#### T2 — AI recipe generation from selected pantry items
+
+| Test Scenario ID | Test Case ID | Test Case Description | Test Priority | Pre-Requisite | Post-Requisite | Target Completion Time |
+|---|---|---|---|---|---|---|
+| UAT-T2 | UAT-T2A | "You have a few things sitting in your fridge you want to use up before they go bad. Get a recipe out of what you already have." | High | Pantry has items from T1; Terms + AI consent already accepted; dietary filter (if any) already saved | Recipe available for T3 | ≤ 10 s generation (p90); progress shown ≤ 1 s after tap |
+
+| S.No | Action | Inputs | Expected Output | Actual Output | Test Device | Test Result | Test Comments |
+|---|---|---|---|---|---|---|---|
+| 1 | Select 2–4 pantry items to use | Pantry item selection | Selection is reflected on screen | | | | |
+| 2 | Tap generate | Generate tap | Progress indicator appears within 1 s | | | | |
+| 3 | Wait for the result | — | Recipe returned within 10 s (p90) (NFR4) | | | | |
+| 4 | Read the generated recipe's ingredient list | — | Uses only the selected items + declared staples (salt, oil, water, pepper) (NFR5); zero ingredients violate the saved dietary filter (NFR6) (F3, F6) | | | | |
+
+**Pass:** all 4 steps succeed as expected above. **Fail:** recipe contains an item not selected and not a staple; recipe contains a dietary-filter violation (automatic fail, release blocker); no progress shown within 1 s; generation takes > 10 s.
+
+#### T3 — Cook & leftover confirmation
+
+| Test Scenario ID | Test Case ID | Test Case Description | Test Priority | Pre-Requisite | Post-Requisite | Target Completion Time |
+|---|---|---|---|---|---|---|
+| UAT-T3 | UAT-T3A | "You just finished cooking that meal. Let the app know what's left." | High | A planned meal exists (from T2) with known pantry impact | Pantry reflects actual leftovers, ready for T4 | ≤ 2 taps, < 10 s |
+
+| S.No | Action | Inputs | Expected Output | Actual Output | Test Device | Test Result | Test Comments |
+|---|---|---|---|---|---|---|---|
+| 1 | Tap "mark cooked" on the planned meal | Mark-cooked tap | Leftover-confirm box opens | | | | |
+| 2 | Review the box and adjust quantities if needed | Leftover quantities | Box reflects the user's actual leftovers | | | | |
+| 3 | Confirm | Confirm tap | Pantry quantities deducted correctly; done in ≤2 taps and <10s total (F2, NFR11) | | | | |
+
+**Pass:** all 3 steps succeed as expected above. **Fail:** pantry deducts the wrong amount; confirm takes >2 taps or ≥10s; pantry is changed without the user confirming.
+
+#### T4 — Auto grocery list
+
+| Test Scenario ID | Test Case ID | Test Case Description | Test Priority | Pre-Requisite | Post-Requisite | Target Completion Time |
+|---|---|---|---|---|---|---|
+| UAT-T4 | UAT-T4A | "You're about to go shopping for what you're missing for the meals you've planned. Pull up what you need." | High | At least one not-yet-cooked recipe pooled; pantry reflects T1/T3 state | — | List renders < 3 s |
+
+| S.No | Action | Inputs | Expected Output | Actual Output | Test Device | Test Result | Test Comments |
+|---|---|---|---|---|---|---|---|
+| 1 | Open the grocery list | — | List renders in < 3 s (NFR9) | | | | |
+| 2 | Scan the list against known pantry stock | — | List contains **zero** items already stocked in sufficient quantity (F4, NFR7) | | | | |
+
+**Pass:** both steps succeed as expected above. **Fail:** list takes ≥3s to render; list includes ≥1 item already adequately stocked.
+
+#### T5 — Search saved recipes (secondary entry point)
+
+| Test Scenario ID | Test Case ID | Test Case Description | Test Priority | Pre-Requisite | Post-Requisite | Target Completion Time |
+|---|---|---|---|---|---|---|
+| UAT-T5 | UAT-T5A | "You remember saving a recipe before that used something you have right now. Find it and get it ready to shop for." | Medium | ≥1 recipe already saved from a prior session, using a known ingredient | Recipe joins the pending grocery-list pool | No fixed ceiling — record actual time; pooling itself must be 0 extra taps |
+
+| S.No | Action | Inputs | Expected Output | Actual Output | Test Device | Test Result | Test Comments |
+|---|---|---|---|---|---|---|---|
+| 1 | Search saved recipes by a named ingredient | Ingredient name | Correct matching recipe(s) returned (F7) | | | | |
+| 2 | Open and select the matching recipe | Selection tap | Recipe opens; no further "add to plan" tap needed | | | | |
+| 3 | Check the grocery-list pool | — | Pool now includes this recipe automatically, 0 extra taps (F4, NFR12) | | | | |
+
+**Pass:** all 3 steps succeed as expected above. **Fail:** search misses the correct recipe or returns wrong matches; an extra manual step is needed to pool it.
 
 **Session structure** (~30 min/user), per the course's run-of-session guide:
 Intro + consent (3') → baseline "old way" for T1/T4 (5') → T1–T5 with
