@@ -1,6 +1,9 @@
 node_modules/
 dist/
-backend/data/
 .DS_Store
 *.log
 .env
+
+# Local data: raw dataset and dev database stay out of git; recipes.json is committed
+backend/data/*.csv
+backend/data/db.json
