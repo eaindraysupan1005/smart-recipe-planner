@@ -13,16 +13,33 @@ create table if not exists users (
   id          uuid primary key,
   email       text not null,
   name        text not null,
-  created_at  timestamptz not null
+  created_at  timestamptz not null,
+  password_hash   text,
+  google_id       text,
+  picture         text,
+  email_verified  boolean,
+  last_login_at   timestamptz
 );
+
+-- Existing projects: add the columns that were introduced after first setup.
+alter table users add column if not exists password_hash  text;
+alter table users add column if not exists google_id      text;
+alter table users add column if not exists picture        text;
+alter table users add column if not exists email_verified boolean;
+alter table users add column if not exists last_login_at  timestamptz;
 create unique index if not exists users_email_lower_key on users (lower(email));
 
 -- Dummy auth: an opaque session token only, never a password (PDPA).
 create table if not exists sessions (
   token       text primary key,
   user_id     uuid not null references users (id) on delete cascade,
-  created_at  timestamptz not null
+  created_at  timestamptz not null,
+  expires_at  timestamptz not null default (now() + interval '30 days'),
+  method      text
 );
+-- Existing projects: add the columns introduced after first setup.
+alter table sessions add column if not exists expires_at timestamptz not null default (now() + interval '30 days');
+alter table sessions add column if not exists method     text;
 create index if not exists sessions_user_id_idx on sessions (user_id);
 
 create table if not exists diet_profiles (
