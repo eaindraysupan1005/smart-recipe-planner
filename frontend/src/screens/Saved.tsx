@@ -129,7 +129,7 @@ export function SavedCheck() {
                 <div key={i.name} className="row">
                   <div className="dot ok">✓</div>
                   <div className="main name">{i.name}</div>
-                  <div className="end">{i.stock}</div>
+                  <div className="end">{i.stock === 'staple' ? 'Usually at home' : i.stock}</div>
                 </div>
               ))}
             </div>

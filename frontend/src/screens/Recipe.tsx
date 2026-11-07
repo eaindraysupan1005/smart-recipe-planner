@@ -200,7 +200,7 @@ export function RecipeDetail() {
             </div>
           ))}
         </div>
-        <div className="sub" style={{ marginTop: 10 }}>Staples used: {recipe.staples.join(' · ')}</div>
+        <div className="sub" style={{ marginTop: 10 }}>Usually at home: {recipe.staples.join(' · ')}</div>
 
         <div className="section"><span>Method</span></div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -303,7 +303,7 @@ function CookSheet({ recipe, onClose }: { recipe: Recipe; onClose: () => void })
           })}
         </div>
       )}
-      <div className="sub" style={{ marginTop: 10, fontSize: 12.5 }}>Staples ({recipe.staples.join(', ')}) are not tracked.</div>
+      <div className="sub" style={{ marginTop: 10, fontSize: 12.5 }}>Things usually at home ({recipe.staples.join(', ')}) only come off your pantry if you track them there.</div>
       <button className="btn" style={{ marginTop: 20 }} onClick={confirm} disabled={!rows || busy}>
         <CheckIcon />
         {busy ? 'Updating pantry…' : 'Mark as cooked'}

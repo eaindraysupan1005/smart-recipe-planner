@@ -5,7 +5,7 @@ import { consentState } from '../consent.js';
 import { activeFilters, AiUnavailableError } from '../ai.js';
 import { cook, type ChefResult } from '../chef.js';
 import { complianceTags } from '../allergens.js';
-import { canonicalName, isSeasoning, STAPLES } from '../ingredient-text.js';
+import { isSeasoning, isStaple } from '../ingredient-text.js';
 import { convertQty, estimateQty, sameFood } from '../units.js';
 import { aiLimit } from '../rate-limit.js';
 import { MOODS } from '../moods.js';
@@ -36,12 +36,16 @@ function pantryCheck(recipe: Recipe, pantry: PantryItem[]) {
   const need: Ingredient[] = [];
   for (const ing of recipe.ingredients.filter((i) => !isSeasoning(i.name))) {
     const p = findPantryItem(pantry, ing);
+    // Basic staples (oil, sugar, flour, stock, vinegar) are assumed to be in any
+    // kitchen: listed with their amounts, deducted when tracked, never "needed".
+    const staple = isStaple(ing.name);
     if (!p) {
-      need.push(ing);
+      if (staple) have.push({ ...ing, stock: 'staple' });
+      else need.push(ing);
       continue;
     }
     const wanted = convertQty(ing.qty, ing.unit, p.unit, ing.name);
-    if (wanted && p.qty < wanted) need.push({ ...ing, qty: round(ing.qty * (1 - p.qty / wanted)) });
+    if (wanted && p.qty < wanted && !staple) need.push({ ...ing, qty: round(ing.qty * (1 - p.qty / wanted)) });
     else have.push({ ...ing, stock: `${p.qty} ${p.unit}`.trim() });
   }
   return { have, need };
@@ -51,7 +55,7 @@ function withCheck(recipe: Recipe, pantry: PantryItem[]) {
   const check = pantryCheck(recipe, pantry);
   // "Needs:" comes from the live pantry, not from what the chef claimed when it
   // wrote the dish — the AI can list an ingredient and still say nothing is missing.
-  const missing = check.need.map((n) => n.name).filter((name) => !STAPLES.has(canonicalName(name) ?? ''));
+  const missing = check.need.map((n) => n.name);
   // A suggestion that matches something already in Favorites (same book recipe or same title).
   const alreadySaved = recipe.status === 'generated' && db.recipes.some((r) => (
     r.userId === recipe.userId && r.status === 'saved' && r.id !== recipe.id
@@ -220,13 +224,27 @@ recipesRouter.delete('/:id', (req, res) => {
 
 // ── Cook & confirm leftovers ───────────────────────────────────────────────
 
-function deductions(recipe: Recipe, pantry: PantryItem[]) {
-  return recipe.ingredients.filter((ing) => !isSeasoning(ing.name)).map((ing) => {
+interface Deduction {
+  pantryItemId: string | null;
+  name: string;
+  unit: string;
+  before: number;
+  use: number;
+  after: number;
+  tracked: boolean;
+}
+
+function deductions(recipe: Recipe, pantry: PantryItem[]): Deduction[] {
+  return recipe.ingredients.filter((ing) => !isSeasoning(ing.name)).flatMap((ing): Deduction[] => {
     const p = findPantryItem(pantry, ing);
-    if (!p) return { pantryItemId: null, name: ing.name, unit: ing.unit, before: 0, use: ing.qty, after: 0, tracked: false };
+    if (!p) {
+      // Untracked staples are assumed, so there is nothing to confirm.
+      if (isStaple(ing.name)) return [];
+      return [{ pantryItemId: null, name: ing.name, unit: ing.unit, before: 0, use: ing.qty, after: 0, tracked: false }];
+    }
     const wanted = (ing.qty > 0 ? convertQty(ing.qty, ing.unit, p.unit, ing.name) : estimateQty(ing.name, recipe.servings ?? 2, p.unit)) ?? 0;
     const use = Math.min(wanted, p.qty);
-    return { pantryItemId: p.id, name: p.name, unit: p.unit, before: p.qty, use: round(use), after: round(Math.max(0, p.qty - use)), tracked: true };
+    return [{ pantryItemId: p.id, name: p.name, unit: p.unit, before: p.qty, use: round(use), after: round(Math.max(0, p.qty - use)), tracked: true }];
   });
 }
 
