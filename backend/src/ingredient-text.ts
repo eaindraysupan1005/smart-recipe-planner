@@ -122,6 +122,14 @@ const CANON_KEYS = CANON.flatMap(([name, keys]) => keys.map((k) => ({ k, name })
 /** Pantry staples we assume everyone has — never counted as "missing". */
 export const STAPLES = new Set(['Salt', 'Pepper', 'Vegetable oil', 'Olive oil', 'Sugar', 'Flour', 'Stock', 'Vinegar', 'Water']);
 
+const SEASONING = /\b(salt|pepper|peppercorns?|seasonings?|spices?|paprika|cumin|turmeric|cinnamon|nutmeg|oregano|thyme|rosemary|water)\b/i;
+const PEPPER_VEG = /\b(bell|chil+i|red|green|yellow|orange|sweet|hot|cayenne|jalapeno)\s+pepper\b/i;
+
+/** Salt, pepper, dried spices and water: flavour, not pantry items to track. */
+export function isSeasoning(name: string): boolean {
+  return SEASONING.test(name) && !PEPPER_VEG.test(name);
+}
+
 export function canonicalName(text: string): string | null {
   const t = ` ${text.toLowerCase()} `;
   const hit = CANON_KEYS.find(({ k }) => t.includes(` ${k}`) || t.includes(`${k} `) || t.includes(k));
