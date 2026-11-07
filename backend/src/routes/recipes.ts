@@ -5,6 +5,8 @@ import { consentState } from '../consent.js';
 import { activeFilters, AiUnavailableError } from '../ai.js';
 import { cook, type ChefResult } from '../chef.js';
 import { complianceTags } from '../allergens.js';
+import { canonicalName, isSeasoning, STAPLES } from '../ingredient-text.js';
+import { convertQty, estimateQty, sameFood } from '../units.js';
 import { aiLimit } from '../rate-limit.js';
 import { MOODS } from '../moods.js';
 import { getDiet } from './profile.js';
@@ -22,21 +24,40 @@ function findRecipe(userId: string, id: string): Recipe {
   return r;
 }
 
+/** The pantry row for a recipe ingredient, preferring one whose unit we can convert. */
+function findPantryItem(pantry: PantryItem[], ing: Ingredient): PantryItem | undefined {
+  const matches = pantry.filter((x) => sameFood(x.name, ing.name));
+  return matches.find((x) => convertQty(ing.qty, ing.unit, x.unit, ing.name) !== null) ?? matches[0];
+}
+
 /** Local comparison against the pantry — nothing is sent to the AI service. */
 function pantryCheck(recipe: Recipe, pantry: PantryItem[]) {
   const have: (Ingredient & { stock: string })[] = [];
   const need: Ingredient[] = [];
-  for (const ing of recipe.ingredients) {
-    const p = pantry.find((x) => sameName(x.name, ing.name));
-    if (!p) need.push(ing);
-    else if (p.unit === ing.unit && p.qty < ing.qty) need.push({ ...ing, qty: round(ing.qty - p.qty) });
+  for (const ing of recipe.ingredients.filter((i) => !isSeasoning(i.name))) {
+    const p = findPantryItem(pantry, ing);
+    if (!p) {
+      need.push(ing);
+      continue;
+    }
+    const wanted = convertQty(ing.qty, ing.unit, p.unit, ing.name);
+    if (wanted && p.qty < wanted) need.push({ ...ing, qty: round(ing.qty * (1 - p.qty / wanted)) });
     else have.push({ ...ing, stock: `${p.qty} ${p.unit}`.trim() });
   }
   return { have, need };
 }
 
 function withCheck(recipe: Recipe, pantry: PantryItem[]) {
-  return { ...recipe, check: pantryCheck(recipe, pantry) };
+  const check = pantryCheck(recipe, pantry);
+  // "Needs:" comes from the live pantry, not from what the chef claimed when it
+  // wrote the dish — the AI can list an ingredient and still say nothing is missing.
+  const missing = check.need.map((n) => n.name).filter((name) => !STAPLES.has(canonicalName(name) ?? ''));
+  // A suggestion that matches something already in Favorites (same book recipe or same title).
+  const alreadySaved = recipe.status === 'generated' && db.recipes.some((r) => (
+    r.userId === recipe.userId && r.status === 'saved' && r.id !== recipe.id
+    && (sameName(r.name, recipe.name) || (!!recipe.generation.sourceRecipeId && r.generation.sourceRecipeId === recipe.generation.sourceRecipeId))
+  ));
+  return { ...recipe, missing, alreadySaved, check };
 }
 
 recipesRouter.get('/', (req, res) => {
@@ -94,6 +115,8 @@ async function runGeneration(
   }
 
   const filters = diet ? activeFilters(diet) : [];
+  // One timestamp per batch, so the list (newest first) keeps the chef's order.
+  const createdAt = now();
   const made: Recipe[] = outcome.results.map((r: ChefResult) => {
     const recipe: Recipe = {
       id: newId(),
@@ -103,7 +126,7 @@ async function runGeneration(
       servings: r.servings,
       // Only tick a filter the dish actually satisfies — the rest are warnings.
       tags: complianceTags(filters, r.warnings),
-      ingredients: r.ingredients,
+      ingredients: r.ingredients.filter((i) => !isSeasoning(i.name)),
       staples: r.staples,
       steps: r.steps,
       excluded: r.excluded,
@@ -116,7 +139,7 @@ async function runGeneration(
         model: outcome.model,
         pantrySnapshot: snapshot,
         filters,
-        createdAt: now(),
+        createdAt,
         durationMs: outcome.durationMs,
         variant,
         regeneratedFrom,
@@ -198,10 +221,11 @@ recipesRouter.delete('/:id', (req, res) => {
 // ── Cook & confirm leftovers ───────────────────────────────────────────────
 
 function deductions(recipe: Recipe, pantry: PantryItem[]) {
-  return recipe.ingredients.map((ing) => {
-    const p = pantry.find((x) => sameName(x.name, ing.name));
+  return recipe.ingredients.filter((ing) => !isSeasoning(ing.name)).map((ing) => {
+    const p = findPantryItem(pantry, ing);
     if (!p) return { pantryItemId: null, name: ing.name, unit: ing.unit, before: 0, use: ing.qty, after: 0, tracked: false };
-    const use = p.unit === ing.unit ? Math.min(ing.qty, p.qty) : 0;
+    const wanted = (ing.qty > 0 ? convertQty(ing.qty, ing.unit, p.unit, ing.name) : estimateQty(ing.name, recipe.servings ?? 2, p.unit)) ?? 0;
+    const use = Math.min(wanted, p.qty);
     return { pantryItemId: p.id, name: p.name, unit: p.unit, before: p.qty, use: round(use), after: round(Math.max(0, p.qty - use)), tracked: true };
   });
 }

@@ -19,7 +19,8 @@ import { dataFile } from './paths.js';
 import { askJson, geminiModel, GeminiError, hasGeminiKey } from './gemini.js';
 import { MOODS, findMood, type Mood } from './moods.js';
 import { SAMPLE_RECIPES } from './sample-recipes.js';
-import { STAPLES } from './ingredient-text.js';
+import { canonicalName, isSeasoning, STAPLES } from './ingredient-text.js';
+import { sameFood } from './units.js';
 import { activeFilters, generateRecipe } from './ai.js';
 import { conflicts, hasAllergyWarning, warningsFor, type Warning } from './allergens.js';
 import type { DatasetRecipe, RecipeDataset } from './dataset-types.js';
@@ -138,6 +139,7 @@ Rules you never break:
 - Respect their allergies and dietary filters: strongly prefer dishes that are safe for them.
 - If the best dish for the occasion does contain something they avoid, you may still suggest it, but say so plainly in "why" — never hide it or pretend the ingredient is absent.
 - Prefer what the cook already has. Basic staples (salt, pepper, oil, water, sugar, flour, stock, vinegar) can be assumed.
+- Never list salt, pepper, spices, seasonings or water in "ingredients" — mention them in the steps only.
 - Be honest about anything they would need to buy.
 - Keep steps short, practical and in the order a cook would do them.
 Reply with JSON only, no prose outside the JSON.`;
@@ -254,22 +256,50 @@ Reply as JSON: {"name":"","minutes":0,"servings":0,"why":"<max 20 words>","ingre
   };
 }
 
+/**
+ * Holds an invented dish to "only what they picked": ingredients matching a
+ * picked item take its pantry name (so cooking deducts the right row), and
+ * anything else that isn't a staple or seasoning comes back as `extras`.
+ */
+function pinToPicked(ingredients: Ingredient[], picked: Ingredient[]): { ingredients: Ingredient[]; extras: string[] } {
+  const extras: string[] = [];
+  const pinned = ingredients.map((ing) => {
+    const own = picked.find((p) => sameFood(p.name, ing.name));
+    if (own) return { ...ing, name: own.name };
+    if (!isSeasoning(ing.name) && !STAPLES.has(canonicalName(ing.name) ?? '')) extras.push(ing.name);
+    return ing;
+  });
+  return { ingredients: pinned, extras };
+}
+
 async function inventRecipe(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, moodText: string | undefined): Promise<ChefResult> {
   const prompt = `${pantryBlock(picked, diet, mood, moodText)}
 
 Nothing in our database fits. Write one original dish using only what they picked plus basic staples.
+ALLOWED INGREDIENTS: ${picked.map((p) => p.name).join(', ')} — plus salt, pepper, spices, oil, water, sugar, flour, stock, vinegar.
+Anything else is forbidden, including a different variety of an allowed one (no "grape tomatoes" when they have "Tomatoes"). Use the allowed names exactly.
 Reply as JSON: {"name":"","minutes":0,"servings":0,"why":"<max 20 words>","ingredients":[{"name":"","qty":0,"unit":""}],"steps":["",""],"missing":[]}`;
 
-  const r = await askJson<AiRecipeShape>(prompt, { system: SYSTEM, temperature: 0.8 });
+  let r = await askJson<AiRecipeShape>(prompt, { system: SYSTEM, temperature: 0.8 });
+  let pinned = pinToPicked(cleanIngredients(r.ingredients), picked);
+  if (pinned.extras.length) {
+    console.warn(`Invented recipe used unpicked items (${pinned.extras.join(', ')}); asking again.`);
+    r = await askJson<AiRecipeShape>(
+      `${prompt}\n\nYou used ${pinned.extras.join(', ')}, which they do not have. Rewrite the dish without them.`,
+      { system: SYSTEM, temperature: 0.5 },
+    );
+    pinned = pinToPicked(cleanIngredients(r.ingredients), picked);
+  }
   return {
     name: String(r.name ?? 'Chef’s improvisation').slice(0, 80),
     minutes: Number(r.minutes) || 30,
     servings: Number(r.servings) || mood?.serves || 2,
-    ingredients: cleanIngredients(r.ingredients),
+    ingredients: pinned.ingredients,
     staples: ['salt', 'oil', 'pepper'],
     steps: (r.steps ?? []).map((s) => String(s)).filter(Boolean).slice(0, 12),
     why: String(r.why ?? '').slice(0, 160),
-    missing: (r.missing ?? []).map(String).slice(0, 8),
+    // Still off-pantry after the retry: say so rather than strip them, since the steps use them.
+    missing: pinned.extras.slice(0, 8),
     excluded: [],
     warnings: [],
     method: 'invented',
@@ -288,8 +318,24 @@ function localWhy(c: Candidate, mood: Mood | undefined): string {
 /** No key, or Gemini failed: best local candidate, else the built-in generator. */
 async function localFallback(picked: Ingredient[], diet: DietProfile | undefined, mood: Mood | undefined, candidates: Candidate[], variant: number): Promise<ChefResult[]> {
   const usable = candidates.filter((c) => c.missing.length <= 2).slice(0, 3);
+  const fromPantry = async (): Promise<ChefResult> => {
+    const made = await generateRecipe(picked, diet, variant);
+    return {
+      name: made.name,
+      minutes: made.minutes,
+      servings: mood?.serves ?? 2,
+      ingredients: made.ingredients,
+      staples: made.staples,
+      steps: made.steps,
+      why: 'Built from your ingredients while the chef service is unavailable.',
+      missing: [],
+      excluded: made.excluded,
+      warnings: [],
+      method: 'local',
+    };
+  };
   if (usable.length) {
-    return usable.map((c) => ({
+    const fromBook = usable.map((c) => ({
       name: c.recipe.name,
       minutes: c.recipe.minutes,
       servings: c.recipe.servings,
@@ -304,21 +350,9 @@ async function localFallback(picked: Ingredient[], diet: DietProfile | undefined
       sourceRecipeId: c.recipe.id,
       sourceRecipeName: c.recipe.name,
     }));
+    return fromBook.every((r) => r.missing.length > 0) ? [await fromPantry(), ...fromBook] : fromBook;
   }
-  const made = await generateRecipe(picked, diet, variant);
-  return [{
-    name: made.name,
-    minutes: made.minutes,
-    servings: mood?.serves ?? 2,
-    ingredients: made.ingredients,
-    staples: made.staples,
-    steps: made.steps,
-    why: 'Built from your ingredients while the chef service is unavailable.',
-    missing: [],
-    excluded: made.excluded,
-    warnings: [],
-    method: 'local',
-  }];
+  return [await fromPantry()];
 }
 
 export interface CookOptions {
@@ -410,7 +444,14 @@ export async function cook(opts: CookOptions): Promise<CookOutcome> {
     const strong = candidates.filter((c) => c.missing.length <= 2);
     if (strong.length >= 2) {
       const picked = await pickFromDataset(opts.picked, opts.diet, mood, moodText, strong.slice(0, 18), count);
-      if (picked.length) return finish(picked, true);
+      if (picked.length) {
+        // Every book recipe needs shopping: lead with one made from what they have.
+        if (picked.every((r) => r.missing.length > 0)) {
+          const invented = await inventRecipe(opts.picked, opts.diet, mood, moodText).catch(() => undefined);
+          if (invented?.ingredients.length) return finish([invented, ...picked], true);
+        }
+        return finish(picked, true);
+      }
     }
     // 2 · ADAPT — closest recipe, rewritten around the pantry.
     if (candidates.length) {

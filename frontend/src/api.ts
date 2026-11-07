@@ -50,6 +50,8 @@ export interface Recipe {
   why?: string;
   servings?: number;
   missing?: string[];
+  /** A suggestion that is already in Favorites. */
+  alreadySaved?: boolean;
   warnings?: Warning[];
   generation: {
     model: string;

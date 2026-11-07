@@ -5,6 +5,9 @@ import { useApp } from '../state';
 import { Loading, TabScreen } from '../components/ui';
 import { WarningBadge } from '../components/Warnings';
 
+/** Written from the picked items alone, not taken from the recipe book. */
+const fromPantry = (r: Recipe) => r.generation.method === 'invented' || (r.generation.method === 'local' && !r.generation.sourceRecipeId);
+
 /** J7 — AI suggestions: keep the ones you want, delete the rest. */
 export function Recipes() {
   const nav = useNavigate();
@@ -43,6 +46,11 @@ export function Recipes() {
               <div key={r.id} className="card pad16">
                 <div onClick={() => nav(`/recipes/${r.id}`)} style={{ cursor: 'pointer' }}>
                   <div style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.25 }}>{r.name}</div>
+                  {fromPantry(r) && (
+                    <div style={{ display: 'inline-block', marginTop: 6, padding: '3px 9px', borderRadius: 999, fontSize: 12, fontWeight: 700, background: 'var(--green-soft)', color: 'var(--green)' }}>
+                      Made from your pantry
+                    </div>
+                  )}
                   <div className="sub" style={{ marginTop: 5 }}>
                     {/* r.tags only lists the filters this dish actually meets. */}
                     {[`${r.minutes} min`, r.servings ? `serves ${r.servings}` : '', ...r.tags.map((t) => t.replace(' ✓', '').toLowerCase())].filter(Boolean).join(' · ')}
@@ -59,7 +67,9 @@ export function Recipes() {
                   )}
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 13 }}>
-                  <button className="btn" style={{ height: 42, borderRadius: 11, fontSize: 13.5 }} onClick={() => save(r)}>Add to Favorite</button>
+                  <button className="btn" style={{ height: 42, borderRadius: 11, fontSize: 13.5 }} onClick={() => save(r)} disabled={r.alreadySaved}>
+                    {r.alreadySaved ? 'Added to Favorites' : 'Add to Favorite'}
+                  </button>
                   <button className="btn-outline danger" style={{ width: 'auto', height: 42, borderRadius: 11, padding: '0 16px', fontSize: 13.5, borderWidth: 1 }} onClick={() => remove(r)}>
                     Delete
                   </button>
