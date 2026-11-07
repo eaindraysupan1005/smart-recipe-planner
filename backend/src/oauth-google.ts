@@ -111,7 +111,8 @@ export async function finish(code: string, state: string): Promise<{ profile: Go
     profile: {
       googleId: info.sub,
       email: info.email,
-      emailVerified: info.email_verified !== false,
+      // Unknown counts as unverified: we link accounts by email.
+      emailVerified: info.email_verified === true,
       name: (info.given_name || info.name || info.email.split('@')[0]).slice(0, 60),
       picture: info.picture,
     },

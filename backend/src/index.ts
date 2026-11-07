@@ -61,8 +61,9 @@ if (fs.existsSync(path.join(webRoot, 'index.html'))) {
 
 app.use(errorHandler);
 
-// API_PORT, not PORT — dev tooling often sets PORT for the web server.
-const port = Number(process.env.API_PORT ?? 4000);
+// API_PORT first — dev tooling often sets PORT for the web server. Hosts such
+// as Render or Railway only set PORT, so fall back to it when deployed.
+const port = Number(process.env.API_PORT ?? process.env.PORT ?? 4000);
 app.listen(port, () => {
   const served = fs.existsSync(path.join(webRoot, 'index.html'));
   console.log(served ? `What2Cook running on http://localhost:${port}` : `What2Cook API listening on http://localhost:${port}`);
