@@ -29,7 +29,7 @@ alter table users add column if not exists email_verified boolean;
 alter table users add column if not exists last_login_at  timestamptz;
 create unique index if not exists users_email_lower_key on users (lower(email));
 
--- Dummy auth: an opaque session token only, never a password (PDPA).
+-- Sessions: an opaque session token only, never a password or Google token (PDPA).
 create table if not exists sessions (
   token       text primary key,
   user_id     uuid not null references users (id) on delete cascade,

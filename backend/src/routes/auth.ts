@@ -4,7 +4,7 @@ import { db, newId, now, persist } from '../db.js';
 import { HttpError, requireAuth } from '../middleware.js';
 import { addRecord, consentState, VERSIONS } from '../consent.js';
 import { burnSameWork, checkPassword, clearAttempts, hashPassword, noteFailure, tooManyAttempts, verifyPassword } from '../auth-password.js';
-import { finish, googleConfigured, OAuthError, publicUrl, startUrl } from '../oauth-google.js';
+import { finish, googleConfigured, OAuthError, publicUrl, startUrl, type GoogleProfile } from '../oauth-google.js';
 import { signupLimit } from '../rate-limit.js';
 import type { Session, User } from '../types.js';
 
@@ -162,6 +162,26 @@ authRouter.get('/google', (req, res) => {
 const handoffs = new Map<string, { token: string; isNew: boolean; createdAt: number }>();
 const HANDOFF_TTL = 60_000;
 
+/**
+ * The sign-in page tells the user, under the Google button, that continuing
+ * means accepting the Terms and the AI & Food Safety Disclaimer — so a new
+ * Google account gets the same acceptance record as an email sign-up.
+ */
+function createGoogleUser(profile: GoogleProfile): User {
+  const user: User = {
+    id: newId(),
+    email: profile.email,
+    name: profile.name,
+    createdAt: now(),
+    googleId: profile.googleId,
+    picture: profile.picture,
+    emailVerified: profile.emailVerified,
+  };
+  db.users.push(user);
+  acceptTermsFor(user.id);
+  return user;
+}
+
 authRouter.get('/google/callback', async (req, res, next) => {
   const { code, state, error } = req.query;
   const fail = (reason: string) => res.redirect(`${publicUrl()}/signin?error=${encodeURIComponent(reason)}`);
@@ -170,29 +190,19 @@ authRouter.get('/google/callback', async (req, res, next) => {
 
   try {
     const { profile, returnTo } = await finish(code, state);
+    // Accounts are matched by email, so Google must vouch for that address.
+    if (!profile.emailVerified) return fail('Google has not verified that email address, so we cannot sign you in with it.');
     let user = db.users.find((u) => u.googleId === profile.googleId) ?? findByEmail(profile.email);
     let isNew = false;
 
     if (!user) {
-      user = {
-        id: newId(),
-        email: profile.email,
-        name: profile.name,
-        createdAt: now(),
-        googleId: profile.googleId,
-        picture: profile.picture,
-        emailVerified: profile.emailVerified,
-      };
-      db.users.push(user);
-      acceptTermsFor(user.id);
-      addRecord(user.id, 'terms', 'granted', 'Signed up with Google');
+      user = createGoogleUser(profile);
       isNew = true;
     } else if (!user.googleId) {
       // Same email, existing password account: link the two.
       user.googleId = profile.googleId;
       user.picture ??= profile.picture;
       user.emailVerified ||= profile.emailVerified;
-      addRecord(user.id, 'terms', 'granted', 'Linked Google sign-in to this account');
     }
     persist();
 

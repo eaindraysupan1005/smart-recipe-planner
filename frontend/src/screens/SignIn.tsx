@@ -84,6 +84,10 @@ export function SignIn() {
               <GoogleMark />
               Continue with Google
             </a>
+            {/* Continuing is the acceptance for Google accounts; the backend records it for new ones. */}
+            <div className="fine" style={{ marginTop: 10, fontSize: 11.5, textAlign: 'center' }}>
+              By continuing with Google, you agree to the <u>Terms</u> and the <u>AI &amp; Food Safety Disclaimer</u>.
+            </div>
             <div className="divider"><span>or with email</span></div>
           </>
         )}
