@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { DATA_DIR, dataFile } from './paths.js';
-import { parseIngredientLine, STAPLES } from './ingredient-text.js';
+import { isStaple, parseIngredientLine } from './ingredient-text.js';
 import { MOODS } from './moods.js';
 import type { DatasetRecipe, RecipeDataset } from './dataset-types.js';
 
@@ -153,7 +153,7 @@ function toRecipe(row: string[], layout: Layout, id: number): DatasetRecipe | nu
   const parsed = rawIngredients.map(parseIngredientLine).filter((x): x is NonNullable<typeof x> => !!x);
   if (parsed.length < 2) return null;
 
-  const keys = [...new Set(parsed.map((p) => p.canonical).filter((c): c is string => !!c && !STAPLES.has(c)))];
+  const keys = [...new Set(parsed.map((p) => p.canonical).filter((c): c is string => !!c && !isStaple(c)))];
   if (keys.length < 2) return null; // too vague to match a pantry
 
   const tags = layout.tags !== undefined ? parseList(row[layout.tags] ?? '').map((t) => t.toLowerCase()) : [];

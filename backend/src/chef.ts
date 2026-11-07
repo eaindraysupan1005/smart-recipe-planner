@@ -19,7 +19,7 @@ import { dataFile } from './paths.js';
 import { askJson, geminiModel, GeminiError, hasGeminiKey } from './gemini.js';
 import { MOODS, findMood, type Mood } from './moods.js';
 import { SAMPLE_RECIPES } from './sample-recipes.js';
-import { canonicalName, isSeasoning, STAPLES } from './ingredient-text.js';
+import { isSeasoning, isStaple } from './ingredient-text.js';
 import { sameFood } from './units.js';
 import { activeFilters, generateRecipe } from './ai.js';
 import { conflicts, hasAllergyWarning, warningsFor, type Warning } from './allergens.js';
@@ -93,7 +93,7 @@ export function shortlist(picked: Ingredient[], diet: DietProfile | undefined, m
     const have: string[] = [];
     const missing: string[] = [];
     for (const k of r.keys) {
-      if (pickedKeys.has(k) || STAPLES.has(k)) have.push(k);
+      if (pickedKeys.has(k) || isStaple(k)) have.push(k);
       else missing.push(k);
     }
     if (!have.length) continue;
@@ -138,8 +138,8 @@ You choose dishes for the occasion, not just for the ingredients.
 Rules you never break:
 - Respect their allergies and dietary filters: strongly prefer dishes that are safe for them.
 - If the best dish for the occasion does contain something they avoid, you may still suggest it, but say so plainly in "why" — never hide it or pretend the ingredient is absent.
-- Prefer what the cook already has. Basic staples (salt, pepper, oil, water, sugar, flour, stock, vinegar) can be assumed.
-- Never list salt, pepper, spices, seasonings or water in "ingredients" — mention them in the steps only.
+- Prefer what the cook already has. Pantry staples and condiments (oil, sugar, honey, flour, cornstarch, baking powder, stock, vinegar, soy/fish/oyster sauce, ketchup, mayonnaise, mustard, hot sauce) can be assumed.
+- Never list salt, pepper, spices, spice powders, dried herbs or water in "ingredients" — mention them in the steps only.
 - Be honest about anything they would need to buy.
 - Keep steps short, practical and in the order a cook would do them.
 Reply with JSON only, no prose outside the JSON.`;
@@ -266,7 +266,7 @@ function pinToPicked(ingredients: Ingredient[], picked: Ingredient[]): { ingredi
   const pinned = ingredients.map((ing) => {
     const own = picked.find((p) => sameFood(p.name, ing.name));
     if (own) return { ...ing, name: own.name };
-    if (!isSeasoning(ing.name) && !STAPLES.has(canonicalName(ing.name) ?? '')) extras.push(ing.name);
+    if (!isSeasoning(ing.name) && !isStaple(ing.name)) extras.push(ing.name);
     return ing;
   });
   return { ingredients: pinned, extras };
@@ -276,7 +276,7 @@ async function inventRecipe(picked: Ingredient[], diet: DietProfile | undefined,
   const prompt = `${pantryBlock(picked, diet, mood, moodText)}
 
 Nothing in our database fits. Write one original dish using only what they picked plus basic staples.
-ALLOWED INGREDIENTS: ${picked.map((p) => p.name).join(', ')} — plus salt, pepper, spices, oil, water, sugar, flour, stock, vinegar.
+ALLOWED INGREDIENTS: ${picked.map((p) => p.name).join(', ')} — plus seasonings, spices, pantry staples and condiments.
 Anything else is forbidden, including a different variety of an allowed one (no "grape tomatoes" when they have "Tomatoes"). Use the allowed names exactly.
 Reply as JSON: {"name":"","minutes":0,"servings":0,"why":"<max 20 words>","ingredients":[{"name":"","qty":0,"unit":""}],"steps":["",""],"missing":[]}`;
 

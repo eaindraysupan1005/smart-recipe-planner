@@ -122,12 +122,50 @@ const CANON_KEYS = CANON.flatMap(([name, keys]) => keys.map((k) => ({ k, name })
 /** Pantry staples we assume everyone has — never counted as "missing". */
 export const STAPLES = new Set(['Salt', 'Pepper', 'Vegetable oil', 'Olive oil', 'Sugar', 'Flour', 'Stock', 'Vinegar', 'Water']);
 
-const SEASONING = /\b(salt|pepper|peppercorns?|seasonings?|spices?|paprika|cumin|turmeric|cinnamon|nutmeg|oregano|thyme|rosemary|water)\b/i;
-const PEPPER_VEG = /\b(bell|chil+i|red|green|yellow|orange|sweet|hot|cayenne|jalapeno)\s+pepper\b/i;
+/** Seasonings: hidden from ingredient lists entirely, like salt. */
+const SEASONING = new RegExp(
+  '\\b(' +
+    [
+      'salt', 'pepper', 'peppercorns?', 'seasonings?', 'spices?', 'water', 'msg',
+      'paprika', 'cumin', 'turmeric', 'cinnamon', 'nutmeg', 'cardamom', 'allspice', 'cayenne', 'saffron', 'sumac',
+      'za.?atar', 'garam masala', 'five.spice', 'star anise', 'mace',
+      'oregano', 'thyme', 'rosemary', 'sage', 'marjoram', 'tarragon', 'dill weed', 'herbes de provence',
+      'bay lea(f|ves)', 'fennel seeds?', 'mustard seeds?', 'cumin seeds?', 'coriander seeds?', 'caraway seeds?',
+      'celery seeds?', 'nigella seeds?', 'fenugreek',
+      '(ground|whole) (cloves|coriander|ginger|cinnamon|cardamom|mustard)',
+      'dried (basil|parsley|dill|mint|coriander|chives|herbs|chil+i(es)?)',
+    ].join('|') +
+    ')\\b',
+  'i',
+);
+const PEPPER_VEG = /\b(bell|chil+i|red|green|yellow|orange|sweet|hot|jalapeno)\s+peppers?\b(?!\s+flakes)/i;
+const ALWAYS_SEASONING = /\b((chil+i|red pepper|pepper) flakes|crushed red pepper|\w+ powder)\b/i;
 
-/** Salt, pepper, dried spices and water: flavour, not pantry items to track. */
+/** Salt, pepper, spices, spice powders, dried herbs and water: flavour, not pantry items to track. */
 export function isSeasoning(name: string): boolean {
+  if (/\b(cocoa|milk|protein|baking|custard) powder\b/i.test(name)) return false;
+  if (ALWAYS_SEASONING.test(name)) return true;
   return SEASONING.test(name) && !PEPPER_VEG.test(name);
+}
+
+/** Condiments and pantry staples: listed with amounts, deducted if tracked, never "needed". */
+const STAPLE_NAMES = new RegExp(
+  '\\b(' +
+    [
+      'oil', 'cooking spray', 'sugar', 'honey', 'maple syrup', 'golden syrup', 'molasses', 'vinegar',
+      'flour', 'corn ?starch', 'cornflour', 'baking powder', 'baking soda', 'bicarbonate', 'yeast',
+      'vanilla', 'stock', 'broth', 'bouillon',
+      'soy sauce', 'soya sauce', 'tamari', 'fish sauce', 'oyster sauce', 'hoisin', 'teriyaki',
+      'worcestershire', 'hot sauce', 'tabasco', 'sriracha', 'chil+i sauce', 'sweet chil+i', 'chil+i paste',
+      'ketchup', 'catsup', 'mayonnaise', 'mayo', 'mustard', 'dijon', 'bbq sauce', 'barbecue sauce',
+      'relish', 'mirin', 'sesame paste', 'tahini', 'miso',
+    ].join('|') +
+    ')\\b',
+  'i',
+);
+
+export function isStaple(name: string): boolean {
+  return STAPLES.has(canonicalName(name) ?? '') || STAPLE_NAMES.test(name);
 }
 
 export function canonicalName(text: string): string | null {
@@ -176,7 +214,8 @@ export function parseIngredientLine(line: string): (Ingredient & { canonical: st
   const nameWords = words.slice(i).filter((w) => !NOISE.has(w.toLowerCase()) && !/^\d/.test(w));
   const name = nameWords.join(' ').trim();
   if (!name) return null;
-  const canonical = canonicalName(head) ?? canonicalName(name);
+  // "garlic powder" is a seasoning, not Garlic: keep its own name so it can be hidden.
+  const canonical = isSeasoning(head) ? null : canonicalName(head) ?? canonicalName(name);
   const pretty = canonical ?? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
   return { name: pretty, qty, unit, canonical, raw };
 }
