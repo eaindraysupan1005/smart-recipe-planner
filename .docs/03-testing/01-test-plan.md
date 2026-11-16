@@ -5,6 +5,7 @@
 - Feature list: [01-feature-list.md](../02-design/01-feature-list.md)
 - User journey: [02-user-journey.md](../02-design/02-user-journey.md)
 - Legal source: [rule.md](../../rule.md)
+- Security checklist: [02-security-checklist.md](02-security-checklist.md)
 
 ---
 
