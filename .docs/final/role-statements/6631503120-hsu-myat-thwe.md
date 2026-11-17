@@ -17,3 +17,7 @@ logic and user tests UT05, UT06, UT12 and UT15. I use AI tools, like Claude,
 for time and effort efficiency and I always check the results myself. As a
 tech lead, I help my team make good technical choices, keep our work
 connected, and deliver an app that people can trust.
+
+## Evidence
+
+[Database schema](../../../backend/supabase/schema.sql) · [grocery route](../../../backend/src/routes/grocery.ts) · [recipes route](../../../backend/src/routes/recipes.ts) · [security checklist](../../03-testing/02-security-checklist.md) · [test plan](../../03-testing/01-test-plan.md) · [Round 1 logs](../../03-testing/03-uat-session-logs-round1.md) · [Round 2 logs](../../03-testing/04-uat-session-logs-round2.md)

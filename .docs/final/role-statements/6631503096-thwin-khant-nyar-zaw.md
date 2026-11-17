@@ -24,3 +24,11 @@ I also treated compliance as part of the user experience. Consent became a
 plain-language choice, while allergen conflicts appeared through a
 three-level warning hierarchy. Rather than silently hiding recipes, the
 design highlighted risks and left the final decision to the cook.
+
+## AI disclosure
+
+I used Claude Design to produce the visual prototype and Claude to help draft design documents. I reviewed and adjusted the output, and made the design decisions myself.
+
+## Evidence
+
+[Feature list](../../02-design/01-feature-list.md) · [user journey](../../02-design/02-user-journey.md) · [prototype](../../02-design/03-prototype.md) · [design system](../../02-design/design-system.md) · [frontend screens](../../../frontend/src/screens) · [styles](../../../frontend/src/styles.css)

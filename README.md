@@ -1,5 +1,7 @@
 # What2Cook — Smart Recipe & Pantry Assistant
 
+**Live app:** <https://what2cook-ojt5.onrender.com/> (hosted on Render)
+
 Team Apex. React + TypeScript frontend, Node + Express + TypeScript backend.
 Built from the Claude Design prototype `What2Cook.dc.html`.
 
@@ -13,7 +15,10 @@ npm run demo
 That builds both apps, loads the demo data and starts **one** server:
 **http://localhost:4000** — app and API together, no Vite, no proxy.
 
-Sign in with **demo@what2cook.app** and **any password** (auth is a dummy).
+**Test account:** sign in with **demo@what2cook.app** and password
+**CookWith.Me2026** (created by `npm run seed`, which also prints it). You can
+also create your own account on the sign-up screen (it asks you to accept the
+Terms and the AI & Food Safety disclaimer first).
 
 Reset the demo data at any time, even while the server is running — it reloads
 the file automatically:
@@ -66,11 +71,26 @@ npm run dev
 - Web app: http://localhost:5173 (Vite, proxies `/api` to the backend)
 - API: http://localhost:4000 (`API_PORT` to change)
 
-Auth is a **dummy**: any email and any password work. No password is ever
-stored — only an opaque session token (PDPA rule).
+Accounts use a real sign-up and login: passwords are hashed with scrypt and
+never stored in clear, sessions use an opaque token, and Google sign-in is
+available when `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` are set (PDPA rule:
+only login tokens are kept, never credentials).
 
 Data lives in `backend/data/db.json` (git-ignored) unless Supabase is configured
 — see below. Delete the file to reset.
+
+## Run the tests
+
+```bash
+npm test
+```
+
+Runs the backend test suite in `backend/test/` (Node's built-in test runner, no
+extra setup, no API key needed, temporary data directory — your `db.json` is
+not touched): receipt parser, unit conversion, dietary-filter warnings,
+password hashing, rate limiting, the API (auth, pantry, grocery list, consent,
+logs, full delete), the core workflow end to end, and repo checks (README,
+`.env.example`, no committed secrets).
 
 ## Database (Supabase)
 
