@@ -19,9 +19,9 @@ Team: **Apex** (SE Case Studies, 1305493, 1/2569).
 Source of truth for vision, roles, and scope:
 [Smart Recipe & Pantry Assistant- Charter.md](Smart%20Recipe%20%26%20Pantry%20Assistant-%20Charter.md).
 
-Course phase: **DISCOVER** (W1–W5). No production code yet — the work right now
-is requirements, backlog, design, and compliance, ending at the User Validation
-Gate (W5, Sep 9 2026).
+Course phase: **All phases complete** (DISCOVER, BUILD, TEST, DELIVER) —
+production code, testing, and final deliverables are done; this file now
+describes a completed project, not a work-in-progress one.
 
 ## Legal & compliance rules — always apply
 
