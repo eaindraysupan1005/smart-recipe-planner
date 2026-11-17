@@ -67,6 +67,31 @@ separate file only.
   no longer names AI availability as a risk either, though NFR8 still covers
   it.)*
 
+## How the team uses AI
+
+Two separate uses — don't conflate them:
+
+1. **AI as a dev/process tool (Claude Code).** The team uses Claude Code,
+   guided by this file, to draft and keep in sync the DISCOVER/W4 paperwork:
+   turning raw interview notes into requirement specs (`requirement-writer`
+   agent / `/capture-requirement`), checking the spec-backlog-design stay
+   traceable (`backlog-auditor`, `design-writer` agents / `/audit-backlog`,
+   `/audit-design`), and drafting final deliverables such as
+   `.docs/final/case-study.md` and `.docs/final/ai-logic.md`. A team member
+   always reviews and approves what Claude drafts before it's committed —
+   nothing here is auto-published. Each member's own personal use of AI
+   tools (if any) is disclosed in their own file under
+   `.docs/final/role-statements/`.
+2. **AI as a product feature (Gemini).** Separate from the above — this is
+   what the app itself does for its users: receipt photos are read with
+   Gemini vision, and recipes are generated through a
+   pick-from-dataset / adapt / invent cascade with a local rule-based
+   fallback when Gemini is unavailable. What data goes in, how it's
+   constrained (LR2 — minimum fields only), and how it's checked for
+   allergen/dietary safety is written up in full in
+   [.docs/final/ai-logic.md](.docs/final/ai-logic.md) — that file, not this
+   one, is the source of truth for the product's AI logic.
+
 ## Repository structure
 
 ```
