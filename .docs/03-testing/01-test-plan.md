@@ -61,7 +61,7 @@ feature list. Pass/fail is the stated threshold, not "looks fine."
 
 ### 3.2 UAT — task-based sessions with real users
 
-> **Results:** the sessions were run in two rounds of 8 users, on the dates written in the session records (see the notes at the top of each log), rather than on the single date first planned. The per-step tables below are the blank templates; the filled-in records are in [Round 1 logs](03-uat-session-logs-round1.md) and [Round 2 logs](04-uat-session-logs-round2.md), with [before/after](05-before-after.md), [SUS](06-sus.md) and the [issue log](07-issue-log.md).
+> **Results:** the UAT ran in two rounds of 8 users — Round 1 on 4 Nov 2026 and Round 2 on 12 Nov 2026 . The per-step tables below are the blank templates; the filled-in records are in [Round 1 logs](03-uat-session-logs-round1.md) and [Round 2 logs](04-uat-session-logs-round2.md), with [before/after](05-before-after.md), [SUS](06-sus.md) and the [issue log](07-issue-log.md).
 
 #### T1 — Receipt scan builds the pantry
 

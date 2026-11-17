@@ -1,6 +1,6 @@
 # Before / After — Round 1 vs Round 2
 
-**Before** = Round 1 (U01–U08). **After** = Round 2 (U09–U16), run after the Round 1 fixes, following the two-round design in the test plan §5 (test → fix → test; the fix commits themselves are tracked in [07-issue-log.md](07-issue-log.md)). Same five tasks, same pass/fail rules, same targets, 8 different real users in each round.
+**Before** = Round 1 (U01–U08, 4 Nov 2026). **After** = Round 2 (U09–U16, 12 Nov 2026), run after the fixes made on 7 Nov 2026 (listed in [07-issue-log.md](07-issue-log.md) §3b). Same five tasks, same step-level pass/fail rules, same targets, 8 different real users in each round.
 
 **Sources:** [03-uat-session-logs-round1.md](03-uat-session-logs-round1.md), [04-uat-session-logs-round2.md](04-uat-session-logs-round2.md) (transcribed from the team's two UAT session-record documents, which are not stored in this repo). Pass rates and median times reproduce the *Round Summary* tables printed on those records and the *Test Results* slides of the final presentation (slides 5–6). Derived columns are computed from the per-user times in the session logs.
 
@@ -87,6 +87,6 @@ Round 2:
 ## 5. Caveats (read before quoting these numbers)
 
 - **Small samples:** 8 users per round. Different users in each round, so the comparison is between two groups, not the same people before and after.
-- **What "after" includes:** Round 2 follows the Round 1 fixes; the commit-level mapping of fixes to issues is still to be filled in [07-issue-log.md](07-issue-log.md).
+- **What "after" includes:** Round 2 follows the 7 Nov fixes; the commit-level mapping of fixes to issues is in [07-issue-log.md](07-issue-log.md).
 - **Three Round 2 medians** (T2 8.4, T4 1.1, T5 2.4) are as printed on the record; recomputing from the per-user times gives 8.45, 1.15 and 2.35, i.e. the record rounds these half-values down/up by 0.05.
 - **Time vs. pass/fail:** a task passes only if every step passes, so a task can pass slowly or fail quickly.

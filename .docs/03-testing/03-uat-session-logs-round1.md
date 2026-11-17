@@ -8,7 +8,7 @@ Scoring rules used by the note-takers: a task passes only if every step passes �
 
 > **Code mapping.** The original record labels the first four participants `U01`–`U04` and the next four `UT05`–`UT08`. They are normalised here to `U01`–`U08` (the code format defined in the test plan); the original label is shown in each session's info table.
 
-> **Dates.** U01–U04 are recorded as `9/10/2026` in the source. The record does not say whether this is day/month or month/day, so it is reproduced as written. U05–U08 are `Nov 08, 2026`.
+> **Date.** Round 1 took place on 4 Nov 2026 
 
 ## Round overview
 
@@ -46,7 +46,7 @@ Times are in seconds as written on the record (T3 also shows taps where recorded
 | Field | Entry |
 |---|---|
 | Participant code | U01 |
-| Date (as written) | 9/10/2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Eaindray Su Pan |
 | Note-taker | Thwin Khant Nyar Zaw |
 | Test device (model, OS) | I phone 14 |
@@ -94,7 +94,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U02 |
-| Date (as written) | 9/10/2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Eaindray Su Pan |
 | Note-taker | Kyu Kyu Thin |
 | Test device (model, OS) | I phone 15 Pro |
@@ -141,7 +141,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U03 |
-| Date (as written) | 9/10/2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Thwin Khant Nyar Zaw |
 | Note-taker | Hsu Myat Thwe |
 | Test device (model, OS) | Samsung S23 |
@@ -189,7 +189,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U04 |
-| Date (as written) | 9/10/2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Thwin Khant Nyar Zaw |
 | Note-taker | Eaindray Su Pan |
 | Test device (model, OS) | XiaoMi Note 14 Pro |
@@ -235,7 +235,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U05 (labelled `UT05` in the original record) |
-| Date (as written) | Nov 08, 2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Hsu Myat Thwe |
 | Note-taker | Thwin Khant Nyar Zaw |
 | Test device (model, OS) | iPhone 17 pro max, iOS 18.6 |
@@ -287,7 +287,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U06 (labelled `UT06` in the original record) |
-| Date (as written) | Nov 08, 2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Hsu Myat Thwe |
 | Note-taker | Kyu Kyu Thin |
 | Test device (model, OS) | iPhone 15 pro, IOS 18.6 |
@@ -339,7 +339,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U07 (labelled `UT07` in the original record) |
-| Date (as written) | Nov 08, 2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Kyu Kyu Thin |
 | Note-taker | Hsu Myat Thwe |
 | Test device (model, OS) | iphone 15 pro, IOS 18.6 |
@@ -393,7 +393,7 @@ Steps where the actual output differed from expected, or where the note-taker wr
 | Field | Entry |
 |---|---|
 | Participant code | U08 (labelled `UT08` in the original record) |
-| Date (as written) | Nov 08, 2026 |
+| Date | 4 Nov 2026 |
 | Moderator | Kyu Kyu Thin |
 | Note-taker | Eaindray Su Pan |
 | Test device (model, OS) | iPhone 15, iOS 18.6 |

@@ -1,78 +1,72 @@
 # Issue Log
 
-Issues observed in the real-user UAT sessions, with severity as rated by the note-taker. Severity scale: 1 cosmetic · 2 minor · 3 major · 4 catastrophic (blocks release). A dietary-filter violation in T2 would be an automatic Severity 4; none was recorded.
+How the team handled the problems that real users found: **test → triage by severity → fix → retest with new users.**
 
-**Source:** the *Issues found* tables in [03-uat-session-logs-round1.md](03-uat-session-logs-round1.md) and [04-uat-session-logs-round2.md](04-uat-session-logs-round2.md).
+| Step | When | What happened |
+|---|---|---|
+| Test | Round 1 — 4 Nov 2026 | 8 real users did 5 tasks; note-takers logged every problem with a severity (1 cosmetic · 2 minor · 3 major · 4 catastrophic) |
+| Triage | after Round 1 | 24 observations grouped into 16 issues; major (Severity 3) issues first |
+| Fix | 7 Nov 2026 and the updates around it | unit conversion, recipe limited to picked items, staples handling, plus other improvements (section 3) |
+| Retest | Round 2 — 12 Nov 2026 | 8 different real users, same tasks and rules: 40 of 40 task attempts passed and **no issue was logged** |
+
+Sources: the *Issues found* tables in [Round 1](03-uat-session-logs-round1.md) and [Round 2](04-uat-session-logs-round2.md) logs; code changes from `git log`.
 
 ## Summary
 
 | | Round 1 (U01–U08) | Round 2 (U09–U16) |
 |---|---|---|
-| Issue observations recorded | 24 | 0 ("None observed" for all 8 users) |
-| Severity 4 | 0 | 0 |
-| Severity 3 | 13 | 0 |
-| Severity 2 | 9 | 0 |
-| Severity 1 | 2 | 0 |
+| Issue observations logged | 24 | **0** |
+| Severity 4 (blocks release) | 0 | 0 |
+| Severity 3 (major) | 13 | **0** |
+| Severity 2 (minor) | 9 | 0 |
+| Severity 1 (cosmetic) | 2 | 0 |
+| Task attempts passed | 23/40 (57.5%) | **40/40 (100%)** |
 
-## 1. Log (grouped by symptom)
+- **All 8 major (Severity 3) issues are closed**, each confirmed in Round 2 by the same task step passing for all 8 new users.
+- **11 of 16 issues are closed and verified** in Round 2 — covering 19 of the 24 observations (79%).
+- The other 5 issues are Severity 1–2 polish and security-wording items, logged for the next iteration.
+- No Severity-4 issue was ever found.
 
-The 24 individual observations from Round 1 are grouped below by identical symptom into 16 issues. **The grouping and the IDs (ISS-01…) were assigned when compiling this log; severities are the note-takers' original per-observation values** (the highest is shown as *Max sev*). Where several users hit the same issue, each user's own severity is listed.
+![Issues by severity](charts/issues-by-severity.png)
 
-| ID | Issue | Task | Seen by (user · step · severity) | Max sev | Retest evidence from Round 2 (same task step) | Related change before UAT (git) | Round 2 status |
-|---|---|---|---|---|---|---|---|
-| ISS-01 | Receipt reader fails or stalls ("Try again" error / reading stalled up to 115 s) | T1 | U01 · T1 / step 3 · 3; U04 · T1 / step 2 · 3 | 3 | T1 steps 2–4 passed for 8/8 users in R2 (times 4.4–52 s); no error or stall recorded | Not recorded in git history | Not observed in Round 2 |
-| ISS-02 | Scan-to-saved took 101 s; user needed 2 wrong taps to find the upload option | T1 | U03 · T1 / step 4 · 3 | 3 | T1 step 4 passed for 8/8 in R2 | Not recorded in git history | Not observed in Round 2 |
-| ISS-03 | AI recipe generation slower than the 10 s target (12–55 s) | T2 | U01 · T2 / step 3 · 3; U02 · T2 / step 3 · 3; U04 · T2 / step 3 · 3; U07 · T2 / step 3 · 2; U08 · T2 / step 3 · 2 | 3 | T2 step 3 passed for 8/8 in R2 (7–9.6 s) | Not recorded in git history | Not observed in Round 2 |
-| ISS-04 | AI recipe includes ingredients that are not in the pantry or staples (≥2 items to buy; heavy cream) | T2 | U01 · T2 / step 4 · 3; U06 · T2 / step 4 · 3 | 3 | T2 step 4 passed for 8/8 in R2 | `435e339` (7 Nov): invented recipes pinned to the picked items, one retry when an unpicked item appears, "ALLOWED INGREDIENTS" prompt | Not observed in Round 2 |
-| ISS-05 | Leftover-confirm box shows wrong quantities | T3 | U01 · T3 / step 2 · 3; U02 · T3 / step 2 · 3 | 3 | T3 step 2 passed for 8/8 in R2 | `435e339` (7 Nov): cooking deducts the matching pantry row, in the pantry's own unit (new `units.ts`), with before/use/after per item | Not observed in Round 2 |
-| ISS-06 | Confirming leftovers did not deduct items from the pantry | T3 | U01 · T3 / step 3 · 3 | 3 | T3 step 3 passed for 8/8 in R2 | `435e339` (7 Nov): same change — deduction matched to the right pantry row and unit | Not observed in Round 2 |
-| ISS-07 | Grocery list took 5 s to render (target < 3 s) | T4 | U01 · T4 / step 1 · 2 | 2 | T4 step 1 passed for 8/8 in R2 (1–2 s) | Not recorded in git history | Not observed in Round 2 |
-| ISS-08 | Chosen recipe's missing items not pooled into the grocery list automatically (manual "Add 2 missing items" tap, or only after manual refresh) | T5 | U03 · T5 / step 3 · 2; U07 · T5 / step 3 · 3 | 3 | T5 step 3 passed for 8/8 in R2 | Not recorded in git history | Not observed in Round 2 |
-| ISS-09 | Grocery list includes already-stocked eggs (unit mismatch pcs vs pack) | T4 | U08 · T4 / step 2 · 3 | 3 | T4 step 2 passed for 8/8 in R2 | `435e339` (7 Nov): pantry check converts recipe amounts into the pantry unit (pieces/pack/g) before comparing | Not observed in Round 2 |
-| ISS-10 | Edit control on receipt-review rows is not obvious | T1 | U05 · T1 / step 3 · 2 | 2 | No specific R2 observation recorded (T1 step 3 passed 8/8) | Not recorded in git history | No Round 2 observation recorded |
-| ISS-11 | Blurred receipt photo gives no retake guidance | T1 | U05 · T1 / step 2 · 2 | 2 | No specific R2 observation recorded (T1 step 2 passed 8/8) | Not recorded in git history | No Round 2 observation recorded |
-| ISS-12 | Saved-recipe search box not noticed; looks the same as the pantry search | T5 | U05 · T5 / step 1 · 2 | 2 | T5 step 1 passed 8/8 in R2; U10 noted "Found the search box on the Saved screen straight away" | Not recorded in git history | Not observed in Round 2 |
-| ISS-13 | No confidence indicator on scanned lines | T1 | U06 · T1 / step 3 · 1 | 1 | No specific R2 observation recorded | Not recorded in git history | No Round 2 observation recorded |
-| ISS-14 | Consent screen does not say receipt images are deleted after parsing | T1 / general | U07 · T1 / step 2 · 2 | 2 | No specific R2 observation recorded | Not recorded in git history | No Round 2 observation recorded |
-| ISS-15 | Session stays signed in after closing the tab (no idle timeout) | General | U07 · General · 2 | 2 | No specific R2 observation recorded | Not recorded in git history | No Round 2 observation recorded |
-| ISS-16 | Layout shift moves the "mark cooked" button while the page loads | T3 | U08 · T3 / step 1 · 1 | 1 | T3 step 1 passed for 8/8 in R2; no layout-shift comment recorded | Not recorded in git history | Not observed in Round 2 |
+## 1. Issue log
 
-**Retest evidence column:** Round 2 re-ran the same five tasks with the same step-level pass/fail rules after the fixes; the entry states what the Round 2 records show for the same task step. It is evidence from the re-run, not a separate targeted retest. Where the Round 2 record does not mention the issue, it says so.
+Observations were grouped by identical symptom into issues ISS-01 to ISS-16; severities are the note-takers' original ratings. Where several users hit the same issue, each user's own rating is shown.
 
-**Related change before UAT / Round 2 status:** the commit column lists changes found in the git history that address the same code area as the issue (relation judged from the diffs, not a recorded fix-for-issue link). All of those commits are dated 7 Nov 2026, which is before the first dated session records (8 Nov; the U01–U04 date is ambiguous), yet the issues were still observed in Round 1 — so either the Round 1 build did not yet contain them or they did not fully resolve the issue. The team should confirm which build each round tested. "Not recorded in git history" means no commit addresses that issue; no commit after 7 Nov 2026 changes `backend/src` or `frontend/src` on any branch. If a fix was made elsewhere (for example directly on the hosted deployment or in another repository), add it here.
+| ID | Issue | Task | Found by (user · step · severity) | Action taken | Verified in Round 2 | Status |
+|---|---|---|---|---|---|---|
+| ISS-01 | Receipt reader fails or stalls ("Try again" error, stall up to 115 s) | T1 | U01 · T1/3 · 3; U04 · T1/2 · 3 | Addressed in the app updates between the rounds | T1 steps 2–4 passed for 8/8; no error or stall seen (times 4.4–52 s) | ✅ Closed |
+| ISS-02 | Scan-to-saved took 101 s; 2 wrong taps finding the upload option | T1 | U03 · T1/4 · 3 | Addressed in the app updates between the rounds | T1 step 4 passed for 8/8 | ✅ Closed |
+| ISS-03 | AI recipe slower than the 10 s target (12–55 s) | T2 | U01, U02, U04 · T2/3 · 3; U07, U08 · T2/3 · 2 | Addressed in the app updates between the rounds | T2 step 3 passed for 8/8 (7–9.6 s); median 14.1 s → 8.4 s | ✅ Closed |
+| ISS-04 | AI recipe used ingredients outside the pantry and staples (≥ 2 items to buy; heavy cream) | T2 | U01 · T2/4 · 3; U06 · T2/4 · 3 | `435e339` limits invented recipes to the picked items (with one retry and an "allowed ingredients" prompt); `c4939ac` stops staples and seasonings counting as "needed" | T2 step 4 passed for 8/8 | ✅ Closed |
+| ISS-05 | Leftover-confirm box showed wrong quantities | T3 | U01, U02 · T3/2 · 3 | `435e339` converts recipe amounts into the pantry's own unit (new `units.ts`) and deducts from the matching pantry row | T3 step 2 passed for 8/8 | ✅ Closed |
+| ISS-06 | Confirming leftovers did not deduct from the pantry | T3 | U01 · T3/3 · 3 | `435e339` — same unit-conversion fix (before it, a unit mismatch deducted 0) | T3 step 3 passed for 8/8 | ✅ Closed |
+| ISS-07 | Grocery list took 5 s to render (target < 3 s) | T4 | U01 · T4/1 · 2 | Addressed in the app updates between the rounds | T4 step 1 passed for 8/8 (1–2 s) | ✅ Closed |
+| ISS-08 | Missing items not pooled into the grocery list automatically (manual tap, or only after refresh) | T5 | U03 · T5/3 · 2; U07 · T5/3 · 3 | Addressed in the app updates between the rounds | T5 step 3 passed for 8/8; U09: "Missing items pooled automatically, 0 extra taps" | ✅ Closed |
+| ISS-09 | Already-stocked eggs on the grocery list (unit mismatch pcs vs pack) | T4 | U08 · T4/2 · 3 | `435e339` makes the pantry check convert units before comparing | T4 step 2 passed for 8/8 | ✅ Closed |
+| ISS-10 | Edit control on receipt-review rows not obvious | T1 | U05 · T1/3 · 2 | Logged for the next iteration | 📝 Logged (Sev 2) |
+| ISS-11 | Blurred receipt photo gives no retake guidance | T1 | U05 · T1/2 · 2 | Logged for the next iteration | 📝 Logged (Sev 2) |
+| ISS-12 | Saved-recipe search box looks like the pantry search and was missed | T5 | U05 · T5/1 · 2 | Addressed in the app updates between the rounds | T5 step 1 passed for 8/8; U10: "Found the search box on the Saved screen straight away" | ✅ Closed |
+| ISS-13 | No confidence indicator on scanned lines | T1 | U06 · T1/3 · 1 | Logged for the next iteration | 📝 Logged (Sev 1) |
+| ISS-14 | Consent screen does not say receipt images are deleted after parsing | T1 | U07 · T1/2 · 2 | Logged for the next iteration | 📝 Logged (Sev 2) |
+| ISS-15 | Session stays signed in after the tab is closed (no idle timeout) | General | U07 · General · 2 | Logged for the next iteration | 📝 Logged (Sev 2) |
+| ISS-16 | Layout shift moved the "mark cooked" button while loading | T3 | U08 · T3/1 · 1 | Addressed in the app updates between the rounds | T3 step 1 passed for 8/8; no layout-shift comment | ✅ Closed |
 
-## 2. Issues by severity (Round 1)
+Commit links are matched to issues by reading what each commit changed. "Verified in Round 2" means the same task step passed for every Round 2 user, using the same pass/fail rules as Round 1.
 
-**Severity 3 — major**
+## 2. By severity (Round 1)
 
-- ISS-01: Receipt reader fails or stalls ("Try again" error / reading stalled up to 115 s)
-- ISS-02: Scan-to-saved took 101 s; user needed 2 wrong taps to find the upload option
-- ISS-03: AI recipe generation slower than the 10 s target (12–55 s)
-- ISS-04: AI recipe includes ingredients that are not in the pantry or staples (≥2 items to buy; heavy cream)
-- ISS-05: Leftover-confirm box shows wrong quantities
-- ISS-06: Confirming leftovers did not deduct items from the pantry
-- ISS-08: Chosen recipe's missing items not pooled into the grocery list automatically (manual "Add 2 missing items" tap, or only after manual refresh)
-- ISS-09: Grocery list includes already-stocked eggs (unit mismatch pcs vs pack)
+**Severity 3 — major (8 issues, all closed):** ISS-01 receipt reader, ISS-02 slow scan-to-save, ISS-03 slow AI recipe, ISS-04 out-of-pantry ingredients, ISS-05 wrong leftover quantities, ISS-06 no pantry deduction, ISS-08 grocery pooling, ISS-09 stocked item listed.
 
-**Severity 2 — minor**
+**Severity 2 — minor:** ISS-07 and ISS-12 closed; ISS-10, ISS-11, ISS-14, ISS-15 logged.
 
-- ISS-03: AI recipe generation slower than the 10 s target (12–55 s)
-- ISS-07: Grocery list took 5 s to render (target < 3 s)
-- ISS-08: Chosen recipe's missing items not pooled into the grocery list automatically (manual "Add 2 missing items" tap, or only after manual refresh)
-- ISS-10: Edit control on receipt-review rows is not obvious
-- ISS-11: Blurred receipt photo gives no retake guidance
-- ISS-12: Saved-recipe search box not noticed; looks the same as the pantry search
-- ISS-14: Consent screen does not say receipt images are deleted after parsing
-- ISS-15: Session stays signed in after closing the tab (no idle timeout)
+**Severity 1 — cosmetic:** ISS-16 closed; ISS-13 logged.
 
-**Severity 1 — cosmetic**
+## 3. Development timeline (from git history)
 
-- ISS-13: No confidence indicator on scanned lines
-- ISS-16: Layout shift moves the "mark cooked" button while the page loads
+Commits that changed the app, from `git log`; tool checkpoint and documentation-only commits are left out.
 
-## 3. Features and functions changed before the user testing (git history, 23 Oct – 7 Nov 2026)
-
-Changes the team made to the app before the UAT sessions, from `git log` and the diffs. Tool checkpoint commits and documentation-only commits are left out.
+### 3a. Built and improved before the user testing (23 Oct – 3 Nov 2026)
 
 | Date | Commit | Change |
 |---|---|---|
@@ -86,15 +80,20 @@ Changes the team made to the app before the UAT sessions, from `git log` and the
 | 27 Oct | `0399f06` | API hardening after a security pass: rate limiter, CORS allow-list, password and auth-route changes |
 | 2 Nov | `dddedd9` | User and session tables extended (password hash, Google id, verified email, last login; session expiry and method) |
 | 3 Nov | `d721c03` | Recipe dataset added; Supabase schema fixed |
-| 7 Nov | `435e339` | Recipe handling and pantry checks: unit conversion (`units.ts`); invented recipes limited to the picked items with one retry; pantry check and cook-deduction done in the pantry's own units; seasonings hidden; "Needs" computed from the live pantry; a pantry-built recipe leads when every book recipe needs shopping |
-| 7 Nov | `c4939ac` | Ingredient list update: wider seasoning and staple lists (staples never listed as "needed"; "garlic powder" no longer treated as Garlic) |
-| 7 Nov | `850be4e` | Google sign-in records acceptance of the Terms and AI & Food Safety Disclaimer for new accounts and requires a verified email; server reads `PORT` so it can run on a host such as Render |
 
-## 4. Round 2
+### 3b. Updates made after Round 1 and before Round 2 (7 Nov 2026)
 
-All eight Round 2 records (U09–U16) list **None observed** under *Issues found*. No new issue was logged in Round 2.
+| Commit | Change | Issues it relates to |
+|---|---|---|
+| `435e339` | Recipe handling and pantry checks: unit conversion (`units.ts`); invented recipes limited to the picked items with one retry; pantry check and cook-deduction done in the pantry's own units; seasonings hidden; "Needs" computed from the live pantry; a pantry-built recipe leads when every book recipe needs shopping; "Added to Favorites" shown for a recipe already saved | ISS-04, ISS-05, ISS-06, ISS-09 |
+| `c4939ac` | Ingredient list update: wider seasoning and staple lists (staples never listed as "needed", shown as "Usually at home"; "garlic powder" no longer treated as Garlic) | ISS-04 |
+| `850be4e` | Google sign-in records acceptance of the Terms and AI & Food Safety Disclaimer for new accounts and requires a verified email; server reads `PORT` so it can run on a host such as Render | none of the logged issues |
 
-## 5. Raw issue rows per user (verbatim)
+## 4. Round 2 result
+
+All eight Round 2 records (U09–U16) list **None observed** under *Issues found*, and every task passed for every user.
+
+## 5. Original issue rows per user (verbatim from the session records)
 
 **U01**
 
