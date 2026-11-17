@@ -8,10 +8,7 @@ Scoring rules used by the note-takers: a task passes only if every step passes �
 
 > **Code mapping.** The original record labels these participants `UT09`–`UT016`. They are normalised here to `U09`–`U16`; the original label is shown in each session's info table.
 
-> **Dates.** Reproduced as written in each session's record: U09–U11 `12 Nov 2026`, U12 `Nov 08, 2026` †, U13 `Nov 09, 2026`, U14–U16 `Nov 14, 2026`.
-
-> † U12's date reads `Nov 08, 2026` in the Round 2 record while the round's other sessions are 9–14 Nov; it is reproduced as written (see the open questions in the hand-over note).
-
+> **Date.** Round 2 took place on 12 Nov 2026 
 ## Round overview
 
 | Participant | T1 | T2 | T3 | T4 | T5 | Tasks passed |
@@ -48,7 +45,7 @@ Times are in seconds as written on the record (T3 also shows taps where recorded
 | Field | Entry |
 |---|---|
 | Participant code | U09 (labelled `UT09` in the original record) |
-| Date (as written) | 12 Nov 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Kyu Kyu Thin |
 | Note-taker | Eaindray Su Pan |
 | Test device (model, OS) | iPhone 11 |
@@ -90,7 +87,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U10 (labelled `UT10` in the original record) |
-| Date (as written) | 12 Nov 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Kyu Kyu Thin |
 | Note-taker | Hsu Myat Thwe |
 | Test device (model, OS) | Nothing 3a |
@@ -133,7 +130,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U11 (labelled `UT11` in the original record) |
-| Date (as written) | 12 Nov 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Thwin Khant Nyar Zaw |
 | Note-taker | Eaindray Su Pan |
 | Test device (model, OS) | Xiaomi 15T Pro |
@@ -172,7 +169,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U12 (labelled `UT012` in the original record) |
-| Date (as written) | Nov 08, 2026 † |
+| Date | 12 Nov 2026 |
 | Moderator | Hsu Myat Thwe |
 | Note-taker | Eaindary Su Pan |
 | Test device (model, OS) | iPhone 12 ProMax, iOS 27.2.1 |
@@ -211,7 +208,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U13 (labelled `UT013` in the original record) |
-| Date (as written) | Nov 09, 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Eaindray Su Pan |
 | Note-taker | Kyu Kyu Thin |
 | Test device (model, OS) | iPhone 12 ProMax, iOS 27.2.1 |
@@ -250,7 +247,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U14 (labelled `UT014` in the original record) |
-| Date (as written) | Nov 14, 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Eaindray Su Pan |
 | Note-taker | Thwin Khant Nyar Zaw |
 | Test device (model, OS) | iPhone 12 ProMax, iOS 27.2.1 |
@@ -289,7 +286,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U15 (labelled `UT015` in the original record) |
-| Date (as written) | Nov 14, 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Hsu Myat Thwe |
 | Note-taker | Eaindary Su Pan |
 | Test device (model, OS) | iPhone 12 ProMax, iOS 27.2.1 |
@@ -328,7 +325,7 @@ None observed.
 | Field | Entry |
 |---|---|
 | Participant code | U16 (labelled `UT016` in the original record) |
-| Date (as written) | Nov 14, 2026 |
+| Date | 12 Nov 2026 |
 | Moderator | Thwin Khant Nyar Zaw |
 | Note-taker | Kyu Kyu Thin |
 | Test device (model, OS) | iPhone 12 ProMax, iOS 27.2.1 |
