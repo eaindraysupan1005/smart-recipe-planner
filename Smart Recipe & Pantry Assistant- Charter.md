@@ -78,7 +78,20 @@ The system focuses on one core workflow: pantry in, meal plan and grocery list o
 | Test | **Beta Review** – before/after metric (food waste and weekly grocery cost) \+ at least 3 feedback-driven fixes (Impact Report) | **W9–W11** |
 | Deliver | Real-user sign-off; **Final Showcase** (10-min pitch); portfolio pack (case study, demo video, evidence log, impact metrics, role statements) | **W12–W14** |
 
-# **8\. Authorization**
+# **8\. Team Rules**
+
+These are the working rules the team already follows. They are written in [CLAUDE.md](CLAUDE.md) (project instructions), [rule.md](rule.md) (legal rules) and the test plan; this section brings them into the Charter.
+
+* **Ask, never guess:** If anything is unclear, the team asks and offers at least three options before deciding.
+* **No invented evidence:** Interview pains, user quotes, test results and metrics must come from real sources. Nothing is fabricated; a gap is stated as a gap.
+* **Scope discipline:** One core workflow this semester and Features F1–F7 only. Anything beyond that needs a new Charter feature behind it.
+* **Legal rules apply to everything:** Every requirement follows rule.md (PDPA, Computer Crime Act §26, Electronic Transactions Act §9/26/28), written into the spec as numbered legal requirements (LR1, LR2, …).
+* **Traceability:** Every backlog row traces to a requirement ID and a real pain. The spec and the backlog are kept in sync and checked after each change.
+* **Version control:** Changes under .claude/ and .docs/ are committed and pushed to GitHub; work is merged through pull requests.
+* **Human in the loop for AI:** AI drafts are reviewed by a team member before they are merged, and each member discloses their own AI-tool use in their role statement.
+* **Participant privacy in testing:** Test participants are identified by codes only (U01, U02, …), give PDPA-informed consent before each session, and are asked separately before any recording.
+
+# **9\. Authorization**
 
 **Team Members:** Chell Hmue May, Eaindray Su Pan, Kyu Kyu Thin, Thwin Khant Nyar Zaw, Hsu Myat Thwe
 

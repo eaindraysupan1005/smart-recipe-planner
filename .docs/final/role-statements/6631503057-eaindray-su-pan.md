@@ -20,3 +20,11 @@ this process on their own, without me checking every file by hand. We're
 still in the DISCOVER phase, so I haven't written product code yet — but the
 compliance foundation I built is what every later feature, especially the
 AI recipe generator, will have to follow.
+
+## AI disclosure
+
+I used Claude Code to draft the legal requirements (LR1–LR9), the spec and the agent and skill files. I reviewed and edited every draft myself before it was merged, and I am responsible for the final content.
+
+## Evidence
+
+[rule.md](../../../rule.md) · [CLAUDE.md](../../../CLAUDE.md) · [agents](../../../.claude/agents) · [skills](../../../.claude/skills) · [spec](../../01-requirements/01-spec/20260902-01-pantry-meal-planning.md) · [backlog](../../01-requirements/backlog.md)

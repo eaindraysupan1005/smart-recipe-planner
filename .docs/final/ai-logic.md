@@ -72,32 +72,61 @@ produced it, so an AI-generated recipe can be explained after the fact.
 
 ## Prove
 
-No formal evaluation set or eval log exists in the repo yet — this is an
-honest gap, not a result. The automated-tests gap already flagged in the
-repo audit (no `test` script, no test files) means none of the logic above
-— `shortlist()`'s scoring, `excludedFor()`'s allergen matching, or the
-cascade's fallback behaviour — currently has recorded proof it works beyond
-manual use during the demo.
+Two kinds of evidence exist: automated tests of the logic around the AI, and
+real-user results on the AI tasks. A dedicated allergen-leak evaluation of the
+live model has **not** been run (see "Not yet done" below).
 
-What *would* prove it, and is not yet done:
-- A fixed test set of ~15–20 (pantry selection × dietary filter) combinations,
-  run through `generateRecipe()` / `cook()`, checked for **zero** allergen
-  leaks (NFR5 in the spec claims 100% allergen safety — currently unverified
-  by any automated check).
-- A small receipt-photo test set (different languages/formats) checked
-  against `readReceiptPhoto()` output for name/qty/unit accuracy.
-- Logging actual `usedAi` / `method` / `durationMs` values from real demo or
-  UAT runs, rather than only the shape of the code.
+**1. Automated tests** — `npm test` (run on 17 Nov 2026): **62 tests, 62 pass,
+0 fail**, in [backend/test](../../backend/test). The API tests run with an empty
+`GEMINI_API_KEY`, so they exercise the local (non-Gemini) path and the
+fallback behaviour, not the live model. Relevant tests:
+- `allergens.test.ts` — declared allergies/diets raise the right warnings (F6).
+- `api.test.ts` — the full pantry → recipe → cook → grocery-list flow with
+  consent and leftover deduction; a simulated AI outage returns a friendly
+  503 and loses nothing (NFR8); a vegetarian filter is honoured by the
+  generated recipe; consent can be withdrawn and the AI is blocked again.
+- `receipt.test.ts`, `units.test.ts` — receipt parsing and unit conversion
+  used before pantry quantities reach the AI.
+
+**2. Real-user evaluation** — UAT task T2 (AI recipe), 8 users before fixes
+and 8 different users after ([logs](../03-testing/03-uat-session-logs-round1.md),
+[Round 2](../03-testing/04-uat-session-logs-round2.md),
+[before/after](../03-testing/05-before-after.md)). Pass criteria per step:
+progress shown ≤ 1 s, recipe ≤ 10 s, only selected items + declared staples,
+0 dietary violations.
+- **Baseline (Round 1):** 2 of 8 users passed. Two users were shown a recipe
+  with ingredients that were not in their pantry or staples (one needed ≥ 2
+  items to buy; one got heavy cream). Five recipes arrived after 12–55 s.
+- **After fixes (Round 2):** 8 of 8 passed; all recipes arrived in 7–9.6 s
+  and used only selected items + staples.
+- **Dietary filters in the sessions:** 0 violations recorded in either round,
+  with no-pork, vegetarian and peanut-allergy filters among those used.
+
+**3. Receipt reading** (Gemini vision with Tesseract fallback), UAT T1: four
+Round 1 records give lines read correctly before correction — 12/14, 13/15,
+11/12 and 16/18 (52 of 59 lines, 88.1%; each above the 85% target). Round 1
+also had two sessions where the reader failed or stalled (U01: a "Try again"
+error; U04: a stall of about 55 s with an error shown).
+
+**Not yet done:**
+- A fixed test set of ~15–20 (pantry selection × dietary filter) combinations
+  run through the live model and checked for zero allergen leaks (NFR5 claims
+  100% allergen safety; the sessions above are 16 users, not an exhaustive
+  check).
+- A receipt-photo test set across languages and formats scored against
+  `readReceiptPhoto()` output.
+- Logged `usedAi` / `method` / `durationMs` values from live runs.
 
 ## Measure
 
-Also not yet done — no numbers exist in the repo to report honestly. Once
-the "Prove" step above is run, the team should report at minimum:
-- % of test combinations with zero allergen/diet violations (target: 100%,
-  per NFR5).
-- % of AI calls that succeeded vs. fell back locally, and typical
-  `durationMs`, from real usage (ties to NFR8, AI availability).
-- Receipt OCR accuracy (lines correctly read) across the test receipts.
+| Measure | Before (Round 1) | After (Round 2) | Source |
+|---|---|---|---|
+| T2 AI recipe task passed | 2/8 | 8/8 | [05-before-after.md](../03-testing/05-before-after.md) |
+| Median generation time (target ≤ 10 s) | 14.1 s | 8.4 s | same |
+| Recipes within 10 s | 3/8 | 8/8 | same |
+| Users shown ingredients outside pantry + staples | 2/8 | 0/8 | session logs (T2 step 4) |
+| Dietary-filter violations recorded | 0 | 0 | session logs |
+| Automated tests passing | — | 62/62 | `npm test`, 17 Nov 2026 |
 
-**TODO for the team:** fill in this section with real figures once the test
-set above is run — do not put placeholder numbers here.
+Not measured: the share of AI calls that succeeded versus fell back locally,
+and the live-model allergen-leak rate. No figure is claimed for either.

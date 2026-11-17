@@ -2,6 +2,8 @@
 
 Team Apex · SE Case Studies 1305493/2569
 
+**Live app:** <https://what2cook-ojt5.onrender.com/> (hosted on Render; sign in with the test account in the [README](../../README.md))
+
 ## Problem
 
 People who cook for themselves 4+ times a week waste a meaningful share of
@@ -46,6 +48,10 @@ backend ([frontend/](../../frontend), [backend/](../../backend)), with:
 - **Design before code:** feature list, user journey, low-fi prototype, and
   diagrams (context, use case, architecture, activity) in
   [.docs/02-design/](../02-design) before any screen was built.
+- **Tested with real users in two rounds:** a [test plan](../03-testing/01-test-plan.md)
+  with 15 test cases and 5 task-based UAT scenarios; Round 1 (8 users) found
+  the problems, the team fixed them, Round 2 (8 different users) re-ran the
+  same tasks, and 16 SUS questionnaire responses were collected.
 - **AI as a cascade with a safety net**, not a single prompt call — see
   [ai-logic.md](ai-logic.md) for the full PICK → ADAPT → INVENT → local-fallback
   design, and why allergen/diet safety is checked twice (by the model's
@@ -56,11 +62,31 @@ backend ([frontend/](../../frontend), [backend/](../../backend)), with:
 - A working demo: one-command run (`npm run demo`) with a seeded account,
   12 pantry items, a saved recipe, and a pending grocery list — see
   [README.md](../../README.md) for the 4-minute demo path.
-- **No live/deployed URL yet** — the app currently runs locally only (no
-  hosting configured). This is an open gap to close before final
-  submission if a public link is required.
-- Real-user testing, SUS/before-after numbers, and an issue log are **not
-  yet captured** in the repo (test plan exists, but results don't) — see
-  the repo gap audit for the full list. `comparison-table.md` in this same
-  folder is intentionally left blank until those numbers exist, so nothing
-  here is a placeholder presented as a result.
+- **Live URL:** <https://what2cook-ojt5.onrender.com/> — the app is deployed on Render (the home page and the `/api/health` check both answer 200).
+- **Real-user results** (two UAT rounds, 8 users each, 5 tasks; full numbers in
+  [comparison-table.md](comparison-table.md) and
+  [05-before-after.md](../03-testing/05-before-after.md)):
+
+  | | Round 1 (before) | Round 2 (after) |
+  |---|---|---|
+  | Task attempts passed | 23/40 (57.5%) | 40/40 (100%) |
+  | Users passing all 5 tasks | 0/8 | 8/8 |
+  | AI recipe task (T2) passed | 2/8 | 8/8 |
+  | Median AI recipe time (target ≤ 10 s) | 14.1 s | 8.4 s |
+  | Median receipt-scan time (target ≤ 60 s) | 54.5 s | 12.4 s |
+  | Issues observed / Severity-3 | 24 / 13 | 0 / 0 |
+
+  Usability (SUS, 16 responses): mean **71.3**, median 72.5 — above the 68
+  benchmark but below the 80.8 "excellent" threshold, with a wide spread
+  (range 50–100; 7 of 16 responses below 68) — see
+  [06-sus.md](../03-testing/06-sus.md). Issues, severities and Round 2 retest
+  evidence: [07-issue-log.md](../03-testing/07-issue-log.md); session logs:
+  [Round 1](../03-testing/03-uat-session-logs-round1.md),
+  [Round 2](../03-testing/04-uat-session-logs-round2.md).
+- **Limits of the evidence:** 8 users per round and different people in each
+  round, so the improvement is indicative, not statistically proven. The
+  Charter's food-waste (≥ 20%) and grocery-cost (≥ 10%) targets were **not
+  measured** — the UAT tested task performance, not weeks of real cooking.
+- **What is still open:** no live-model AI evaluation set (see
+  [ai-logic.md](ai-logic.md)), and the interview count is not documented. The
+  full status of every deliverable is in [README.md](README.md).
