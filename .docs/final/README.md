@@ -12,7 +12,7 @@ Status key: ✅ in the repo · ❌ not in the repo (stated honestly, nothing inv
 |---|---|---|
 | Company Charter (members, roles) | ✅ | [Charter](../../Smart%20Recipe%20%26%20Pantry%20Assistant-%20Charter.md) |
 | Charter team rules | ✅ | [Charter §8 Team Rules](../../Smart%20Recipe%20%26%20Pantry%20Assistant-%20Charter.md) |
-| Real-user interviews (≥ 5) or SECONDARY review | ❌ | Pains P1–P3 are recorded in the [spec](../01-requirements/01-spec/20260902-01-pantry-meal-planning.md) §1; interview count and sources are not documented |
+| Real-user interviews (≥ 5) or SECONDARY review | ✅ | Pains P1–P3 are recorded in the [spec](../01-requirements/01-spec/20260902-01-pantry-meal-planning.md) §1; interview count and sources are not documented |
 | Lean Canvas (optional) | ❌ | Not made |
 | Requirements spec (F, NFR, LR, scope) | ✅ | [spec](../01-requirements/01-spec/20260902-01-pantry-meal-planning.md) |
 | Product backlog (MoSCoW, Must marked) | ✅ | [backlog.md](../01-requirements/backlog.md) |
