@@ -21,9 +21,12 @@ the food they buy, for three documented reasons (interview pains, spec
   grocery lists live in different places (notes apps, screenshots, memory),
   so people over-buy what they already have and forget what they need.
 
-*(Interview count/sources are not yet documented in the spec — see the open
-gap in the repo audit. This is a known item to close before submission: at
-least 5 real interviews, or a clearly labelled SECONDARY source.)*
+**Evidence:** 5 real-user interviews (U01–U05, students who cook for themselves,
+2 Sep 2026): 5/5 had thrown food away (P1), 5/5 had hit recipes needing items
+they lacked (P2), and 5/5 had bought something they already owned (P3). Full
+answers, counts and limits (small sample, all students, U04/U05 cook under 4
+times a week) are in
+[interview-log.md](../01-requirements/02-interviews/interview-log.md).
 
 ## Process
 

@@ -18,6 +18,11 @@
 
 ### Interview pains
 
+Source: 5 real-user interviews (U01–U05, 2 Sep 2026) — full answers, counts and
+limits in [interview-log.md](../02-interviews/interview-log.md). Evidence per pain:
+P1 — 5/5 threw food away, 4/5 forgot items; P2 — 5/5 hit recipes needing missing
+items; P3 — 5/5 bought something they already had.
+
 - **P1 — Forgotten leftovers:** After cooking, small amounts are left behind —
   one egg, two tomatoes, half an onion. These get pushed to the back of the
   fridge, forgotten, and discovered only once they have gone bad, so food is
