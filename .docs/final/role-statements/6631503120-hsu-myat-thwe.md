@@ -21,3 +21,11 @@ connected, and deliver an app that people can trust.
 ## Evidence
 
 [Database schema](../../../backend/supabase/schema.sql) · [grocery route](../../../backend/src/routes/grocery.ts) · [recipes route](../../../backend/src/routes/recipes.ts) · [security checklist](../../03-testing/02-security-checklist.md) · [test plan](../../03-testing/01-test-plan.md) · [Round 1 logs](../../03-testing/03-uat-session-logs-round1.md) · [Round 2 logs](../../03-testing/04-uat-session-logs-round2.md)
+
+## Reflection
+
+**1. Lessons learned.** Building What2Cook with AI changed how we work in every phase. One thing got better: speed. AI helped us turn interview notes into specs, draft the test plan and security checklist, and write backend code, so I had time to build the database and my two features, F4 and F5, and to run user tests. One thing got worse: trust in the output. AI code looked correct but hid bugs that only real users found. In Round 1 of our testing, cooking deducted nothing when the recipe unit and the pantry unit were different, and the grocery list showed eggs we already had ("pcs" against "pack"). The AI recipe also added heavy cream that was not in the pantry. Only 23 of 40 task attempts passed. After we fixed these, Round 2 passed 40 of 40. Some documents drafted with AI also went out of date, for example the README still said login was a dummy. So I learned that AI makes drafting fast, but testing with real users and checking every result myself is what makes the work safe.
+
+**2. Where I stand.** I am a student building full-stack skills: backend logic, a database, security checks and testing. I use AI tools like Claude to save time, but I always review the results, and I am still building my own fundamentals so I can judge whether AI output is right.
+
+**3. My plan.** Next year I will keep building full-stack projects that use AI, and learn more about how to test and evaluate AI output, such as checking that a recipe only uses allowed ingredients. In five years I want to be an AI Engineer who builds AI features that are tested, safe and trusted by users. I also want to explore more about AI agents and AI automation in the future.
